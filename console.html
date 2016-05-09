@@ -1,0 +1,110 @@
+<html>
+  <head>
+    <title>WakaruLand Console</title>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <h1>WakaruLand</h1>
+    <hr />
+    <p>name:
+    <input type="text" value="test" id="name">
+    </p>
+    <table>
+      <tr>
+        <td>
+          <img src="images/emoine.jpg" id="emoine" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/hiee.jpg" id="hiee" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/iihanashida.jpg" id="iihanashida" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/kandoushita.jpg" id="kandoushita" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="images/kininaru.jpg" id="kininaru" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/majikayo.jpg" id="majikayo" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/naruhodo.jpg" id="naruhodo" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/shitteta.jpg" id="shitteta" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="images/soudane.jpg" id="soudane" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/soukamo.jpg" id="soukamo" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/soukana.jpg" id="soukana" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/sugoi.jpg" id="sugoi" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="images/tashikani.jpg" id="tashikani" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/tensai.jpg" id="tensai" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/wakaran.jpg" id="wakaran" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/wara.jpg" id="wara" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+      </tr>
+    </table>
+    <div id="log"></div>
+    <script src="http://linda-server.herokuapp.com/js/jquery.min.js"></script>
+    <script src="http://linda-server.herokuapp.com/socket.io/socket.io.js"></script>
+    <script src="http://linda-server.herokuapp.com/linda/linda.js"></script>
+    <script>
+      // connect Socket.IO & Linda
+      const server_url = "http://linda-server.herokuapp.com";
+      const socket = io.connect(server_url);
+      const linda = new Linda().connect(socket);
+      const ts = linda.tuplespace("wakaruland");
+
+      const output = function(msg){
+        $("#log").prepend( $("<p>").text(msg) );
+      };
+
+      var name = document.getElementById("name").value;
+
+      linda.io.on("connect", function(){
+        output("connect Linda!!");
+        // receive chat messages
+        ts.watch({type: "reaction"}, function(err, tuple){
+          if (name == tuple.data.who) {
+            output(name + " < " + tuple.data.reaction);
+          }
+        });
+      });
+
+      const img_ids = ["emoine", "hiee", "iihanashida", "kandoushita", "kininaru", "majikayo", "naruhodo", "shitteta",
+                       "soudane", "soukamo", "soukana", "sugoi", "tashikani", "tensai", "wakaran", "wara"];
+
+      const sendReaction = function(id) {
+        name = document.getElementById("name").value;
+        ts.write({who: name, type: "reaction", reaction: id});
+        for (var i in img_ids) {
+          document.getElementById(img_ids[i]).border = 0;
+        }
+        document.getElementById(id).border = 3;
+      };
+    </script>
+  </body>
+</html>

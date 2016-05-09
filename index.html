@@ -1,0 +1,64 @@
+<html>
+<head>
+<title>WakaruLand Mobile</title>
+<meta charset="utf-8" name="viewport" content="width=device-width" />
+</head>
+<body>
+<p>name:
+<input type="text" value="test" id="name" />
+</p>
+<p>
+<select name="reaction" id="select">
+  <option value="emoine">エモいね</option>
+  <option value="hiee">ひえぇ〜</option>
+  <option value="iihanashida">いい話だ</option>
+  <option value="kandoushita">感動した</option>
+  <option value="kininaru">気になる</option>
+  <option value="majikayo">まじかよ</option>
+  <option value="naruhodo">なるほど</option>
+  <option value="shitteta">知ってた</option>
+  <option value="soudane">そうだね</option>
+  <option value="soukamo">そうかも</option>
+  <option value="soukana">そうかな</option>
+  <option value="sugoi">すごい！</option>
+  <option value="tashikani">たしかに</option>
+  <option value="tensai">天才</option>
+  <option value="wakaran">わからん</option>
+  <option value="wara">笑</option>
+</select>
+<input type="button" value="OK" onclick="change_img()">
+</p>
+<div id="log"></div>
+<img src="images/blank.jpg" id="img" width="100%">
+<script src="http://linda-server.herokuapp.com/js/jquery.min.js"></script>
+<script src="http://linda-server.herokuapp.com/socket.io/socket.io.js"></script>
+<script src="http://linda-server.herokuapp.com/linda/linda.js"></script>
+<script>
+  // connect Socket.IO & Linda
+  const server_url = "http://linda-server.herokuapp.com";
+  const socket = io.connect(server_url);
+  const linda = new Linda().connect(socket);
+  const ts = linda.tuplespace("wakaruland");
+
+  const output = function(msg){
+    $("#log").prepend( $("<p>").text(msg) );
+  };
+
+  var name = document.getElementById("name").value;
+
+  const change_img = function(){
+    name = document.getElementById("name").value;
+    document.getElementById("img").src = "images/" + document.getElementById("select").value + ".jpg";
+  };
+
+  linda.io.on("connect", function(){
+    output("connect Linda!!");
+      ts.watch({type: "reaction"}, function(err, tuple){
+        if (document.getElementById("name").value == tuple.data.who) {
+          document.getElementById("img").src = "images/" + tuple.data.reaction + ".jpg";
+        }
+      });
+  });
+</script>
+</body>
+</html>
