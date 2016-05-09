@@ -31,12 +31,12 @@
 </p>
 <div id="log"></div>
 <img src="images/blank.jpg" id="img" width="100%">
-<script src="http://linda-server.herokuapp.com/js/jquery.min.js"></script>
-<script src="http://linda-server.herokuapp.com/socket.io/socket.io.js"></script>
-<script src="http://linda-server.herokuapp.com/linda/linda.js"></script>
+<script src="https://linda-server.herokuapp.com/js/jquery.min.js"></script>
+<script src="https://linda-server.herokuapp.com/socket.io/socket.io.js"></script>
+<script src="https://linda-server.herokuapp.com/linda/linda.js"></script>
 <script>
   // connect Socket.IO & Linda
-  const server_url = "http://linda-server.herokuapp.com";
+  const server_url = "https://linda-server.herokuapp.com";
   const socket = io.connect(server_url);
   const linda = new Linda().connect(socket);
   const ts = linda.tuplespace("wakaruland");
