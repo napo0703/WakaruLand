@@ -1,65 +1,116 @@
 <html>
-<head>
-<title>WakaruLand Mobile</title>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-</head>
-<body>
-<p>name:
-<input type="text" value="test" id="name" />
-</p>
-<p>
-<select name="reaction" id="select">
-  <option value="emoine">エモいね</option>
-  <option value="hiee">ひえぇ〜</option>
-  <option value="iihanashida">いい話だ</option>
-  <option value="kandoushita">感動した</option>
-  <option value="kininaru">気になる</option>
-  <option value="majikayo">まじかよ</option>
-  <option value="naruhodo">なるほど</option>
-  <option value="shitteta">知ってた</option>
-  <option value="soudane">そうだね</option>
-  <option value="soukamo">そうかも</option>
-  <option value="soukana">そうかな</option>
-  <option value="sugoi">すごい！</option>
-  <option value="tashikani">たしかに</option>
-  <option value="tensai">天才</option>
-  <option value="wakaran">わからん</option>
-  <option value="wara">笑</option>
-</select>
-<input type="button" value="OK" onclick="change_img()">
-</p>
-<div id="log"></div>
-<img src="images/blank.jpg" id="img" width="100%">
-<script src="https://linda-server.herokuapp.com/js/jquery.min.js"></script>
-<script src="https://linda-server.herokuapp.com/socket.io/socket.io.js"></script>
-<script src="https://linda-server.herokuapp.com/linda/linda.js"></script>
-<script>
-  // connect Socket.IO & Linda
-  const server_url = "https://linda-server.herokuapp.com";
-  const socket = io.connect(server_url);
-  const linda = new Linda().connect(socket);
-  const ts = linda.tuplespace("wakaruland");
+  <head>
+    <title>WakaruLand Console</title>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <h1>WakaruLand</h1>
+    <hr />
+    <p>name:
+      <input type="text" value="test" id="name">
+    </p>
+    <div onclick="obj=document.getElementById('open').style; obj.display=(obj.display=='none')?'block':'none';">
+      <a style="cursor:pointer;">▼ Reaction</a>
+    </div>
+    <table id="open" style="display:none;clear:both;">
+      <tr>
+        <td>
+          <img src="images/emoine.jpg" id="emoine" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/hiee.jpg" id="hiee" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/iihanashida.jpg" id="iihanashida" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/kandoushita.jpg" id="kandoushita" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="images/kininaru.jpg" id="kininaru" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/majikayo.jpg" id="majikayo" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/naruhodo.jpg" id="naruhodo" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/shitteta.jpg" id="shitteta" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="images/soudane.jpg" id="soudane" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/soukamo.jpg" id="soukamo" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/soukana.jpg" id="soukana" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/sugoi.jpg" id="sugoi" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="images/tashikani.jpg" id="tashikani" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/tensai.jpg" id="tensai" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/wakaran.jpg" id="wakaran" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+        <td>
+          <img src="images/wara.jpg" id="wara" onclick="sendReaction(this.id);return false" width="100">
+        </td>
+      </tr>
+    </table>
+    <img src="images/wakaran.jpg" id="img" width="100%">
+    <div id="log"></div>
+    <script src="https://linda-server.herokuapp.com/js/jquery.min.js"></script>
+    <script src="https://linda-server.herokuapp.com/socket.io/socket.io.js"></script>
+    <script src="https://linda-server.herokuapp.com/linda/linda.js"></script>
+    <script>
+      // connect Socket.IO & Linda
+      const server_url = "https://linda-server.herokuapp.com";
+      const socket = io.connect(server_url);
+      const linda = new Linda().connect(socket);
+      const ts = linda.tuplespace("wakaruland");
 
-  const output = function(msg){
-    $("#log").prepend( $("<p>").text(msg) );
-  };
+      const output = function(msg){
+        $("#log").prepend( $("<p>").text(msg) );
+      };
 
-  var name = document.getElementById("name").value;
+      var name = document.getElementById("name").value;
 
-  const change_img = function(){
-    name = document.getElementById("name").value;
-    document.getElementById("img").src = "images/" + document.getElementById("select").value + ".jpg";
-  };
-
-  linda.io.on("connect", function(){
-    output("connect Linda!!");
-      ts.watch({type: "reaction"}, function(err, tuple){
-        if (document.getElementById("name").value == tuple.data.who) {
-          document.getElementById("img").src = "images/" + tuple.data.reaction + ".jpg";
-        }
+      linda.io.on("connect", function(){
+        output("connect Linda!!");
+        // receive chat messages
+        ts.watch({type: "reaction"}, function(err, tuple){
+          if (name == tuple.data.who) {
+            output(name + " < " + tuple.data.reaction);
+          }
+        });
       });
-  });
-</script>
-</body>
+
+      const img_ids = ["emoine", "hiee", "iihanashida", "kandoushita", "kininaru", "majikayo", "naruhodo", "shitteta",
+                       "soudane", "soukamo", "soukana", "sugoi", "tashikani", "tensai", "wakaran", "wara"];
+
+      const sendReaction = function(id) {
+        name = document.getElementById("name").value;
+        document.getElementById("img").src = "images/" + id + ".jpg";
+        ts.write({who: name, type: "reaction", reaction: id});
+        for (var i in img_ids) {
+          document.getElementById(img_ids[i]).border = 0;
+        }
+        document.getElementById(id).border = 3;
+        obj=document.getElementById('open').style; obj.display=(obj.display=='none')?'block':'none';
+      };
+    </script>
+  </body>
 </html>
