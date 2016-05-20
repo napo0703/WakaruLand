@@ -7,68 +7,68 @@
   <body>
     <p>name: <input type="text" value="test" id="name">
     </p>
-    <div onclick="obj=document.getElementById('open').style; obj.display=(obj.display=='none')?'block':'none';">
+    <div onclick="obj=document.getElementById('open').style;obj.display=(obj.display=='none')?'block':'none';">
       <a style="cursor:pointer;">▼ Reaction</a>
     </div>
     <table id="open" style="display:none;clear:both;">
       <tr>
         <td>
-          <img src="images/emoine.jpg" id="emoine" onclick="sendReaction(this.id);return false" width="25%" />
+          <img src="images/s/emoine.jpg" id="emoine" onclick="sendReaction(this.id);return false" width="100%" />
         </td>
         <td>
-          <img src="images/hiee.jpg" id="hiee" onclick="sendReaction(this.id);return false" width="25%" />
+          <img src="images/s/hiee.jpg" id="hiee" onclick="sendReaction(this.id);return false" width="100%" />
         </td>
         <td>
-          <img src="images/iihanashida.jpg" id="iihanashida" onclick="sendReaction(this.id);return false" width="25%" />
+          <img src="images/s/iihanashida.jpg" id="iihanashida" onclick="sendReaction(this.id);return false" width="100%" />
         </td>
         <td>
-          <img src="images/kandoushita.jpg" id="kandoushita" onclick="sendReaction(this.id);return false" width="25%" />
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <img src="images/kininaru.jpg" id="kininaru" onclick="sendReaction(this.id);return false" width="25%" />
-        </td>
-        <td>
-          <img src="images/majikayo.jpg" id="majikayo" onclick="sendReaction(this.id);return false" width="25%" />
-        </td>
-        <td>
-          <img src="images/naruhodo.jpg" id="naruhodo" onclick="sendReaction(this.id);return false" width="25%" />
-        </td>
-        <td>
-          <img src="images/shitteta.jpg" id="shitteta" onclick="sendReaction(this.id);return false" width="25%" />
+          <img src="images/s/kandoushita.jpg" id="kandoushita" onclick="sendReaction(this.id);return false" width="100%" />
         </td>
       </tr>
       <tr>
         <td>
-          <img src="images/soudane.jpg" id="soudane" onclick="sendReaction(this.id);return false" width="25%" />
+          <img src="images/s/kininaru.jpg" id="kininaru" onclick="sendReaction(this.id);return false" width="100%" />
         </td>
         <td>
-          <img src="images/soukamo.jpg" id="soukamo" onclick="sendReaction(this.id);return false" width="25%" />
+          <img src="images/s/majikayo.jpg" id="majikayo" onclick="sendReaction(this.id);return false" width="100%" />
         </td>
         <td>
-          <img src="images/soukana.jpg" id="soukana" onclick="sendReaction(this.id);return false" width="25%" />
+          <img src="images/s/naruhodo.jpg" id="naruhodo" onclick="sendReaction(this.id);return false" width="100%" />
         </td>
         <td>
-          <img src="images/sugoi.jpg" id="sugoi" onclick="sendReaction(this.id);return false" width="25%" />
+          <img src="images/s/shitteta.jpg" id="shitteta" onclick="sendReaction(this.id);return false" width="100%" />
         </td>
       </tr>
       <tr>
         <td>
-          <img src="images/tashikani.jpg" id="tashikani" onclick="sendReaction(this.id);return false" width="25%" />
+          <img src="images/s/soudane.jpg" id="soudane" onclick="sendReaction(this.id);return false" width="100%" />
         </td>
         <td>
-          <img src="images/tensai.jpg" id="tensai" onclick="sendReaction(this.id);return false" width="25%" />
+          <img src="images/s/soukamo.jpg" id="soukamo" onclick="sendReaction(this.id);return false" width="100%" />
         </td>
         <td>
-          <img src="images/wakaran.jpg" id="wakaran" onclick="sendReaction(this.id);return false" width="25%" />
+          <img src="images/s/soukana.jpg" id="soukana" onclick="sendReaction(this.id);return false" width="100%" />
         </td>
         <td>
-          <img src="images/wara.jpg" id="wara" onclick="sendReaction(this.id);return false" width="25%" />
+          <img src="images/s/sugoi.jpg" id="sugoi" onclick="sendReaction(this.id);return false" width="100%" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="images/s/tashikani.jpg" id="tashikani" onclick="sendReaction(this.id);return false" width="100%" />
+        </td>
+        <td>
+          <img src="images/s/tensai.jpg" id="tensai" onclick="sendReaction(this.id);return false" width="100%" />
+        </td>
+        <td>
+          <img src="images/s/wakaran.jpg" id="wakaran" onclick="sendReaction(this.id);return false" width="100%" />
+        </td>
+        <td>
+          <img src="images/s/wara.jpg" id="wara" onclick="sendReaction(this.id);return false" width="100%" />
         </td>
       </tr>
     </table>
-    <img src="images/wakaran.jpg" id="img" width="100%">
+    <img src="images/l/wakaran.jpg" id="img" width="100%">
     <div id="log"></div>
     <script src="https://linda-server.herokuapp.com/js/jquery.min.js"></script>
     <script src="https://linda-server.herokuapp.com/socket.io/socket.io.js"></script>
@@ -102,7 +102,7 @@
       if (!(_ua.Mobile || _ua.Tablet)){
         document.getElementById("img").width = "320";
         for (var i in img_ids) {
-          document.getElementById(img_ids[i]).width = "100";
+          document.getElementById(img_ids[i]).width = "96";
         }
       }
 
@@ -125,7 +125,7 @@
           if (name == tuple.data.who) {
             const reaction = tuple.data.reaction
             output(name + " < " + reaction);
-            document.getElementById("img").src = "images/" + reaction + ".jpg";
+            document.getElementById("img").src = "images/l/" + reaction + ".jpg";
           }
         });
       });
@@ -133,14 +133,14 @@
       const sendReaction = function(id) {
         name = document.getElementById("name").value;
         if (window.localStorage) localStorage.name = name;
-        document.getElementById("img").src = "images/" + id + ".jpg";
+        document.getElementById("img").src = "images/l/" + id + ".jpg";
         ts.write({who: name, type: "reaction", reaction: id});
         for (var i in img_ids) {
           document.getElementById(img_ids[i]).border = 0;
         }
         document.getElementById(id).border = 3;
         const obj = document.getElementById('open').style;
-        obj.display=(obj.display=='none')?'block':'none';
+        obj.display = (obj.display=='none') ? 'block' : 'none';
       };
     </script>
   </body>
