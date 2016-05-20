@@ -74,6 +74,8 @@
     <script src="https://linda-server.herokuapp.com/socket.io/socket.io.js"></script>
     <script src="https://linda-server.herokuapp.com/linda/linda.js"></script>
     <script>
+      if (window.localStorage) document.getElementById("name").value = localStorage.name;
+
       // ユーザエージェント判定
       const _ua = (function (u){
         return {
@@ -130,6 +132,7 @@
 
       const sendReaction = function(id) {
         name = document.getElementById("name").value;
+        if (window.localStorage) localStorage.name = name;
         document.getElementById("img").src = "images/" + id + ".jpg";
         ts.write({who: name, type: "reaction", reaction: id});
         for (var i in img_ids) {
