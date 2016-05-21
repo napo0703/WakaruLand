@@ -1,70 +1,71 @@
 <html>
   <head>
-    <title>WakaruLand Console</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>わかるらんど</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   </head>
   <body>
-    <p>name: <input type="text" value="test" id="name">
+    <p>
+      name: <input type="text" value="test" id="name">
     </p>
-    <div onclick="obj=document.getElementById('open').style;obj.display=(obj.display=='none')?'block':'none';">
+    <div onclick="switchMenu()">
       <a style="cursor:pointer;">▼ Reaction</a>
     </div>
     <table id="open" style="display:none;clear:both;">
       <tr>
         <td>
-          <img src="images/s/emoine.jpg" id="emoine" onclick="sendReaction(this.id);return false" width="100%" />
+          <img src="images/s/emoine.jpg" id="emoine" onclick="sendReaction(this.id);return false" width="100%"/>
         </td>
         <td>
-          <img src="images/s/hiee.jpg" id="hiee" onclick="sendReaction(this.id);return false" width="100%" />
+          <img src="images/s/hiee.jpg" id="hiee" onclick="sendReaction(this.id);return false" width="100%"/>
         </td>
         <td>
-          <img src="images/s/iihanashida.jpg" id="iihanashida" onclick="sendReaction(this.id);return false" width="100%" />
+          <img src="images/s/iihanashida.jpg" id="iihanashida" onclick="sendReaction(this.id);return false" width="100%"/>
         </td>
         <td>
-          <img src="images/s/kandoushita.jpg" id="kandoushita" onclick="sendReaction(this.id);return false" width="100%" />
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <img src="images/s/kininaru.jpg" id="kininaru" onclick="sendReaction(this.id);return false" width="100%" />
-        </td>
-        <td>
-          <img src="images/s/majikayo.jpg" id="majikayo" onclick="sendReaction(this.id);return false" width="100%" />
-        </td>
-        <td>
-          <img src="images/s/naruhodo.jpg" id="naruhodo" onclick="sendReaction(this.id);return false" width="100%" />
-        </td>
-        <td>
-          <img src="images/s/shitteta.jpg" id="shitteta" onclick="sendReaction(this.id);return false" width="100%" />
+          <img src="images/s/kandoushita.jpg" id="kandoushita" onclick="sendReaction(this.id);return false" width="100%"/>
         </td>
       </tr>
       <tr>
         <td>
-          <img src="images/s/soudane.jpg" id="soudane" onclick="sendReaction(this.id);return false" width="100%" />
+          <img src="images/s/kininaru.jpg" id="kininaru" onclick="sendReaction(this.id);return false" width="100%"/>
         </td>
         <td>
-          <img src="images/s/soukamo.jpg" id="soukamo" onclick="sendReaction(this.id);return false" width="100%" />
+          <img src="images/s/majikayo.jpg" id="majikayo" onclick="sendReaction(this.id);return false" width="100%"/>
         </td>
         <td>
-          <img src="images/s/soukana.jpg" id="soukana" onclick="sendReaction(this.id);return false" width="100%" />
+          <img src="images/s/naruhodo.jpg" id="naruhodo" onclick="sendReaction(this.id);return false" width="100%"/>
         </td>
         <td>
-          <img src="images/s/sugoi.jpg" id="sugoi" onclick="sendReaction(this.id);return false" width="100%" />
+          <img src="images/s/shitteta.jpg" id="shitteta" onclick="sendReaction(this.id);return false" width="100%"/>
         </td>
       </tr>
       <tr>
         <td>
-          <img src="images/s/tashikani.jpg" id="tashikani" onclick="sendReaction(this.id);return false" width="100%" />
+          <img src="images/s/soudane.jpg" id="soudane" onclick="sendReaction(this.id);return false" width="100%"/>
         </td>
         <td>
-          <img src="images/s/tensai.jpg" id="tensai" onclick="sendReaction(this.id);return false" width="100%" />
+          <img src="images/s/soukamo.jpg" id="soukamo" onclick="sendReaction(this.id);return false" width="100%"/>
         </td>
         <td>
-          <img src="images/s/wakaran.jpg" id="wakaran" onclick="sendReaction(this.id);return false" width="100%" />
+          <img src="images/s/soukana.jpg" id="soukana" onclick="sendReaction(this.id);return false" width="100%"/>
         </td>
         <td>
-          <img src="images/s/wara.jpg" id="wara" onclick="sendReaction(this.id);return false" width="100%" />
+          <img src="images/s/sugoi.jpg" id="sugoi" onclick="sendReaction(this.id);return false" width="100%"/>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="images/s/tashikani.jpg" id="tashikani" onclick="sendReaction(this.id);return false" width="100%"/>
+        </td>
+        <td>
+          <img src="images/s/tensai.jpg" id="tensai" onclick="sendReaction(this.id);return false" width="100%"/>
+        </td>
+        <td>
+          <img src="images/s/wakaran.jpg" id="wakaran" onclick="sendReaction(this.id);return false" width="100%"/>
+        </td>
+        <td>
+          <img src="images/s/wara.jpg" id="wara" onclick="sendReaction(this.id);return false" width="100%"/>
         </td>
       </tr>
     </table>
@@ -73,75 +74,6 @@
     <script src="https://linda-server.herokuapp.com/js/jquery.min.js"></script>
     <script src="https://linda-server.herokuapp.com/socket.io/socket.io.js"></script>
     <script src="https://linda-server.herokuapp.com/linda/linda.js"></script>
-    <script>
-      if (window.localStorage) document.getElementById("name").value = localStorage.name;
-
-      // ユーザエージェント判定
-      const _ua = (function (u){
-        return {
-          Tablet:(u.indexOf("windows") != -1 && u.indexOf("touch") != -1 && u.indexOf("tablet pc") == -1)
-          || u.indexOf("ipad") != -1
-          || (u.indexOf("android") != -1 && u.indexOf("mobile") == -1)
-          || (u.indexOf("firefox") != -1 && u.indexOf("tablet") != -1)
-          || u.indexOf("kindle") != -1
-          || u.indexOf("silk") != -1
-          || u.indexOf("playbook") != -1,
-          Mobile:(u.indexOf("windows") != -1 && u.indexOf("phone") != -1)
-          || u.indexOf("iphone") != -1
-          || u.indexOf("ipod") != -1
-          || (u.indexOf("android") != -1 && u.indexOf("mobile") != -1)
-          || (u.indexOf("firefox") != -1 && u.indexOf("mobile") != -1)
-          || u.indexOf("blackberry") != -1
-        }
-      })(window.navigator.userAgent.toLowerCase());
-
-      const img_ids = ["emoine", "hiee", "iihanashida", "kandoushita", "kininaru", "majikayo", "naruhodo", "shitteta",
-                       "soudane", "soukamo", "soukana", "sugoi", "tashikani", "tensai", "wakaran", "wara"];
-
-      // 画像の大きさ設定
-      if (!(_ua.Mobile || _ua.Tablet)){
-        document.getElementById("img").width = "320";
-        for (var i in img_ids) {
-          document.getElementById(img_ids[i]).width = "96";
-        }
-      }
-
-      // connect Socket.IO & Linda
-      const server_url = "https://linda-server.herokuapp.com";
-      const socket = io.connect(server_url);
-      const linda = new Linda().connect(socket);
-      const ts = linda.tuplespace("wakaruland");
-
-      const output = function(msg){
-        $("#log").prepend( $("<p>").text(msg) );
-      };
-
-      var name = document.getElementById("name").value;
-
-      linda.io.on("connect", function(){
-        output("connect Linda!!");
-        // receive chat messages
-        ts.watch({type: "reaction"}, function(err, tuple){
-          if (name == tuple.data.who) {
-            const reaction = tuple.data.reaction
-            output(name + " < " + reaction);
-            document.getElementById("img").src = "images/l/" + reaction + ".jpg";
-          }
-        });
-      });
-
-      const sendReaction = function(id) {
-        name = document.getElementById("name").value;
-        if (window.localStorage) localStorage.name = name;
-        document.getElementById("img").src = "images/l/" + id + ".jpg";
-        ts.write({who: name, type: "reaction", reaction: id});
-        for (var i in img_ids) {
-          document.getElementById(img_ids[i]).border = 0;
-        }
-        document.getElementById(id).border = 3;
-        const obj = document.getElementById('open').style;
-        obj.display = (obj.display=='none') ? 'block' : 'none';
-      };
-    </script>
+    <script src="index.js"></script>
   </body>
 </html>

@@ -1,0 +1,5 @@
+.cell {
+    float: left;
+    width: 24.5%;
+    border: 1px solid #000000;
+}
