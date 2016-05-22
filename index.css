@@ -1,0 +1,24 @@
+@media screen and (min-width: 481px) {
+  #icon_view {
+    width: 480px;
+  }
+  #img {
+    width: 480px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  #icon_view {
+    width: 100%;
+  }
+  #img {
+    width: 100%;
+  }
+}
+
+.icon {
+  float: left;
+  width: 20%;
+  box-sizing:border-box;
+  border: 1px solid #000000;
+}

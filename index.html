@@ -3,74 +3,29 @@
     <title>わかるらんど</title>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="index.css" />
   </head>
   <body>
-    <p>
-      name: <input type="text" value="test" id="name">
-    </p>
-    <div onclick="switchMenu()">
-      <a style="cursor:pointer;">▼ Reaction</a>
-    </div>
-    <table id="open" style="display:none;clear:both;">
+    <table width="100%">
       <tr>
         <td>
-          <img src="images/s/emoine.jpg" id="emoine" onclick="sendReaction(this.id);return false" width="100%"/>
-        </td>
-        <td>
-          <img src="images/s/hiee.jpg" id="hiee" onclick="sendReaction(this.id);return false" width="100%"/>
-        </td>
-        <td>
-          <img src="images/s/iihanashida.jpg" id="iihanashida" onclick="sendReaction(this.id);return false" width="100%"/>
-        </td>
-        <td>
-          <img src="images/s/kandoushita.jpg" id="kandoushita" onclick="sendReaction(this.id);return false" width="100%"/>
+          <p>
+            name: <input type="text" value="test" id="name">
+          </p>
+          <div onclick="switchMenu()">
+            <a style="cursor:pointer;">▼ Reaction</a>
+          </div>
+          <div id="icon_view" style="display:none;clear:both;"></div>
         </td>
       </tr>
       <tr>
         <td>
-          <img src="images/s/kininaru.jpg" id="kininaru" onclick="sendReaction(this.id);return false" width="100%"/>
-        </td>
-        <td>
-          <img src="images/s/majikayo.jpg" id="majikayo" onclick="sendReaction(this.id);return false" width="100%"/>
-        </td>
-        <td>
-          <img src="images/s/naruhodo.jpg" id="naruhodo" onclick="sendReaction(this.id);return false" width="100%"/>
-        </td>
-        <td>
-          <img src="images/s/shitteta.jpg" id="shitteta" onclick="sendReaction(this.id);return false" width="100%"/>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <img src="images/s/soudane.jpg" id="soudane" onclick="sendReaction(this.id);return false" width="100%"/>
-        </td>
-        <td>
-          <img src="images/s/soukamo.jpg" id="soukamo" onclick="sendReaction(this.id);return false" width="100%"/>
-        </td>
-        <td>
-          <img src="images/s/soukana.jpg" id="soukana" onclick="sendReaction(this.id);return false" width="100%"/>
-        </td>
-        <td>
-          <img src="images/s/sugoi.jpg" id="sugoi" onclick="sendReaction(this.id);return false" width="100%"/>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <img src="images/s/tashikani.jpg" id="tashikani" onclick="sendReaction(this.id);return false" width="100%"/>
-        </td>
-        <td>
-          <img src="images/s/tensai.jpg" id="tensai" onclick="sendReaction(this.id);return false" width="100%"/>
-        </td>
-        <td>
-          <img src="images/s/wakaran.jpg" id="wakaran" onclick="sendReaction(this.id);return false" width="100%"/>
-        </td>
-        <td>
-          <img src="images/s/wara.jpg" id="wara" onclick="sendReaction(this.id);return false" width="100%"/>
+          <img src="images/l/wakaran.jpg" id="img" width="100%">
+          <div id="log"></div>
         </td>
       </tr>
     </table>
-    <img src="images/l/wakaran.jpg" id="img" width="100%">
-    <div id="log"></div>
+
     <script src="https://linda-server.herokuapp.com/js/jquery.min.js"></script>
     <script src="https://linda-server.herokuapp.com/socket.io/socket.io.js"></script>
     <script src="https://linda-server.herokuapp.com/linda/linda.js"></script>

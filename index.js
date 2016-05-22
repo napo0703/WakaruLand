@@ -1,5 +1,9 @@
 if (window.localStorage) document.getElementById("name").value = localStorage.name;
 
+const img_ids = ["emoine", "hiee", "ichiriaru", "iihanashida", "kami", "kandoushita", "kininaru","majikayo", "naki",
+  "naruhodo", "otsu", "shitteta", "soudane", "soukamo", "soukana", "sugoi", "tashikani", "tasukete",
+  "tensai", "toutoi", "wakaran", "wakaru", "wara", "maru", "batsu"];
+
 // ユーザエージェント判定
 const _ua = (function (u){
   return {
@@ -19,24 +23,11 @@ const _ua = (function (u){
   }
 })(window.navigator.userAgent.toLowerCase());
 
-const img_ids = ["emoine", "hiee", "iihanashida", "kandoushita", "kininaru", "majikayo", "naruhodo", "shitteta",
-                 "soudane", "soukamo", "soukana", "sugoi", "tashikani", "tensai", "wakaran", "wara"];
-
-// 画像の大きさ設定
-if (!(_ua.Mobile || _ua.Tablet)){
-  document.getElementById("img").width = "320";
-  for (var i in img_ids) {
-    document.getElementById(img_ids[i]).width = "96";
-  }
-}
-
 // connect Socket.IO & Linda
 const server_url = "https://linda-server.herokuapp.com";
 const socket = io.connect(server_url);
 const linda = new Linda().connect(socket);
 const ts = linda.tuplespace("wakaruland");
-
-var myName = document.getElementById("name").value;
 
 linda.io.on("connect", function(){
   output("connect Linda!!");
@@ -47,31 +38,42 @@ linda.io.on("connect", function(){
   });
 });
 
+var myName = document.getElementById("name").value;
+
+const sendReaction = function(id) {
+  return function () {
+    myName = document.getElementById("name").value;
+    if (window.localStorage) localStorage.name = myName;
+    document.getElementById("img").src = "images/l/" + id + ".jpg";
+    ts.write({who: myName, type: "reaction", reaction: id});
+    switchMenu();
+  }
+};
+
 const output = function(msg){
   $("#log").prepend( $("<p>").text(msg) );
   console.log(msg);
 };
 
 const switchMenu = function() {
-  const obj = document.getElementById('open').style;
+  const obj = document.getElementById('icon_view').style;
   obj.display = (obj.display == 'none') ? 'block' : 'none';
 };
 
-const sendReaction = function(id) {
-  myName = document.getElementById("name").value;
-  if (window.localStorage) localStorage.name = myName;
-  document.getElementById("img").src = "images/l/" + id + ".jpg";
-  ts.write({who: myName, type: "reaction", reaction: id});
-  for (var i in img_ids) {
-    document.getElementById(img_ids[i]).border = 0;
-  }
-  document.getElementById(id).border = 3;
-  switchMenu();
-};
+// リアクションアイコン画像を動的に追加
+for (var i in img_ids) {
+  const id = img_ids[i];
+  var gridCell = document.createElement("div");
+  gridCell.setAttribute("class", "icon");
+  var img = document.createElement("img");
+  img.setAttribute("id", id);
+  img.setAttribute("src", "images/" + id + ".jpg");
+  img.setAttribute("width", "100%");
+  gridCell.appendChild(img);
+  document.getElementById("icon_view").appendChild(gridCell);
+}
 
-// Gyazzからnameの一覧を取得
-var nameArray = [];
-const gyazz_url = "http://gyazz.masuilab.org/wakaruland/name/json";
-$.getJSON(gyazz_url, function(jsonData) {
-  nameArray = jsonData.data;
-});
+for (var i in img_ids) {
+  const id = img_ids[i];
+  document.getElementById(id).onclick = sendReaction(id);
+}

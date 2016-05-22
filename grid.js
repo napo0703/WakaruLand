@@ -19,7 +19,7 @@ linda.io.on("connect", function(){
 // Gyazzから名前の一覧を取得
 var nameArray = [];
 const gyazz_url = "http://gyazz.masuilab.org/wakaruland/name/json";
-$.getJSON(gyazz_url, function(jsonData) {
+$.getJSON(gyazz_url, function (jsonData) {
   nameArray = jsonData.data;
   for (var j in nameArray) {
     const name = nameArray[j];
@@ -31,7 +31,7 @@ $.getJSON(gyazz_url, function(jsonData) {
     const reactionImg = document.createElement("img");
     reactionImg.setAttribute("id", name);
     reactionImg.setAttribute("src", "images/l/blank.jpg");
-    reactionImg.setAttribute("width", "90%");
+    reactionImg.setAttribute("width", "100%");
     gridCell.appendChild(nameText);
     gridCell.appendChild(reactionImg);
     document.getElementById("grid_view").appendChild(gridCell);
