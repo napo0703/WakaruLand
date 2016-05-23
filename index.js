@@ -1,6 +1,6 @@
 if (window.localStorage) document.getElementById("name").value = localStorage.name;
 
-const img_ids = ["emoine", "hiee", "ichiriaru", "iihanashida", "kami", "kandoushita", "kininaru","majikayo", "naki",
+const img_ids = ["blank", "emoine", "hiee", "ichiriaru", "iihanashida", "kami", "kandoushita", "kininaru","majikayo",
   "naruhodo", "otsu", "shitteta", "soudane", "soukamo", "soukana", "sugoi", "tashikani", "tasukete",
   "tensai", "toutoi", "wakaran", "wakaru", "wara", "maru", "batsu"];
 
