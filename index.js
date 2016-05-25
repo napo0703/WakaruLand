@@ -62,15 +62,16 @@ for (var i in img_ids) {
 
 // 30秒間リアクションしなかったら一覧から消す
 const withdrawReaction = function() {
+  stopCount();
   document.getElementById("img").src = "images/l/blank.jpg";
   ts.write({who: myName, response: "NO", time: "30sec"});
-  stopCount();
 };
 
 var count = 0;
 var count30sec;
 
 const startCount = function() {
+  stopCount();
   count30sec = setInterval(function() {
     count += 1;
     console.log(count);
