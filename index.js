@@ -4,25 +4,6 @@ const img_ids = ["blank", "emoine", "hiee", "ichiriaru", "iihanashida", "kami", 
   "naruhodo", "otsu", "shitteta", "soudane", "soukamo", "soukana", "sugoi", "tashikani", "tasukete",
   "tensai", "toutoi", "wakaran", "wakaru", "wara", "maru", "batsu"];
 
-// ユーザエージェント判定
-const _ua = (function (u){
-  return {
-    Tablet:(u.indexOf("windows") != -1 && u.indexOf("touch") != -1 && u.indexOf("tablet pc") == -1)
-    || u.indexOf("ipad") != -1
-    || (u.indexOf("android") != -1 && u.indexOf("mobile") == -1)
-    || (u.indexOf("firefox") != -1 && u.indexOf("tablet") != -1)
-    || u.indexOf("kindle") != -1
-    || u.indexOf("silk") != -1
-    || u.indexOf("playbook") != -1,
-    Mobile:(u.indexOf("windows") != -1 && u.indexOf("phone") != -1)
-    || u.indexOf("iphone") != -1
-    || u.indexOf("ipod") != -1
-    || (u.indexOf("android") != -1 && u.indexOf("mobile") != -1)
-    || (u.indexOf("firefox") != -1 && u.indexOf("mobile") != -1)
-    || u.indexOf("blackberry") != -1
-  }
-})(window.navigator.userAgent.toLowerCase());
-
 // connect Socket.IO & Linda
 const server_url = "https://linda-server.herokuapp.com";
 const socket = io.connect(server_url);
@@ -47,6 +28,7 @@ const sendReaction = function(id) {
     document.getElementById("img").src = "images/l/" + id + ".jpg";
     ts.write({who: myName, type: "reaction", reaction: id});
     switchMenu();
+    startCount();
   }
 };
 
@@ -77,3 +59,38 @@ for (var i in img_ids) {
   const id = img_ids[i];
   document.getElementById(id).onclick = sendReaction(id);
 }
+
+// 30秒間リアクションしなかったら一覧から消す
+const withdrawReaction = function() {
+  document.getElementById("img").src = "images/l/blank.jpg";
+  ts.write({who: myName, response: "NO", time: "30sec"});
+  stopCount();
+};
+
+var count = 0;
+var count30sec;
+
+const startCount = function() {
+  count30sec = setInterval(function() {
+    count += 1;
+    console.log(count);
+    if (count >= 30) {
+      withdrawReaction();
+    }
+  }, 1000);
+};
+
+const stopCount = function() {
+  clearInterval(count30sec);
+  count = 0;
+};
+
+window.addEventListener("beforeunload", function (e) {
+  var confirmationMessage = "\o/";
+  e.returnValue = confirmationMessage;     // Gecko and Trident
+  return confirmationMessage;              // Gecko and WebKit
+});
+
+window.addEventListener('unload', function(e) {
+  ts.write({who: myName, response: "NO", time: "30sec"});
+});
