@@ -13,6 +13,7 @@ linda.io.on("connect", function(){
     if (nameArray.includes(reactor)) {
       console.log(reactor + " < " + reaction);
       document.getElementById(reactor).src = "../images/l/" + reaction + ".jpg";
+      document.getElementById(reactor).style.opacity = 1.0;
     }
   });
 
@@ -20,7 +21,8 @@ linda.io.on("connect", function(){
     const reactor = tuple.data.who;
     if (nameArray.includes(reactor)) {
       console.log(reactor + " < NO response (30sec)");
-      document.getElementById(reactor).src = "../images/l/blank.jpg";
+      document.getElementById(reactor).src = "http://www.paper-glasses.com/api/twipi/"+ reactor + "/original";
+      document.getElementById(reactor).style.opacity = 0.4;
     }
   });
 });
@@ -61,6 +63,7 @@ const createCell = function(name) {
   const gridCell = document.createElement("div");
   gridCell.setAttribute("class", "cell");
   const img = document.createElement("img");
+  img.setAttribute("class", "image");
   img.setAttribute("id", name);
   img.setAttribute("src", img_url);
   img.setAttribute("height", "100%");
