@@ -56,24 +56,15 @@ const getLayoutSize = function(windowWidth, windowHeight, minCellWidth, itemCoun
 };
 
 const createCell = function(name) {
+  //Twitterからプロフィール画像取得
+  const img_url = "http://www.paper-glasses.com/api/twipi/"+ name + "/original";
   const gridCell = document.createElement("div");
   gridCell.setAttribute("class", "cell");
-  //gridCell.style.display = "table";
-  const nameDiv = document.createElement("div");
-  nameDiv.setAttribute("class", "name_text");
-  nameDiv.innerHTML = name;
-  //nameDiv.display = "table-cell";
-  const reactionDiv = document.createElement("div");
-  reactionDiv.setAttribute("class", "reaction_img");
-  //reactionDiv.setAttribute("height", "100%");
-  //reactionDiv.display = "table-cell";
   const img = document.createElement("img");
   img.setAttribute("id", name);
-  img.setAttribute("src", "../images/l/blank.jpg");
+  img.setAttribute("src", img_url);
   img.setAttribute("height", "100%");
-  reactionDiv.appendChild(img);
-  gridCell.appendChild(nameDiv);
-  gridCell.appendChild(reactionDiv);
+  gridCell.appendChild(img);
   return gridCell;
 };
 
