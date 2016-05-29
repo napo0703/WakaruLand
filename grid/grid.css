@@ -1,6 +1,9 @@
 .cell {
-    float: left;
-    width: 25%;
-    box-sizing:border-box;
-    border: 1px solid #000000;
+  float: left;
+  box-sizing:border-box;
+  border: 1px solid #000000;
+}
+
+.name_text {
+  padding-left: 8px;
 }

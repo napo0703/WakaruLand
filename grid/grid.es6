@@ -2,7 +2,7 @@
 const server_url = "https://linda-server.herokuapp.com";
 const socket = io.connect(server_url);
 const linda = new Linda().connect(socket);
-const ts = linda.tuplespace("wakaruland");
+const ts = linda.tuplespace("wakarulanddebug");
 
 linda.io.on("connect", function(){
   console.log("connect Linda!!");
@@ -25,25 +25,21 @@ linda.io.on("connect", function(){
   });
 });
 
-const getLayoutSize = function(windowWidth, windowHeight, minItemWidth, itemCount) {
+const getLayoutSize = function(windowWidth, windowHeight, minCellWidth, itemCount) {
   if (itemCount <= 1) {
     return {"columnCount": 1, "rowCount": 1};
   }
 
   const cellAspectRatio = 1.0;
-  const minHeight = minItemWidth / cellAspectRatio;
-
-  // 最小セルサイズで並べる
-  const maxColumnCount = Math.floor(windowWidth / minItemWidth);
+  const minCellHeight = minCellWidth / cellAspectRatio;
+  const maxColumnCount = Math.floor(windowWidth / minCellWidth);
   const minRowCount = Math.ceil(itemCount / maxColumnCount);
-  if (windowHeight < minRowCount * minHeight) {
+  if (windowHeight < minRowCount * minCellHeight) {
     return {"columnCount": maxColumnCount, "rowCount": minRowCount};
   }
 
   var columnCount = maxColumnCount - 1;
   var rowCount = Math.ceil(itemCount / columnCount);
-
-  // columnCountを減らしてく
   while (columnCount > 1) {
     const cellWidth = windowWidth / columnCount;
     const cellHeight = cellWidth * cellAspectRatio;
@@ -59,26 +55,52 @@ const getLayoutSize = function(windowWidth, windowHeight, minItemWidth, itemCoun
   return {"columnCount": 1, "rowCount": itemCount};
 };
 
+const createCell = function(name) {
+  const gridCell = document.createElement("div");
+  gridCell.setAttribute("class", "cell");
+  //gridCell.style.display = "table";
+  const nameDiv = document.createElement("div");
+  nameDiv.setAttribute("class", "name_text");
+  nameDiv.innerHTML = name;
+  //nameDiv.display = "table-cell";
+  const reactionDiv = document.createElement("div");
+  reactionDiv.setAttribute("class", "reaction_img");
+  //reactionDiv.setAttribute("height", "100%");
+  //reactionDiv.display = "table-cell";
+  const img = document.createElement("img");
+  img.setAttribute("id", name);
+  img.setAttribute("src", "../images/l/blank.jpg");
+  img.setAttribute("height", "100%");
+  reactionDiv.appendChild(img);
+  gridCell.appendChild(nameDiv);
+  gridCell.appendChild(reactionDiv);
+  return gridCell;
+};
+
 // URLのパラメータから表示するユーザを取得
 // TODO: パラメータが正しいCSVフォーマットであるか判定する
 var nameArray = Array.from(new Set(location.search.substring(1).split(',')));
 console.log(nameArray);
-const gridSize = getLayoutSize(window.innerWidth, window.innerHeight, 200, nameArray.length);
-console.log("columnCount = "+ gridSize.columnCount + ", rowCount = " + gridSize.rowCount);
+const minCellWidth = 100;  //TODO: ユーザが任意に変えられるようにしようかな
+const minCellHeight = 100;
+const gridSize = getLayoutSize(window.innerWidth, window.innerHeight, minCellWidth, nameArray.length);
+const columnCount = gridSize.columnCount;
+const rowCount = gridSize.rowCount;
+console.log("columnCount = "+ columnCount + ", rowCount = " + rowCount);
+const cellHeight = Math.max(window.innerHeight / rowCount, minCellWidth);
+
 for (var i in nameArray) {
-  var name = nameArray[i];  // FIXME: Safariでconstの挙動がおかしい
-  console.log(name);
-  const gridCell = document.createElement("div");
-  gridCell.setAttribute("class", "cell");
-  const nameText = document.createElement("p");
-  nameText.innerHTML = name;
-  const reactionImg = document.createElement("img");
-  reactionImg.setAttribute("id", name);
-  reactionImg.setAttribute("src", "../images/l/blank.jpg");
-  reactionImg.setAttribute("width", "100%");
-  gridCell.appendChild(nameText);
-  gridCell.appendChild(reactionImg);
-  document.getElementById("grid_view").appendChild(gridCell);
-  gridCell.style.width = (window.innerWidth / gridSize.columnCount) - (gridSize.columnCount * 10);
-  gridCell.style.height = (window.innerWidth / gridSize.columnCount) - (gridSize.columnCount * 10);
+  const name = nameArray[i];  // FIXME: Safariでconstの挙動がおかしい
+  const cell = createCell(name);
+  document.getElementById("grid_view").appendChild(cell);
+  if (cellHeight == minCellWidth) {
+    cell.style.width = Math.floor(100 / columnCount) + "%";
+    cell.style.height = minCellHeight;
+  } else if (window.innerHeight < cellHeight * rowCount) {
+    cell.style.width = Math.floor(100 / rowCount) + "%";
+    cell.style.height = Math.floor(100 / rowCount) + "%";
+  } else {
+    cell.style.width = Math.floor(100 / columnCount) + "%";
+    cell.style.height = Math.floor(100 / rowCount) + "%";
+  }
 }

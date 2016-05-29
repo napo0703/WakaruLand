@@ -8,7 +8,7 @@ const img_ids = ["blank", "emoine", "hiee", "ichiriaru", "iihanashida", "kami", 
 const server_url = "https://linda-server.herokuapp.com";
 const socket = io.connect(server_url);
 const linda = new Linda().connect(socket);
-const ts = linda.tuplespace("wakaruland");
+const ts = linda.tuplespace("wakarulanddebug");
 
 linda.io.on("connect", function(){
   output("connect Linda!!");
