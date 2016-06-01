@@ -1,6 +1,6 @@
 if (window.localStorage) document.getElementById("name").value = localStorage.name;
 
-const img_ids = ["blank", "emoine", "hiee", "ichiriaru", "iihanashida", "kami", "kandoushita", "kininaru","majikayo",
+const img_ids = ["blank", "emoine", "hiee", "ichiriaru", "iihanashida", "kami", "kandoushita", "kininaru", "majikayo",
   "naruhodo", "otsu", "shitteta", "soudane", "soukamo", "soukana", "sugoi", "tashikani", "tasukete",
   "tensai", "toutoi", "wakaran", "wakaru", "wara", "maru", "batsu"];
 
@@ -60,7 +60,7 @@ for (let i in img_ids) {
   document.getElementById(id).onclick = sendReaction(id);
 }
 
-// 30秒間リアクションしなかったら一覧から消す
+// 30秒間リアクションしなかったらタプルを書き込む
 const withdrawReaction = () => {
   stopCount();
   document.getElementById("img").src = "images/l/blank.jpg";
@@ -68,21 +68,17 @@ const withdrawReaction = () => {
 };
 
 var count = 0;
-var count30sec;
+var count30sec = setTimeout(() => {
+  withdrawReaction();
+}, 30000);
 
 const startCount = () => {
   stopCount();
-  count30sec = setInterval(() => {
-    count += 1;
-    console.log(count);
-    if (count >= 30) {
-      withdrawReaction();
-    }
-  }, 1000);
+  count30sec();
 };
 
 const stopCount = () => {
-  clearInterval(count30sec);
+  clearTimeout(count30sec);
   count = 0;
 };
 
