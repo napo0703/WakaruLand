@@ -38,13 +38,13 @@ const output = (msg) => {
 };
 
 const switchMenu = () => {
-  let obj = document.getElementById('icon_view').style;
+  const obj = document.getElementById('icon_view').style;
   obj.display = (obj.display == 'none') ? 'block' : 'none';
 };
 
 // リアクションアイコン画像を動的に追加
 for (let i in img_ids) {
-  let id = img_ids[i];
+  const id = img_ids[i];
   var gridCell = document.createElement("div");
   gridCell.setAttribute("class", "icon");
   var img = document.createElement("img");
@@ -56,7 +56,7 @@ for (let i in img_ids) {
 }
 
 for (let i in img_ids) {
-  let id = img_ids[i];
+  const id = img_ids[i];
   document.getElementById(id).onclick = sendReaction(id);
 }
 

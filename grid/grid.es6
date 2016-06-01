@@ -8,8 +8,8 @@ linda.io.on("connect", function(){
   console.log("connect Linda!!");
 
   ts.watch({type: "reaction"}, (err, tuple) => {
-    let reactor = tuple.data.who;
-    let reaction = tuple.data.reaction;
+    const reactor = tuple.data.who;
+    const reaction = tuple.data.reaction;
     if (nameArray.includes(reactor)) {
       console.log(reactor + " < " + reaction);
       document.getElementById(reactor).src = `../images/l/${reaction}.jpg`;
@@ -18,7 +18,7 @@ linda.io.on("connect", function(){
   });
 
   ts.watch({response: "NO"}, (err, tuple) => {
-    let reactor = tuple.data.who;
+    const reactor = tuple.data.who;
     if (nameArray.includes(reactor)) {
       console.log(reactor + " < NO response (30sec)");
       document.getElementById(reactor).src = `http://www.paper-glasses.com/api/twipi/${reactor}/original`;
@@ -32,9 +32,9 @@ const getLayoutSize = (windowWidth, windowHeight, minCellWidth, itemCount) => {
     return {"columnCount": 1, "rowCount": 1};
   }
 
-  let cellAspectRatio = 1.0;
-  let minCellHeight = minCellWidth / cellAspectRatio;
-  let maxColumnCount = Math.floor(windowWidth / minCellWidth);
+  const cellAspectRatio = 1.0;
+  const minCellHeight = minCellWidth / cellAspectRatio;
+  const maxColumnCount = Math.floor(windowWidth / minCellWidth);
   const minRowCount = Math.ceil(itemCount / maxColumnCount);
   if (windowHeight < minRowCount * minCellHeight) {
     return {"columnCount": maxColumnCount, "rowCount": minRowCount};
@@ -43,8 +43,8 @@ const getLayoutSize = (windowWidth, windowHeight, minCellWidth, itemCount) => {
   var columnCount = maxColumnCount - 1;
   var rowCount = Math.ceil(itemCount / columnCount);
   while (columnCount > 1) {
-    let cellWidth = windowWidth / columnCount;
-    let cellHeight = cellWidth * cellAspectRatio;
+    const cellWidth = windowWidth / columnCount;
+    const cellHeight = cellWidth * cellAspectRatio;
     if (windowHeight < rowCount * cellHeight) {
       rowCount = Math.ceil(itemCount / columnCount);
       return {"columnCount": columnCount, "rowCount": rowCount};
@@ -59,10 +59,10 @@ const getLayoutSize = (windowWidth, windowHeight, minCellWidth, itemCount) => {
 
 const createCell = (name) => {
   //Twitterからプロフィール画像取得
-  let img_url = `http://www.paper-glasses.com/api/twipi/${name}/original`;
-  let gridCell = document.createElement("div");
+  const img_url = `http://www.paper-glasses.com/api/twipi/${name}/original`;
+  const gridCell = document.createElement("div");
   gridCell.setAttribute("class", "cell");
-  let img = document.createElement("img");
+  const img = document.createElement("img");
   img.setAttribute("class", "image");
   img.setAttribute("id", name);
   img.setAttribute("src", img_url);
@@ -84,8 +84,8 @@ console.log("columnCount = "+ columnCount + ", rowCount = " + rowCount);
 const cellHeight = Math.max(window.innerHeight / rowCount, minCellWidth);
 
 for (let i in nameArray) {
-  let name = nameArray[i];  // FIXME: Safariでconstの挙動がおかしい
-  let cell = createCell(name);
+  const name = nameArray[i];  // FIXME: Safariでconstの挙動がおかしい
+  const cell = createCell(name);
   document.getElementById("grid_view").appendChild(cell);
   if (cellHeight == minCellWidth) {
     cell.style.width = Math.floor(100 / columnCount) + "%";
