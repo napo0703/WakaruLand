@@ -7,27 +7,27 @@ const ts = linda.tuplespace("wakarulanddebug");
 linda.io.on("connect", function(){
   console.log("connect Linda!!");
 
-  ts.watch({type: "reaction"}, function(err, tuple){
+  ts.watch({type: "reaction"}, (err, tuple) => {
     const reactor = tuple.data.who;
     const reaction = tuple.data.reaction;
     if (nameArray.includes(reactor)) {
       console.log(reactor + " < " + reaction);
-      document.getElementById(reactor).src = "../images/l/" + reaction + ".jpg";
+      document.getElementById(reactor).src = `../images/l/${reaction}.jpg`;
       document.getElementById(reactor).style.opacity = 1.0;
     }
   });
 
-  ts.watch({response: "NO"}, function(err, tuple) {
+  ts.watch({response: "NO"}, (err, tuple) => {
     const reactor = tuple.data.who;
     if (nameArray.includes(reactor)) {
       console.log(reactor + " < NO response (30sec)");
-      document.getElementById(reactor).src = "http://www.paper-glasses.com/api/twipi/"+ reactor + "/original";
+      document.getElementById(reactor).src = `http://www.paper-glasses.com/api/twipi/${reactor}/original`;
       document.getElementById(reactor).style.opacity = 0.4;
     }
   });
 });
 
-const getLayoutSize = function(windowWidth, windowHeight, minCellWidth, itemCount) {
+const getLayoutSize = (windowWidth, windowHeight, minCellWidth, itemCount) => {
   if (itemCount <= 1) {
     return {"columnCount": 1, "rowCount": 1};
   }
@@ -57,9 +57,9 @@ const getLayoutSize = function(windowWidth, windowHeight, minCellWidth, itemCoun
   return {"columnCount": 1, "rowCount": itemCount};
 };
 
-const createCell = function(name) {
+const createCell = (name) => {
   //Twitterからプロフィール画像取得
-  const img_url = "http://www.paper-glasses.com/api/twipi/"+ name + "/original";
+  const img_url = `http://www.paper-glasses.com/api/twipi/${name}/original`;
   const gridCell = document.createElement("div");
   gridCell.setAttribute("class", "cell");
   const img = document.createElement("img");
@@ -83,7 +83,7 @@ const rowCount = gridSize.rowCount;
 console.log("columnCount = "+ columnCount + ", rowCount = " + rowCount);
 const cellHeight = Math.max(window.innerHeight / rowCount, minCellWidth);
 
-for (var i in nameArray) {
+for (let i in nameArray) {
   const name = nameArray[i];  // FIXME: Safariでconstの挙動がおかしい
   const cell = createCell(name);
   document.getElementById("grid_view").appendChild(cell);
