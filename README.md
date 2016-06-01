@@ -1,3 +1,3 @@
 # Wakaru Land
 
-https://wakaruland.herokuapp.com
+https://wakaruland.com
