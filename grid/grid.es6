@@ -83,7 +83,7 @@ const rowCount = gridSize.rowCount;
 console.log("columnCount = "+ columnCount + ", rowCount = " + rowCount);
 const cellHeight = Math.max(window.innerHeight / rowCount, minCellWidth);
 
-for (var i in nameArray) {
+for (let i in nameArray) {
   const name = nameArray[i];  // FIXME: Safariでconstの挙動がおかしい
   const cell = createCell(name);
   document.getElementById("grid_view").appendChild(cell);

@@ -1,0 +1,26 @@
+{
+  "name": "wakakurand",
+  "version": "1.0.0",
+  "description": "https://wakaruland.herokuapp.com",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "browser-sync": "^2.12.10",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hikaru-Ito/WakaruLand.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hikaru-Ito/WakaruLand/issues"
+  },
+  "homepage": "https://github.com/Hikaru-Ito/WakaruLand#readme"
+}

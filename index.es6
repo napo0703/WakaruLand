@@ -5,7 +5,7 @@ const img_ids = ["blank", "emoine", "hiee", "ichiriaru", "iihanashida", "kami", 
   "tensai", "toutoi", "wakaran", "wakaru", "wara", "maru", "batsu"];
 
 // connect Socket.IO & Linda
-const server_url = "https://linda-server.herokuapp.com";
+const server_url = "https://linda-server.herokuapp.com/";
 const socket = io.connect(server_url);
 const linda = new Linda().connect(socket);
 const ts = linda.tuplespace("wakarulanddebug");
@@ -43,7 +43,7 @@ const switchMenu = function() {
 };
 
 // リアクションアイコン画像を動的に追加
-for (var i in img_ids) {
+for (let i in img_ids) {
   const id = img_ids[i];
   var gridCell = document.createElement("div");
   gridCell.setAttribute("class", "icon");
@@ -55,7 +55,7 @@ for (var i in img_ids) {
   document.getElementById("icon_view").appendChild(gridCell);
 }
 
-for (var i in img_ids) {
+for (let i in img_ids) {
   const id = img_ids[i];
   document.getElementById(id).onclick = sendReaction(id);
 }
