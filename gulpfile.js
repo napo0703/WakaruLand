@@ -21,7 +21,7 @@ gulp.task('babel', function() {
 gulp.task('browser-sync', function() {
    browserSync({
      server: {
-       baseDir: './',
+       baseDir: './'
      },
      open: 'external',
      port: 7070
