@@ -1,93 +1,179 @@
-if (window.localStorage) document.getElementById("name").value = localStorage.name;
-
-const img_ids = ["blank", "emoine", "hiee", "ichiriaru", "iihanashida", "kami", "kandoushita", "kininaru", "majikayo",
-  "naruhodo", "otsu", "shitteta", "soudane", "soukamo", "soukana", "sugoi", "tashikani", "tasukete",
-  "tensai", "toutoi", "wakaran", "wakaru", "wara", "maru", "batsu"];
+const reactions = ["blank", "emoine", "hiee", "ichiriaru", "iihanashida", "kami", "kandoushita", "kininaru", "majikayo",
+                   "naruhodo", "otsu", "shitteta", "soudane", "soukamo", "soukana", "sugoi", "tashikani", "tasukete",
+                   "tensai", "toutoi", "wakaran", "wakaru", "wara", "maru", "batsu"];
 
 // connect Socket.IO & Linda
 const server_url = "https://linda-server.herokuapp.com/";
 const socket = io.connect(server_url);
 const linda = new Linda().connect(socket);
-const ts = linda.tuplespace("wakarulanddebug");
+const ts = linda.tuplespace("masuilab");
 
-linda.io.on("connect", () => {
-  output("connect Linda!!");
-  ts.watch({type: "reaction"}, (err, tuple) => {
-    if (myName == tuple.data.who) {
-      document.getElementById("img").src = `images/l/${tuple.data.reaction}.jpg`;
+// URL末尾のカンマ区切り文字列から表示するユーザを抽出
+const nameArray = Array.from(new Set(location.search.substring(1).split(',')));
+console.log(nameArray);
+
+if (nameArray.length <= 1) {
+  /**
+   * console リアクション投稿ページ
+   * URL末尾にユーザ名を書かない、または、ユーザ名が1人のとき
+   */
+  let myName = "test";
+  if (nameArray.length == 0) {
+    if (window.localStorage) {
+      myName = localStorage.name;
     }
-  });
-});
-
-var myName = document.getElementById("name").value;
-
-const sendReaction = (id) => {
-  return () => {
-    myName = document.getElementById("name").value;
-    if (window.localStorage) localStorage.name = myName;
-    document.getElementById("img").src = `images/l/${id}.jpg`;
-    ts.write({who: myName, type: "reaction", reaction: id});
-    switchMenu();
-    startCount();
+  } else {
+    myName = nameArray[0];
   }
-};
+  document.getElementById("name_text_box").value = myName;
 
-const output = (msg) => {
-  $("#log").prepend( $("<p>").text(msg) );
-  console.log(msg);
-};
+  var sendReaction = (reaction) => {
+    return () => {
+      myName = document.getElementById("name_text_box").value;
+      if (window.localStorage) localStorage.name = myName;
+      document.getElementById("stamp_grid_view").src = `images/l/${reaction}.jpg`;
+      ts.write({type: "wakaruland", who: myName, value: reaction, time: 30});
+      switchMenu();
+    }
+  };
 
-const switchMenu = () => {
-  const obj = document.getElementById('icon_view').style;
-  obj.display = (obj.display == 'none') ? 'block' : 'none';
-};
+  var switchMenu = () => {
+    const obj = document.getElementById('stamp_grid_view').style;
+    obj.display = (obj.display == 'none') ? 'block' : 'none';
+  };
 
-// リアクションアイコン画像を動的に追加
-for (let i in img_ids) {
-  const id = img_ids[i];
-  var gridCell = document.createElement("div");
-  gridCell.setAttribute("class", "icon");
-  var img = document.createElement("img");
-  img.setAttribute("id", id);
-  img.setAttribute("src", `images/${id}.jpg`);
-  img.setAttribute("width", "100%");
-  gridCell.appendChild(img);
-  document.getElementById("icon_view").appendChild(gridCell);
+  linda.io.on("connect", () => {
+    console.log("connect Linda!!");
+    ts.watch({type: "wakaruland"}, (err, tuple) => {
+      if (myName == tuple.data.who) {
+        document.getElementById("img").src = `images/l/${tuple.data.value}.jpg`;
+      }
+    });
+  });
+
+  // 一覧表示は使わないので削除
+  const gridView = document.getElementById("grid_view");
+  gridView.parentNode.removeChild(gridView);
+
+  // リアクションアイコン画像を動的に追加
+  for (let i in reactions) {
+    const id = reactions[i];
+    const gridCell = document.createElement("div");
+    gridCell.setAttribute("class", "icon");
+    const img = document.createElement("img");
+    img.setAttribute("id", id);
+    img.setAttribute("src", `images/${id}.jpg`);
+    img.setAttribute("width", "100%");
+    gridCell.appendChild(img);
+    document.getElementById("stamp_grid_view").appendChild(gridCell);
+  }
+
+  for (let i in reactions) {
+    const id = reactions[i];
+    document.getElementById(id).onclick = sendReaction(id);
+  }
+
+} else {
+  /**
+   * grid ユーザの一覧ページ
+   * URL末尾に2人以上ユーザ名を書いたとき
+   */
+  const getGridSize = (windowWidth, windowHeight, minCellWidth, itemCount) => {
+    if (itemCount <= 1) {
+      return { "columnCount": 1, "rowCount": 1 };
+    }
+
+    const cellAspectRatio = 1.0;
+    const minCellHeight = minCellWidth / cellAspectRatio;
+    const maxColumnCount = Math.floor(windowWidth / minCellWidth);
+    const minRowCount = Math.ceil(itemCount / maxColumnCount);
+    if (windowHeight < minRowCount * minCellHeight) {
+      return { "columnCount": maxColumnCount, "rowCount": minRowCount };
+    }
+
+    let columnCount = maxColumnCount - 1;
+    let rowCount = Math.ceil(itemCount / columnCount);
+
+    while (columnCount > 1) {
+      const cellWidth = windowWidth / columnCount;
+      const cellHeight = cellWidth * cellAspectRatio;
+      if (windowHeight < rowCount * cellHeight) {
+        rowCount = Math.ceil(itemCount / columnCount);
+        return { "columnCount": columnCount, "rowCount": rowCount };
+      } else {
+        columnCount -= 1;
+        rowCount = Math.ceil(itemCount / columnCount);
+      }
+    }
+    return { "columnCount": 1, "rowCount": itemCount };
+  };
+
+  const createCell = (name) => {
+    //Twitterからプロフィール画像取得
+    const img_url = "http://www.paper-glasses.com/api/twipi/" + name + "/original";
+    const gridCell = document.createElement("div");
+    gridCell.setAttribute("class", "cell");
+    const nameDiv = document.createElement("div");
+    const nameImg = document.createElement("img");
+    const nameText = document.createElement("div");
+    nameDiv.innerHTML = name;
+    const imgDiv = document.createElement("div");
+    const img = document.createElement("img");
+    img.setAttribute("class", "image");
+    img.setAttribute("id", name);
+    img.setAttribute("src", img_url);
+    img.setAttribute("height", "100%");
+    nameDiv.appendChild(nameImg).appendChild(nameText);
+    imgDiv.appendChild(img);
+    gridCell.appendChild(nameDiv).appendChild(imgDiv);
+    return gridCell;
+  };
+
+  linda.io.on("connect", function(){
+    console.log("connect Linda!!");
+
+    ts.watch({type: "wakaruland"}, (err, tuple) => {
+      const reactor = tuple.data.who;
+      const value = tuple.data.value;
+      if (nameArray.includes(reactor)) {
+        console.log(reactor + " < " + value);
+        document.getElementById(reactor).src = `../images/l/${value}.jpg`;
+        document.getElementById(reactor).style.opacity = 1.0;
+      }
+    });
+  });
+
+  const minCellWidth = 100; //TODO: ユーザが任意に変えられるようにしようかな
+  const minCellHeight = 100;
+  const gridSize = getGridSize(window.innerWidth, window.innerHeight, minCellWidth, nameArray.length);
+  const columnCount = gridSize.columnCount;
+  const rowCount = gridSize.rowCount;
+  console.log("columnCount = " + columnCount + ", rowCount = " + rowCount);
+  const cellHeight = Math.max(window.innerHeight / rowCount, minCellWidth);
+  const gridView = document.createElement("div");
+  gridView.setAttribute("id", "grid_view");
+
+  for (let i in nameArray) {
+    const name = nameArray[i];
+    const cell = createCell(name);
+    document.getElementById("grid_view").appendChild(cell);
+    if (cellHeight == minCellWidth) {
+      cell.style.width = Math.floor(100 / columnCount) + "%";
+      cell.style.height = minCellHeight;
+    } else if (window.innerHeight < cellHeight * rowCount) {
+      cell.style.width = Math.floor(100 / rowCount) + "%";
+      cell.style.height = Math.floor(100 / rowCount) + "%";
+    } else {
+      cell.style.width = Math.floor(100 / columnCount) + "%";
+      cell.style.height = Math.floor(100 / rowCount) + "%";
+    }
+  }
+
+  // リアクションの書き込みはいらないので削除
+  const body_ids = ["name_input", "switch_menu", "stamp_grid_view", "img"];
+  for (let i in body_ids) {
+    console.log(body_ids[i]);
+    const ele = document.getElementById(body_ids[i]);
+    ele.parentNode.removeChild(ele);
+  }
 }
-
-for (let i in img_ids) {
-  const id = img_ids[i];
-  document.getElementById(id).onclick = sendReaction(id);
-}
-
-// 30秒間リアクションしなかったらタプルを書き込む
-const withdrawReaction = () => {
-  stopCount();
-  document.getElementById("img").src = "images/l/blank.jpg";
-  ts.write({who: myName, response: "NO", time: "30sec"});
-};
-
-var count = 0;
-var count30sec = setTimeout(() => {
-  withdrawReaction();
-}, 30000);
-
-const startCount = () => {
-  stopCount();
-  count30sec();
-};
-
-const stopCount = () => {
-  clearTimeout(count30sec);
-  count = 0;
-};
-
-window.addEventListener("beforeunload", (e) => {
-  var confirmationMessage = "\o/";
-  e.returnValue = confirmationMessage;     // Gecko and Trident
-  return confirmationMessage;              // Gecko and WebKit
-});
-
-window.addEventListener('unload', (e) => {
-  ts.write({who: myName, response: "NO", time: "30sec"});
-});

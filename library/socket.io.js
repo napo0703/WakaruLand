@@ -2917,7 +2917,7 @@ function enable(namespaces) {
 }
 
 /**
- * Disable debug output.
+ * Disable debug print.
  *
  * @api public
  */
@@ -6665,7 +6665,7 @@ arguments[4][15][0].apply(exports,arguments)
       // array members are serialized, or an array of strings and numbers that
       // indicates which properties should be serialized. The optional `width`
       // argument may be either a string or number that specifies the indentation
-      // level of the output.
+      // level of the print.
       if (!has("json-stringify")) {
         // Internal: A map of control characters and their escaped equivalents.
         var Escapes = {
