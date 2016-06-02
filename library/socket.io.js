@@ -2008,7 +2008,7 @@ WS.prototype.addEventListeners = function(){
 };
 
 /**
- * Override `onData` to use a timer on iOS.
+ * Override `onData` to use a withdrawReaction on iOS.
  * See: https://gist.github.com/mloughran/2052006
  *
  * @api private
@@ -4579,7 +4579,7 @@ Manager.prototype.connect = function(fn){
     var timeout = this._timeout;
     debug('connect attempt will timeout after %d', timeout);
 
-    // set timer
+    // set withdrawReaction
     var timer = setTimeout(function(){
       debug('connect attempt timed out after %d', timeout);
       openSub.destroy();
@@ -5420,7 +5420,7 @@ function url(uri, loc){
 module.exports = Backoff;
 
 /**
- * Initialize backoff timer with `opts`.
+ * Initialize backoff withdrawReaction with `opts`.
  *
  * - `min` initial timeout in milliseconds [100]
  * - `max` max timeout [10000]

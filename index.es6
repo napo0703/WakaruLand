@@ -110,7 +110,7 @@ if (nameArray.length <= 1) {
 
   const createCell = (name) => {
     //Twitterからプロフィール画像取得
-    const img_url = "http://www.paper-glasses.com/api/twipi/" + name + "/original";
+    var img_url = "http://www.paper-glasses.com/api/twipi/" + name + "/original";
     const gridCell = document.createElement("div");
     gridCell.setAttribute("class", "cell");
     const nameDiv = document.createElement("div");
@@ -129,19 +129,52 @@ if (nameArray.length <= 1) {
     return gridCell;
   };
 
+  let timer_ids = {};
+  const withdrawReaction = (reactor, time) => {
+    if (time == "forever" && reactor in timer_ids) {
+      window.clearTimeout(timer_ids[reactor]);
+    } else {
+      if (reactor in timer_ids) {
+        window.clearTimeout(timer_ids[reactor]);
+      }
+      console.log("time = " + time + "msec");
+      timer_ids[reactor] = window.setTimeout(() => {
+        console.log("withdraw -> " + reactor);
+        document.getElementById(reactor).src = "http://www.paper-glasses.com/api/twipi/" + reactor + "/original";
+        document.getElementById(reactor).style.opacity = 0.25;
+      }, time);
+    }
+  };
+
   linda.io.on("connect", function(){
     console.log("connect Linda!!");
 
     ts.watch({type: "wakaruland"}, (err, tuple) => {
       const reactor = tuple.data.who;
-      const value = tuple.data.value;
       if (nameArray.includes(reactor)) {
-        console.log(reactor + " < " + value);
-        document.getElementById(reactor).src = `../images/l/${value}.jpg`;
-        document.getElementById(reactor).style.opacity = 1.0;
+        const value = tuple.data.value;
+        const time = tuple.data.time;
+        const from = tuple.from;
+        console.log(reactor + " < " + value + " " + time + "sec (from " + from + ")");
+
+        if (typeof value == "string") {
+          document.getElementById(reactor).src = `../images/l/${value}.jpg`;
+          document.getElementById(reactor).style.opacity = 1.0;
+          withdrawReaction(reactor, time * 1000);
+        } else if (typeof value == "number") {
+          // TODO: 数値の表示
+          console.log("value is Number!");
+        }
       }
     });
   });
+
+  // リアクションの書き込みはいらないので削除
+  const body_ids = ["name_input", "switch_menu", "stamp_grid_view", "img"];
+  for (let i in body_ids) {
+    const ele = document.getElementById(body_ids[i]);
+    ele.parentNode.removeChild(ele);
+  }
 
   const minCellWidth = 100; //TODO: ユーザが任意に変えられるようにしようかな
   const minCellHeight = 100;
@@ -167,13 +200,5 @@ if (nameArray.length <= 1) {
       cell.style.width = Math.floor(100 / columnCount) + "%";
       cell.style.height = Math.floor(100 / rowCount) + "%";
     }
-  }
-
-  // リアクションの書き込みはいらないので削除
-  const body_ids = ["name_input", "switch_menu", "stamp_grid_view", "img"];
-  for (let i in body_ids) {
-    console.log(body_ids[i]);
-    const ele = document.getElementById(body_ids[i]);
-    ele.parentNode.removeChild(ele);
   }
 }
