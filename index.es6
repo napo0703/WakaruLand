@@ -27,12 +27,12 @@ if (nameArray.length <= 1) {
   }
   document.getElementById("name_text_box").value = myName;
 
-  var sendReaction = (reaction) => {
+  var sendReaction = (reaction, time) => {
     return () => {
       myName = document.getElementById("name_text_box").value;
       if (window.localStorage) localStorage.name = myName;
       document.getElementById("stamp_grid_view").src = `images/l/${reaction}.jpg`;
-      ts.write({type: "wakaruland", who: myName, value: reaction, time: 30});
+      ts.write({type: "wakaruland", who: myName, value: reaction, time: time});
       switchMenu();
     }
   };
@@ -70,7 +70,7 @@ if (nameArray.length <= 1) {
 
   for (let i in reactions) {
     const id = reactions[i];
-    document.getElementById(id).onclick = sendReaction(id);
+    document.getElementById(id).onclick = sendReaction(id, 30);
   }
 
 } else {
@@ -78,14 +78,25 @@ if (nameArray.length <= 1) {
    * grid ユーザの一覧ページ
    * URL末尾に2人以上ユーザ名を書いたとき
    */
+  // FIXME: もっといい方法ありそう
   const getGridSize = (windowWidth, windowHeight, minCellWidth, itemCount) => {
     if (itemCount <= 1) {
       return { "columnCount": 1, "rowCount": 1 };
     }
 
+    if (windowWidth >= windowHeight) {
+      if ((windowWidth / windowHeight) * 2 > itemCount) {
+        return { "columnCount": itemCount, "rowCount": 1 }
+      }
+    } else {
+      if ((windowHeight / windowWidth) * 2 > itemCount) {
+        return { "columnCount": 1, "rowCount": itemCount }
+      }
+    }
+
     const cellAspectRatio = 1.0;
     const minCellHeight = minCellWidth / cellAspectRatio;
-    const maxColumnCount = Math.floor(windowWidth / minCellWidth);
+    const maxColumnCount = Math.min(Math.floor(windowWidth / minCellWidth), itemCount);
     const minRowCount = Math.ceil(itemCount / maxColumnCount);
     if (windowHeight < minRowCount * minCellHeight) {
       return { "columnCount": maxColumnCount, "rowCount": minRowCount };
@@ -95,37 +106,35 @@ if (nameArray.length <= 1) {
     let rowCount = Math.ceil(itemCount / columnCount);
 
     while (columnCount > 1) {
-      const cellWidth = windowWidth / columnCount;
-      const cellHeight = cellWidth * cellAspectRatio;
-      if (windowHeight < rowCount * cellHeight) {
-        rowCount = Math.ceil(itemCount / columnCount);
-        return { "columnCount": columnCount, "rowCount": rowCount };
+      const prevColumnCount = columnCount + 1;
+      const prevRowCount = Math.ceil(itemCount / prevColumnCount);
+      if (Math.min(windowWidth / columnCount, windowHeight / rowCount)
+          < Math.min(windowWidth / prevColumnCount, windowHeight / prevRowCount)) {
+        return { "columnCount": prevColumnCount, "rowCount": prevRowCount }
       } else {
         columnCount -= 1;
         rowCount = Math.ceil(itemCount / columnCount);
       }
     }
-    return { "columnCount": 1, "rowCount": itemCount };
+    if (windowWidth >= windowHeight) return { "columnCount": Math.ceil(itemCount / 2), "rowCount": 2 };
+    else return { "columnCount": 2, "rowCount": Math.ceil(itemCount / 2) };
   };
 
-  const createCell = (name) => {
+  const createCell = (name, cellWidth, cellHeight) => {
     //Twitterからプロフィール画像取得
     var img_url = "http://www.paper-glasses.com/api/twipi/" + name + "/original";
     const gridCell = document.createElement("div");
     gridCell.setAttribute("class", "cell");
-    const nameDiv = document.createElement("div");
-    const nameImg = document.createElement("img");
-    const nameText = document.createElement("div");
-    nameDiv.innerHTML = name;
-    const imgDiv = document.createElement("div");
     const img = document.createElement("img");
     img.setAttribute("class", "image");
     img.setAttribute("id", name);
     img.setAttribute("src", img_url);
-    img.setAttribute("height", "100%");
-    nameDiv.appendChild(nameImg).appendChild(nameText);
-    imgDiv.appendChild(img);
-    gridCell.appendChild(nameDiv).appendChild(imgDiv);
+    if (cellWidth >= cellHeight) {
+      img.setAttribute("height", "100%");
+    } else {
+      img.setAttribute("width", "100%");
+    }
+    gridCell.appendChild(img);
     return gridCell;
   };
 
@@ -182,13 +191,12 @@ if (nameArray.length <= 1) {
   const columnCount = gridSize.columnCount;
   const rowCount = gridSize.rowCount;
   console.log("columnCount = " + columnCount + ", rowCount = " + rowCount);
-  const cellHeight = Math.max(window.innerHeight / rowCount, minCellWidth);
-  const gridView = document.createElement("div");
-  gridView.setAttribute("id", "grid_view");
+  const cellWidth = Math.max(window.innerWidth / columnCount, minCellWidth);
+  const cellHeight = Math.max(window.innerHeight / rowCount, minCellHeight);
 
   for (let i in nameArray) {
     const name = nameArray[i];
-    const cell = createCell(name);
+    const cell = createCell(name, cellWidth, cellHeight);
     document.getElementById("grid_view").appendChild(cell);
     if (cellHeight == minCellWidth) {
       cell.style.width = Math.floor(100 / columnCount) + "%";
