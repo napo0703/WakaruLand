@@ -1,4 +1,1 @@
-<?php
-    header('Location: https://wakaruland.com', true, 301);
-    exit();
-?>
+<?php echo file_get_contents('index.html');
