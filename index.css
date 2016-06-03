@@ -39,3 +39,23 @@
   left: 0;
   margin: auto;
 }
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+  bottom: 0;
+  color: #fff;
+  background: rgba(0,0,0,.5);
+  width: 100%;
+  max-width: 600px;
+  padding: 1em 0;
+}
+.absolute p {
+  margin: 0;
+  padding: 0 0.8em;
+  font-size: 200%;
+  text-align: center;
+}

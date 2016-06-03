@@ -2,6 +2,8 @@ const reactions = ["blank", "emoine", "hiee", "ichiriaru", "iihanashida", "kami"
                    "naruhodo", "otsu", "shitteta", "soudane", "soukamo", "soukana", "sugoi", "tashikani", "tasukete",
                    "tensai", "toutoi", "wakaran", "wakaru", "wara", "maru", "batsu"];
 
+const masuilab_sensor = ["delta_light", "delta_temperature", "delta_door"];
+
 // connect Socket.IO & Linda
 const server_url = "https://linda-server.herokuapp.com/";
 const socket = io.connect(server_url);
@@ -121,10 +123,17 @@ if (nameArray.length <= 1) {
   };
 
   const createCell = (name, cellWidth, cellHeight) => {
-    //Twitterからプロフィール画像取得
-    var img_url = "http://www.paper-glasses.com/api/twipi/" + name + "/original";
+    let img_url;
+    if (masuilab_sensor.includes(name)) {
+      img_url = "images/l/"+ name + ".jpg";
+    } else {
+      //Twitterからプロフィール画像取得
+      img_url = "http://www.paper-glasses.com/api/twipi/" + name + "/original";
+    }
     const gridCell = document.createElement("div");
     gridCell.setAttribute("class", "cell");
+    const figure = document.createElement("figure");
+    figure.setAttribute("class", "relative");
     const img = document.createElement("img");
     img.setAttribute("class", "image");
     img.setAttribute("id", name);
@@ -133,6 +142,15 @@ if (nameArray.length <= 1) {
       img.setAttribute("height", "100%");
     } else {
       img.setAttribute("width", "100%");
+    }
+    if (name == "delta_temperature" || name == "delta_light") {
+      const figcaption = document.createElement("figcaption");
+      figcaption.setAttribute("class", "absolute");
+      const text = document.createElement("p");
+      text.setAttribute("id", name + "_value_text");
+      text.innerHTML = "hoge fuga";
+      figcaption.appendChild(text);
+      gridCell.appendChild(figcaption);
     }
     gridCell.appendChild(img);
     return gridCell;
@@ -149,7 +167,11 @@ if (nameArray.length <= 1) {
       console.log("time = " + time + "msec");
       timer_ids[reactor] = window.setTimeout(() => {
         console.log("withdraw -> " + reactor);
-        document.getElementById(reactor).src = "http://www.paper-glasses.com/api/twipi/" + reactor + "/original";
+        if (masuilab_sensor.includes(reactor)) {
+          document.getElementById(reactor).src = `../images/l/${reactor}.jpg`;
+        } else {
+          document.getElementById(reactor).src = "http://www.paper-glasses.com/api/twipi/" + reactor + "/original";
+        }
         document.getElementById(reactor).style.opacity = 0.25;
       }, time);
     }
@@ -176,6 +198,30 @@ if (nameArray.length <= 1) {
         }
       }
     });
+
+    if (nameArray.includes("delta_temperature")) {
+      ts.watch({where: "delta", type: "sensor", name: "temperature"}, (err, tuple) => {
+        console.log("delta_temperature = " +tuple.data.value);
+        document.getElementById("delta_temperature_value_text").innerHTML = tuple.data.value;
+      })
+    }
+
+    if (nameArray.includes("delta_light")) {
+      ts.watch({where: "delta", type: "sensor", name: "light"}, (err, tuple) => {
+        console.log("delta_light = " + tuple.data.value);
+        document.getElementById("delta_light_value_text").innerHTML = tuple.data.value;
+      })
+    }
+
+    if (nameArray.includes("delta_door")) {
+      ts.watch({where: "delta", type: "door", cmd: "open"}, (err, tuple) => {
+        console.log("delta_door_open!!");
+        document.getElementById("delta_door").src = `../images/l/maru.jpg`;
+        document.getElementById("delta_door").style.opacity = 1.0;
+        withdrawReaction("delta_door", 5000);
+      })
+    }
+
   });
 
   // リアクションの書き込みはいらないので削除
