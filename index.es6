@@ -1,8 +1,9 @@
-const reactions = ["blank", "emoine", "hiee", "ichiriaru", "iihanashida", "kami", "kandoushita", "kininaru", "majikayo",
-                   "naruhodo", "otsu", "shitteta", "soudane", "soukamo", "soukana", "sugoi", "tashikani", "tasukete",
-                   "tensai", "toutoi", "wakaran", "wakaru", "wara", "maru", "batsu"];
+const reactions = ["blank", "エモいね", "ひえぇ〜", "一理ある", "いい話だ", "神", "感動した", "気になる", "まじかよ",
+                   "なるほど", "乙", "知ってた", "そうだね", "そうかも", "そうかな", "すごい！", "たしかに",
+                   "たすけて", "天才", "尊い", "わからん", "わかる！", "笑", "⭕️", "❌"];
 
-const masuilab_sensor = ["delta_light", "delta_temperature", "delta_door"];
+const masuilab_sensor = ["delta_light", "delta_temperature", "delta_door", "enoshima_wind", "sfc_weather",
+                         "shokai_light", "shokai_temperature"];
 
 // connect Socket.IO & Linda
 const server_url = "https://linda-server.herokuapp.com/";
@@ -11,34 +12,38 @@ const linda = new Linda().connect(socket);
 const ts = linda.tuplespace("masuilab");
 
 // URL末尾のカンマ区切り文字列から表示するユーザを抽出
-const nameArray = Array.from(new Set(location.search.substring(1).split(',')));
-console.log(nameArray);
+const fromArray = Array.from(new Set(location.search.substring(1).split(',')));
+console.log(fromArray);
 
-if (nameArray.length <= 1) {
+if (fromArray.length == 0 || (fromArray.length == 1 && (fromArray[0].charAt(0) == "@" || fromArray[0] == ""))) {
   /**
    * console リアクション投稿ページ
-   * URL末尾にユーザ名を書かない、または、ユーザ名が1人のとき
+   * URL末尾に何も書かない、Twitterユーザ名が1人のとき
    */
+
   let myName = "test";
-  if (nameArray.length == 0) {
+  if (fromArray.length == 0 || fromArray[0] == "") {
     if (window.localStorage) {
       myName = localStorage.name;
     }
   } else {
-    myName = nameArray[0];
+    myName = fromArray[0];
   }
-  document.getElementById("name_text_box").value = myName;
+  document.getElementById("name_text_box").value = myName.substring(1);
 
+  // TODO: クリックした長さで表示時間を変える
+  // 一瞬 -> 15秒,   2秒 -> 5分,   5秒 -> ずっと
   var sendReaction = (reaction, time) => {
     return () => {
-      myName = document.getElementById("name_text_box").value;
+      myName = "@" + document.getElementById("name_text_box").value;
       if (window.localStorage) localStorage.name = myName;
-      document.getElementById("stamp_grid_view").src = `images/l/${reaction}.jpg`;
-      ts.write({type: "wakaruland", who: myName, value: reaction, time: time});
+      document.getElementById("img").src = `images/l/${reaction}.png`;
+      ts.write({from: myName, value: reaction, time: time});
       switchMenu();
     }
   };
 
+  // スタンプビューの表示/非表示切り替え
   var switchMenu = () => {
     const obj = document.getElementById('stamp_grid_view').style;
     obj.display = (obj.display == 'none') ? 'block' : 'none';
@@ -46,10 +51,9 @@ if (nameArray.length <= 1) {
 
   linda.io.on("connect", () => {
     console.log("connect Linda!!");
-    ts.watch({type: "wakaruland"}, (err, tuple) => {
-      if (myName == tuple.data.who) {
-        document.getElementById("img").src = `images/l/${tuple.data.value}.jpg`;
-      }
+    ts.watch({from: myName}, (err, tuple) => {
+      console.log(myName+" < " + tuple.data.value);
+      document.getElementById("img").src = `images/l/${tuple.data.value}.png`;
     });
   });
 
@@ -64,7 +68,7 @@ if (nameArray.length <= 1) {
     gridCell.setAttribute("class", "icon");
     const img = document.createElement("img");
     img.setAttribute("id", id);
-    img.setAttribute("src", `images/${id}.jpg`);
+    img.setAttribute("src", `images/${id}.png`);
     img.setAttribute("width", "100%");
     gridCell.appendChild(img);
     document.getElementById("stamp_grid_view").appendChild(gridCell);
@@ -78,9 +82,65 @@ if (nameArray.length <= 1) {
 } else {
   /**
    * grid ユーザの一覧ページ
-   * URL末尾に2人以上ユーザ名を書いたとき
+   * URL末尾に2人以上Twitterユーザ名を書いたとき、1つ以上Twitterユーザ名【以外】を書いたとき
    */
-  // FIXME: もっといい方法ありそう
+
+  // 表示する人/物/現象のViewを動的に生成する
+  const createCell = (name, cellWidth, cellHeight) => {
+    let img_url;
+    if (name.charAt(0) == "@") {
+      //Twitterからプロフィール画像取得
+      img_url = "http://www.paper-glasses.com/api/twipi/" + name.substring(1) + "/original";
+    } else if (masuilab_sensor.includes(name)) {
+      // 研究室のセンサ等の場合
+      img_url = "images/l/" + name + ".png";
+    } else {
+      img_url = "images/l/blank.png";
+    }
+
+    const gridCell = document.createElement("div");
+    gridCell.setAttribute("class", "cell");
+    const img = document.createElement("img");
+    if (masuilab_sensor.includes(name)) {
+      img.setAttribute("class", "image_sensor");
+      img.setAttribute("id", name);
+    } else {
+      img.setAttribute("class", "image");
+    }
+    img.setAttribute("src", img_url);
+
+    if (cellWidth >= cellHeight) {
+      img.setAttribute("height", "100%");
+    } else {
+      img.setAttribute("width", "100%");
+    }
+    gridCell.appendChild(img);
+
+    if (masuilab_sensor.includes(name)) {
+      const figcaption = document.createElement("figcaption");
+      figcaption.setAttribute("class", "absolute");
+      const text = document.createElement("p");
+      text.setAttribute("id", name + "_value_text");
+      figcaption.appendChild(text);
+      gridCell.appendChild(img);
+      gridCell.appendChild(figcaption);
+    } else {
+      const reaction_img = document.createElement("img");
+      reaction_img.setAttribute("class", "reaction_image");
+      reaction_img.setAttribute("id", name);
+      reaction_img.setAttribute("src", "images/l/blank.png");
+      if (cellWidth >= cellHeight) {
+        reaction_img.setAttribute("height", "100%");
+      } else {
+        reaction_img.setAttribute("width", "100%");
+      }
+      gridCell.appendChild(img);
+      gridCell.appendChild(reaction_img);
+    }
+    return gridCell;
+  };
+
+  // ウィンドウサイズと表示数からグリッドの列数と行数を算出する
   const getGridSize = (windowWidth, windowHeight, minCellWidth, itemCount) => {
     if (itemCount <= 1) {
       return { "columnCount": 1, "rowCount": 1 };
@@ -122,40 +182,7 @@ if (nameArray.length <= 1) {
     else return { "columnCount": 2, "rowCount": Math.ceil(itemCount / 2) };
   };
 
-  const createCell = (name, cellWidth, cellHeight) => {
-    let img_url;
-    if (masuilab_sensor.includes(name)) {
-      img_url = "images/l/"+ name + ".jpg";
-    } else {
-      //Twitterからプロフィール画像取得
-      img_url = "http://www.paper-glasses.com/api/twipi/" + name + "/original";
-    }
-    const gridCell = document.createElement("div");
-    gridCell.setAttribute("class", "cell");
-    const figure = document.createElement("figure");
-    figure.setAttribute("class", "relative");
-    const img = document.createElement("img");
-    img.setAttribute("class", "image");
-    img.setAttribute("id", name);
-    img.setAttribute("src", img_url);
-    if (cellWidth >= cellHeight) {
-      img.setAttribute("height", "100%");
-    } else {
-      img.setAttribute("width", "100%");
-    }
-    if (name == "delta_temperature" || name == "delta_light") {
-      const figcaption = document.createElement("figcaption");
-      figcaption.setAttribute("class", "absolute");
-      const text = document.createElement("p");
-      text.setAttribute("id", name + "_value_text");
-      text.innerHTML = "hoge fuga";
-      figcaption.appendChild(text);
-      gridCell.appendChild(figcaption);
-    }
-    gridCell.appendChild(img);
-    return gridCell;
-  };
-
+  // 指定時間後に発言を非表示にする
   let timer_ids = {};
   const withdrawReaction = (reactor, time) => {
     if (time == "forever" && reactor in timer_ids) {
@@ -168,9 +195,9 @@ if (nameArray.length <= 1) {
       timer_ids[reactor] = window.setTimeout(() => {
         console.log("withdraw -> " + reactor);
         if (masuilab_sensor.includes(reactor)) {
-          document.getElementById(reactor).src = `../images/l/${reactor}.jpg`;
+          document.getElementById(reactor).src = `../images/l/${reactor}.png`;
         } else {
-          document.getElementById(reactor).src = "http://www.paper-glasses.com/api/twipi/" + reactor + "/original";
+          document.getElementById(reactor).src = "http://www.paper-glasses.com/api/twipi/" + reactor.substring(1) + "/original";
         }
         document.getElementById(reactor).style.opacity = 0.25;
       }, time);
@@ -180,51 +207,74 @@ if (nameArray.length <= 1) {
   linda.io.on("connect", function(){
     console.log("connect Linda!!");
 
-    ts.watch({type: "wakaruland"}, (err, tuple) => {
-      const reactor = tuple.data.who;
-      if (nameArray.includes(reactor)) {
-        const value = tuple.data.value;
-        const time = tuple.data.time;
-        const from = tuple.from;
-        console.log(reactor + " < " + value + " " + time + "sec (from " + from + ")");
+    for (let i in fromArray) {
+      if (fromArray[i].charAt(0) == "@") {
+        ts.watch({from: fromArray[i]}, (err, tuple) => {
+          const reactor = tuple.data.from;
+          if (fromArray.includes(reactor)) {
+            const value = tuple.data.value;
+            const time = tuple.data.time;
+            const ip_address = tuple.from;
+            console.log(reactor + " < " + value + " " + time + "sec (from " + ip_address + ")");
 
-        if (typeof value == "string") {
-          document.getElementById(reactor).src = `../images/l/${value}.jpg`;
-          document.getElementById(reactor).style.opacity = 1.0;
-          withdrawReaction(reactor, time * 1000);
-        } else if (typeof value == "number") {
-          // TODO: 数値の表示
-          console.log("value is Number!");
-        }
+            if (typeof value == "string") {
+              document.getElementById(reactor).src = `../images/l/${value}.png`;
+              document.getElementById(reactor).style.opacity = 1.0;
+              if (time != 0) {
+                withdrawReaction(reactor, time * 1000);
+              }
+            } else if (typeof value == "number") {
+              // TODO: 数値の表示
+              console.log("value is Number!");
+            }
+          }
+        });
       }
-    });
+    }
 
-    if (nameArray.includes("delta_temperature")) {
+    if (fromArray.includes("delta_temperature")) {
       ts.watch({where: "delta", type: "sensor", name: "temperature"}, (err, tuple) => {
-        console.log("delta_temperature = " +tuple.data.value);
-        document.getElementById("delta_temperature_value_text").innerHTML = tuple.data.value;
-      })
+        const temp = Math.round(tuple.data.value * 10) / 10;
+        console.log("delta_temperature = " + temp);
+        document.getElementById("delta_temperature_value_text").innerHTML = temp + "℃";
+      });
     }
 
-    if (nameArray.includes("delta_light")) {
+    if (fromArray.includes("delta_light")) {
       ts.watch({where: "delta", type: "sensor", name: "light"}, (err, tuple) => {
-        console.log("delta_light = " + tuple.data.value);
-        document.getElementById("delta_light_value_text").innerHTML = tuple.data.value;
-      })
+        const value = tuple.data.value;
+        console.log("delta_light = " + value);
+        document.getElementById("delta_light_value_text").innerHTML = value;
+        if (value <= 100) {
+          document.getElementById("delta_light").src = "images/l/delta_light.png";
+        } else {
+          document.getElementById("delta_light").src = "images/l/delta_light_on.png";
+        }
+      });
     }
 
-    if (nameArray.includes("delta_door")) {
+    if (fromArray.includes("delta_door")) {
       ts.watch({where: "delta", type: "door", cmd: "open"}, (err, tuple) => {
         console.log("delta_door_open!!");
-        document.getElementById("delta_door").src = `../images/l/maru.jpg`;
-        document.getElementById("delta_door").style.opacity = 1.0;
-        withdrawReaction("delta_door", 5000);
-      })
+        const date = new Date();
+        document.getElementById("delta_door_value_text").innerHTML =
+            "Last OPEN " + date.getHours()+ ":" + date.getMinutes() + ":" + date.getSeconds();
+        document.getElementById("delta_door").src = "images/l/delta_door_open.png";
+        window.setTimeout(() => {
+          document.getElementById("delta_door").src = "images/l/delta_door.png";
+        }, 10000);
+      });
     }
 
+    if (fromArray.includes("enoshima_wind")) {
+      ts.watch({where: "enoshima", type: "sensor", name: "wind"}, (err, tuple) => {
+        document.getElementById("enoshima_wind_value_text").innerHTML =
+            tuple.data.direction + " の風 " + tuple.data.speed + "m/s";
+      });
+    }
   });
 
-  // リアクションの書き込みはいらないので削除
+  // リアクションの書き込みのViewはいらないので削除
   const body_ids = ["name_input", "switch_menu", "stamp_grid_view", "img"];
   for (let i in body_ids) {
     const ele = document.getElementById(body_ids[i]);
@@ -233,15 +283,15 @@ if (nameArray.length <= 1) {
 
   const minCellWidth = 100; //TODO: ユーザが任意に変えられるようにしようかな
   const minCellHeight = 100;
-  const gridSize = getGridSize(window.innerWidth, window.innerHeight, minCellWidth, nameArray.length);
+  const gridSize = getGridSize(window.innerWidth, window.innerHeight, minCellWidth, fromArray.length);
   const columnCount = gridSize.columnCount;
   const rowCount = gridSize.rowCount;
   console.log("columnCount = " + columnCount + ", rowCount = " + rowCount);
   const cellWidth = Math.max(window.innerWidth / columnCount, minCellWidth);
   const cellHeight = Math.max(window.innerHeight / rowCount, minCellHeight);
 
-  for (let i in nameArray) {
-    const name = nameArray[i];
+  for (let i in fromArray) {
+    const name = fromArray[i];
     const cell = createCell(name, cellWidth, cellHeight);
     document.getElementById("grid_view").appendChild(cell);
     if (cellHeight == minCellWidth) {

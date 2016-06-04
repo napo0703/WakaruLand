@@ -40,17 +40,32 @@
   margin: auto;
 }
 
-.relative {
-  position: relative;
+.reaction_image {
+  opacity: 1.0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+}
+
+.image_sensor {
+  opacity: 1.0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
 }
 
 .absolute {
   position: absolute;
   bottom: 0;
   color: #fff;
-  background: rgba(0,0,0,.5);
+  background: rgba(0,0,0,.8);
   width: 100%;
-  max-width: 600px;
   padding: 1em 0;
 }
 .absolute p {
