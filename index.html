@@ -6,29 +6,18 @@
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
-    <table width="100%">
-      <tr>
-        <td>
-          <p>
-            name: <input type="text" value="test" id="name">
-          </p>
-          <div onclick="switchMenu()">
-            <a style="cursor:pointer;">▼ Reaction</a>
-          </div>
-          <div id="icon_view" style="display:none;clear:both;"></div>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <img src="images/l/blank.jpg" id="img" width="100%" border="1">
-          <div id="log"></div>
-        </td>
-      </tr>
-    </table>
-
-    <script src="https://linda-server.herokuapp.com/js/jquery.min.js"></script>
+    <div id="name_input">
+      Twitter ID: @<input type="text" value="test" id="name_text_box">
+    </div>
+    <div id="switch_menu" onclick="switchMenu()">
+      <a id="menu_button" style="cursor:pointer;">▼ Reaction</a>
+    </div>
+    <div id="stamp_grid_view" style="display:none;clear:both;"></div>
+    <img src="images/l/blank.png" id="img" width="100%" border="1">
+    <div id="grid_view"></div>
+    <script src="//linda-server.herokuapp.com/js/jquery.min.js"></script>
     <script src="./library/socket.io.js"></script>
-    <script src="https://linda-server.herokuapp.com/linda/linda.js"></script>
+    <script src="//linda-server.herokuapp.com/linda/linda.js"></script>
     <script src="index.js"></script>
   </body>
 </html>
