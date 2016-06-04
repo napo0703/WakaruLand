@@ -24,7 +24,7 @@ if (fromArray.length == 0 || (fromArray.length == 1 && (fromArray[0].charAt(0) =
   let myName = "test";
   if (fromArray.length == 0 || fromArray[0] == "") {
     if (window.localStorage) {
-      myName = localStorage.name;
+      myName = localStorage.name || myName;
     }
   } else {
     myName = fromArray[0];
