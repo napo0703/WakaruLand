@@ -5,14 +5,24 @@
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "./node_modules/.bin/gulp"
+    "build": "browserify --verbose -t [ babelify ] -g uglifyify src/index.js -o dist/index.js",
+    "watch": "watchify --verbose --debug -t [ babelify ] -p browserify-notify src/index.js -o dist/index.js",
+    "gulp": "gulp"
+  },
+  "dependencies": {
+    "babelify": "^7.3.0",
+    "browserify": "^13.0.1",
+    "jquery": "^2.2.4",
+    "socket.io-client": "^1.4.6",
+    "uglifyify": "^3.0.1"
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-stage-0": "^6.5.0",
     "browser-sync": "^2.12.10",
+    "browserify-notify": "^1.1.2",
     "gulp": "^3.9.1",
-    "gulp-babel": "^6.1.2"
+    "watchify": "^3.7.0"
   },
   "repository": {
     "type": "git",

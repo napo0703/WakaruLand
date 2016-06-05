@@ -1,3 +1,11 @@
+import $ from 'jquery'
+
+$('#switch_menu').on("click", () => {
+  switchMenu()
+})
+
+import SocketIO from 'socket.io-client'
+
 const reactions = ["blank", "エモいね", "ひえぇ〜", "一理ある", "いい話だ", "神", "感動した", "気になる", "まじかよ",
                    "なるほど", "乙", "知ってた", "そうだね", "そうかも", "そうかな", "すごい！", "たしかに",
                    "たすけて", "天才", "尊い", "わからん", "わかる！", "笑", "⭕️", "❌"];
@@ -6,8 +14,8 @@ const masuilab_sensor = ["delta_light", "delta_temperature", "delta_door", "enos
                          "shokai_light", "shokai_temperature"];
 
 // connect Socket.IO & Linda
-const server_url = "https://linda-server.herokuapp.com/";
-const socket = io.connect(server_url);
+const server_url = "//linda-server.herokuapp.com/";
+const socket = SocketIO(server_url);
 const linda = new Linda().connect(socket);
 const ts = linda.tuplespace("masuilab");
 

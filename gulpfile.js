@@ -7,16 +7,8 @@
   @Hikaru
 */
 var gulp = require('gulp');
-var babel = require("gulp-babel");
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
-
-gulp.task('babel', function() {
-  gulp.src('./**/*.es6')
-    .pipe(babel())
-    .pipe(gulp.dest('./'))
-    .pipe(reload({ stream: true }));
-});
 
 gulp.task('browser-sync', function() {
    browserSync({
@@ -29,10 +21,10 @@ gulp.task('browser-sync', function() {
 });
 
 gulp.task('watch', function() {
-  gulp.watch('./**/*.es6', ['babel']);
+  gulp.watch('./dist/**/*.js', reload);
   gulp.watch('./**/*.html', reload);
   gulp.watch('./**/*.css', reload);
 });
 
 
-gulp.task('default', ['babel', 'watch', 'browser-sync']);
+gulp.task('default', ['watch', 'browser-sync']);
