@@ -2,6 +2,5 @@
 .idea
 WakaruLand.iml
 node_modules/
-*.js
-!gulpfile.js
-!library/**/*.js
+dist/*.js
+*.log
