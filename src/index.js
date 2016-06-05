@@ -2,7 +2,7 @@ import $ from 'jquery'
 
 $('#switch_menu').on("click", () => {
   switchMenu()
-})
+});
 
 import SocketIO from 'socket.io-client'
 
@@ -10,8 +10,8 @@ const reactions = ["blank", "エモいね", "ひえぇ〜", "一理ある", "い
                    "なるほど", "乙", "知ってた", "そうだね", "そうかも", "そうかな", "すごい！", "たしかに",
                    "たすけて", "天才", "尊い", "わからん", "わかる！", "笑", "⭕️", "❌"];
 
-const masuilab_sensor = ["delta_light", "delta_temperature", "delta_door", "enoshima_wind", "sfc_weather",
-                         "shokai_light", "shokai_temperature"];
+const sensors = ["delta_light", "delta_temperature", "delta_door", "enoshima_wind", "sfc_weather",
+                 "shokai_light", "shokai_temperature"];
 
 // connect Socket.IO & Linda
 const server_url = "//linda-server.herokuapp.com/";
@@ -20,22 +20,23 @@ const linda = new Linda().connect(socket);
 const ts = linda.tuplespace("masuilab");
 
 // URL末尾のカンマ区切り文字列から表示するユーザを抽出
-const fromArray = Array.from(new Set(location.search.substring(1).split(',')));
-console.log(fromArray);
+const display_users = Array.from(new Set(location.search.substring(1).split(',')));
+console.log(display_users);
 
-if (fromArray.length == 0 || (fromArray.length == 1 && (fromArray[0].charAt(0) == "@" || fromArray[0] == ""))) {
+if (display_users.length == 0 ||
+    (display_users.length == 1 && (display_users[0].charAt(0) == "@" || display_users[0] == ""))) {
   /**
    * console リアクション投稿ページ
    * URL末尾に何も書かない、Twitterユーザ名が1人のとき
    */
 
   let myName = "test";
-  if (fromArray.length == 0 || fromArray[0] == "") {
+  if (display_users.length == 0 || display_users[0] == "") {
     if (window.localStorage) {
       myName = localStorage.name || myName;
     }
   } else {
-    myName = fromArray[0];
+    myName = display_users[0];
   }
   document.getElementById("name_text_box").value = myName.substring(1);
 
@@ -94,58 +95,65 @@ if (fromArray.length == 0 || (fromArray.length == 1 && (fromArray[0].charAt(0) =
    */
 
   // 表示する人/物/現象のViewを動的に生成する
-  const createCell = (name, cellWidth, cellHeight) => {
-    let img_url;
-    if (name.charAt(0) == "@") {
-      //Twitterからプロフィール画像取得
-      img_url = "http://www.paper-glasses.com/api/twipi/" + name.substring(1) + "/original";
-    } else if (masuilab_sensor.includes(name)) {
-      // 研究室のセンサ等の場合
-      img_url = "images/l/" + name + ".png";
-    } else {
-      img_url = "images/l/blank.png";
-    }
+  const createUserCell = (from, cellWidth, cellHeight) => {
+    const cell = document.createElement("div");
+    cell.setAttribute("class", "cell");
 
-    const gridCell = document.createElement("div");
-    gridCell.setAttribute("class", "cell");
-    const img = document.createElement("img");
-    if (masuilab_sensor.includes(name)) {
-      img.setAttribute("class", "image_sensor");
-      img.setAttribute("id", name);
-    } else {
-      img.setAttribute("class", "image");
-    }
-    img.setAttribute("src", img_url);
+    const user_icon_layer = document.createElement("img");
+    user_icon_layer.setAttribute("class", "user_image");
+    user_icon_layer.setAttribute("id", from + "_image");
+    user_icon_layer.setAttribute("src", "http://www.paper-glasses.com/api/twipi/" + from.substring(1) + "/original");
+
+    const reaction_img_layer = document.createElement("img");
+    reaction_img_layer.setAttribute("class", "reaction_image");
+    reaction_img_layer.setAttribute("id", from + "_reaction");
+    reaction_img_layer.setAttribute("src", "/images/l/blank.png");
+
+    const reaction_text_layer = document.createElement("div");
+    reaction_text_layer.setAttribute("class", "reaction_text");
+    reaction_text_layer.setAttribute("id", from + "_reaction_text");
 
     if (cellWidth >= cellHeight) {
-      img.setAttribute("height", "100%");
+      user_icon_layer.setAttribute("height", "100%");
+      reaction_img_layer.setAttribute("height", "100%");
+      reaction_text_layer.setAttribute("height", "100%");
     } else {
-      img.setAttribute("width", "100%");
+      user_icon_layer.setAttribute("width", "100%");
+      reaction_img_layer.setAttribute("width", "100%");
+      reaction_text_layer.setAttribute("width", "100%");
     }
-    gridCell.appendChild(img);
 
-    if (masuilab_sensor.includes(name)) {
-      const figcaption = document.createElement("figcaption");
-      figcaption.setAttribute("class", "absolute");
-      const text = document.createElement("p");
-      text.setAttribute("id", name + "_value_text");
-      figcaption.appendChild(text);
-      gridCell.appendChild(img);
-      gridCell.appendChild(figcaption);
+    cell.appendChild(user_icon_layer);
+    cell.appendChild(reaction_img_layer);
+    cell.appendChild(reaction_text_layer);
+    return cell;
+  };
+
+  const createSensorCell = (from, cellWidth, cellHeight) => {
+    const cell = document.createElement("div");
+    cell.setAttribute("class", "cell");
+    
+    const sensor_img_layer = document.createElement("img");
+    sensor_img_layer.setAttribute("class", "sensor_image");
+    sensor_img_layer.setAttribute("id", from + "_image");
+    sensor_img_layer.setAttribute("src", "images/l/" + from + ".png");
+    
+    const sensor_value_text_layer = document.createElement("figcaption");
+    sensor_value_text_layer.setAttribute("class", "caption");
+    
+    const sensor_value_text = document.createElement("p");
+    sensor_value_text.setAttribute("id", from + "_value_text");
+
+    if (cellWidth >= cellHeight) {
+      sensor_img_layer.setAttribute("height", "100%");
     } else {
-      const reaction_img = document.createElement("img");
-      reaction_img.setAttribute("class", "reaction_image");
-      reaction_img.setAttribute("id", name);
-      reaction_img.setAttribute("src", "images/l/blank.png");
-      if (cellWidth >= cellHeight) {
-        reaction_img.setAttribute("height", "100%");
-      } else {
-        reaction_img.setAttribute("width", "100%");
-      }
-      gridCell.appendChild(img);
-      gridCell.appendChild(reaction_img);
+      sensor_img_layer.setAttribute("width", "100%");
     }
-    return gridCell;
+
+    sensor_value_text_layer.appendChild(sensor_value_text);
+    cell.appendChild(sensor_img_layer);
+    cell.appendChild(sensor_value_text_layer);
+    return cell;
   };
 
   // ウィンドウサイズと表示数からグリッドの列数と行数を算出する
@@ -193,7 +201,7 @@ if (fromArray.length == 0 || (fromArray.length == 1 && (fromArray[0].charAt(0) =
   // 指定時間後に発言を非表示にする
   let timer_ids = {};
   const withdrawReaction = (reactor, time) => {
-    if (time == "forever" && reactor in timer_ids) {
+    if (time == 0 && reactor in timer_ids) {
       window.clearTimeout(timer_ids[reactor]);
     } else {
       if (reactor in timer_ids) {
@@ -202,12 +210,12 @@ if (fromArray.length == 0 || (fromArray.length == 1 && (fromArray[0].charAt(0) =
       console.log("time = " + time + "msec");
       timer_ids[reactor] = window.setTimeout(() => {
         console.log("withdraw -> " + reactor);
-        if (masuilab_sensor.includes(reactor)) {
-          document.getElementById(reactor).src = `../images/l/${reactor}.png`;
+        if (sensors.includes(reactor)) {
+          document.getElementById(reactor + "_image").src = `../images/l/${reactor}.png`;
         } else {
-          document.getElementById(reactor).src = "http://www.paper-glasses.com/api/twipi/" + reactor.substring(1) + "/original";
+          document.getElementById(reactor + "_reaction").src = "/images/l/blank.png";
+          document.getElementById(reactor + "_image").style.opacity = 1.0;
         }
-        document.getElementById(reactor).style.opacity = 0.25;
       }, time);
     }
   };
@@ -215,32 +223,26 @@ if (fromArray.length == 0 || (fromArray.length == 1 && (fromArray[0].charAt(0) =
   linda.io.on("connect", function(){
     console.log("connect Linda!!");
 
-    for (let i in fromArray) {
-      if (fromArray[i].charAt(0) == "@") {
-        ts.watch({from: fromArray[i]}, (err, tuple) => {
+    for (let i in display_users) {
+      if (display_users[i].charAt(0) == "@") {
+        ts.watch({from: display_users[i]}, (err, tuple) => {
           const reactor = tuple.data.from;
-          if (fromArray.includes(reactor)) {
+          if (display_users.includes(reactor)) {
             const value = tuple.data.value;
             const time = tuple.data.time;
             const ip_address = tuple.from;
             console.log(reactor + " < " + value + " " + time + "sec (from " + ip_address + ")");
-
-            if (typeof value == "string") {
-              document.getElementById(reactor).src = `../images/l/${value}.png`;
-              document.getElementById(reactor).style.opacity = 1.0;
-              if (time != 0) {
-                withdrawReaction(reactor, time * 1000);
-              }
-            } else if (typeof value == "number") {
-              // TODO: 数値の表示
-              console.log("value is Number!");
+            document.getElementById(reactor + "_reaction").src = `../images/l/${value}.png`;
+            document.getElementById(reactor + "_image").style.opacity = 0.25;
+            if (time != 0) {
+              withdrawReaction(reactor, time * 1000);
             }
           }
         });
       }
     }
 
-    if (fromArray.includes("delta_temperature")) {
+    if (display_users.includes("delta_temperature")) {
       ts.watch({where: "delta", type: "sensor", name: "temperature"}, (err, tuple) => {
         const temp = Math.round(tuple.data.value * 10) / 10;
         console.log("delta_temperature = " + temp);
@@ -248,33 +250,33 @@ if (fromArray.length == 0 || (fromArray.length == 1 && (fromArray[0].charAt(0) =
       });
     }
 
-    if (fromArray.includes("delta_light")) {
+    if (display_users.includes("delta_light")) {
       ts.watch({where: "delta", type: "sensor", name: "light"}, (err, tuple) => {
         const value = tuple.data.value;
         console.log("delta_light = " + value);
         document.getElementById("delta_light_value_text").innerHTML = value;
         if (value <= 100) {
-          document.getElementById("delta_light").src = "images/l/delta_light.png";
+          document.getElementById("delta_light_image").src = "images/l/delta_light.png";
         } else {
-          document.getElementById("delta_light").src = "images/l/delta_light_on.png";
+          document.getElementById("delta_light_image").src = "images/l/delta_light_on.png";
         }
       });
     }
 
-    if (fromArray.includes("delta_door")) {
+    if (display_users.includes("delta_door")) {
       ts.watch({where: "delta", type: "door", cmd: "open"}, (err, tuple) => {
         console.log("delta_door_open!!");
         const date = new Date();
         document.getElementById("delta_door_value_text").innerHTML =
             "Last OPEN " + date.getHours()+ ":" + date.getMinutes() + ":" + date.getSeconds();
-        document.getElementById("delta_door").src = "images/l/delta_door_open.png";
+        document.getElementById("delta_door_image").src = "images/l/delta_door_open.png";
         window.setTimeout(() => {
-          document.getElementById("delta_door").src = "images/l/delta_door.png";
+          document.getElementById("delta_door_image").src = "images/l/delta_door.png";
         }, 10000);
       });
     }
 
-    if (fromArray.includes("enoshima_wind")) {
+    if (display_users.includes("enoshima_wind")) {
       ts.watch({where: "enoshima", type: "sensor", name: "wind"}, (err, tuple) => {
         document.getElementById("enoshima_wind_value_text").innerHTML =
             tuple.data.direction + " の風 " + tuple.data.speed + "m/s";
@@ -291,16 +293,21 @@ if (fromArray.length == 0 || (fromArray.length == 1 && (fromArray[0].charAt(0) =
 
   const minCellWidth = 100; //TODO: ユーザが任意に変えられるようにしようかな
   const minCellHeight = 100;
-  const gridSize = getGridSize(window.innerWidth, window.innerHeight, minCellWidth, fromArray.length);
+  const gridSize = getGridSize(window.innerWidth, window.innerHeight, minCellWidth, display_users.length);
   const columnCount = gridSize.columnCount;
   const rowCount = gridSize.rowCount;
   console.log("columnCount = " + columnCount + ", rowCount = " + rowCount);
   const cellWidth = Math.max(window.innerWidth / columnCount, minCellWidth);
   const cellHeight = Math.max(window.innerHeight / rowCount, minCellHeight);
 
-  for (let i in fromArray) {
-    const name = fromArray[i];
-    const cell = createCell(name, cellWidth, cellHeight);
+  for (let i in display_users) {
+    const name = display_users[i];
+    let cell;
+    if (name.charAt(0) == "@") {
+      cell = createUserCell(name, cellWidth, cellHeight);
+    } else {
+      cell = createSensorCell(name, cellWidth, cellHeight);
+    }
     document.getElementById("grid_view").appendChild(cell);
     if (cellHeight == minCellWidth) {
       cell.style.width = Math.floor(100 / columnCount) + "%";
