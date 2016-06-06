@@ -43,13 +43,12 @@ if (display_users.length == 0 ||
   // TODO: クリックした長さで表示時間を変える
   // 一瞬 -> 15秒,   2秒 -> 5分,   5秒 -> ずっと
   var sendReaction = (reaction, time) => {
-    return () => {
-      myName = "@" + document.getElementById("name_text_box").value;
-      if (window.localStorage) localStorage.name = myName;
-      document.getElementById("img").src = `images/l/${reaction}.png`;
-      ts.write({from: myName, value: reaction, time: time});
-      switchMenu();
-    }
+    myName = "@" + document.getElementById("name_text_box").value;
+    if (window.localStorage) localStorage.name = myName;
+    document.getElementById("img").src = `images/l/${reaction}.png`;
+    document.getElementById(reaction + "_cell").style.backgroundColor = "#ffffff";
+    ts.write({from: myName, value: reaction, time: time});
+    switchMenu();
   };
 
   // スタンプビューの表示/非表示切り替え
@@ -72,20 +71,50 @@ if (display_users.length == 0 ||
 
   // リアクションアイコン画像を動的に追加
   for (let i in reactions) {
-    const id = reactions[i];
+    const reaction = reactions[i];
     const gridCell = document.createElement("div");
     gridCell.setAttribute("class", "icon");
+    gridCell.setAttribute("id", reaction + "_cell");
+    gridCell.setAttribute("style", "background-color:#ffffff");
+
     const img = document.createElement("img");
-    img.setAttribute("id", id);
-    img.setAttribute("src", `images/${id}.png`);
+    img.setAttribute("id", reaction);
+    img.setAttribute("src", `images/${reaction}.png`);
     img.setAttribute("width", "100%");
+    
     gridCell.appendChild(img);
     document.getElementById("stamp_grid_view").appendChild(gridCell);
   }
 
+  let mousedown_id;
+  let mousedown_count = 0;
+  const startCount = (reaction) => {
+    mousedown_id = setInterval(() => {
+      mousedown_count += 1;
+      if (mousedown_count >= 5) {
+        document.getElementById(reaction + "_cell").style.backgroundColor = "#ffbbbb";
+      } else if (mousedown_count >= 2) {
+        document.getElementById(reaction + "_cell").style.backgroundColor = "#bbbbff";
+      }
+    }, 1000);
+  };
+
   for (let i in reactions) {
-    const id = reactions[i];
-    document.getElementById(id).onclick = sendReaction(id, 30);
+    const reaction = reactions[i];
+    document.getElementById(reaction + "_cell").addEventListener("mousedown", () => {
+      startCount(reaction);
+    });
+    document.getElementById(reaction + "_cell").addEventListener("mouseup", () => {
+      clearInterval(mousedown_id);
+      if (mousedown_count >= 5) {
+        sendReaction(reaction, 0);
+      } else if (mousedown_count >= 2) {
+        sendReaction(reaction, 600);
+      } else {
+        sendReaction(reaction, 30);
+      }
+      mousedown_count = 0;
+    });
   }
 
 } else {
@@ -182,7 +211,6 @@ if (display_users.length == 0 ||
 
     let columnCount = maxColumnCount - 1;
     let rowCount = Math.ceil(itemCount / columnCount);
-
     while (columnCount > 1) {
       const prevColumnCount = columnCount + 1;
       const prevRowCount = Math.ceil(itemCount / prevColumnCount);
@@ -267,8 +295,10 @@ if (display_users.length == 0 ||
       ts.watch({where: "delta", type: "door", cmd: "open"}, (err, tuple) => {
         console.log("delta_door_open!!");
         const date = new Date();
+        const minute = date.getMinutes() < 10 ? date.getMinutes() : "0" + date.getMinutes();
+        const second = date.getSeconds() < 10 ? date.getSeconds() : "0" + date.getSeconds();
         document.getElementById("delta_door_value_text").innerHTML =
-            "Last OPEN " + date.getHours()+ ":" + date.getMinutes() + ":" + date.getSeconds();
+            "Last OPEN " + date.getHours()+ ":" + minute + ":" + second;
         document.getElementById("delta_door_image").src = "images/l/delta_door_open.png";
         window.setTimeout(() => {
           document.getElementById("delta_door_image").src = "images/l/delta_door.png";
