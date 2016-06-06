@@ -295,8 +295,8 @@ if (display_users.length == 0 ||
       ts.watch({where: "delta", type: "door", cmd: "open"}, (err, tuple) => {
         console.log("delta_door_open!!");
         const date = new Date();
-        const minute = date.getMinutes() < 10 ? date.getMinutes() : "0" + date.getMinutes();
-        const second = date.getSeconds() < 10 ? date.getSeconds() : "0" + date.getSeconds();
+        const minute = date.getMinutes() > 10 ? date.getMinutes() : "0" + date.getMinutes();
+        const second = date.getSeconds() > 10 ? date.getSeconds() : "0" + date.getSeconds();
         document.getElementById("delta_door_value_text").innerHTML =
             "Last OPEN " + date.getHours()+ ":" + minute + ":" + second;
         document.getElementById("delta_door_image").src = "images/l/delta_door_open.png";
