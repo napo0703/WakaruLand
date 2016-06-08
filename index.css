@@ -30,8 +30,8 @@
   position: relative;
 }
 
-.image {
-  opacity: 0.25;
+.user_image {
+  opacity: 1.0;
   position: absolute;
   top: 0;
   right: 0;
@@ -50,7 +50,7 @@
   margin: auto;
 }
 
-.image_sensor {
+.sensor_image {
   opacity: 1.0;
   position: absolute;
   top: 0;
@@ -60,7 +60,7 @@
   margin: auto;
 }
 
-.absolute {
+.caption {
   position: absolute;
   bottom: 0;
   color: #fff;
@@ -68,7 +68,8 @@
   width: 100%;
   padding: 1em 0;
 }
-.absolute p {
+
+.caption p {
   margin: 0;
   padding: 0 0.8em;
   font-size: 200%;
