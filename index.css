@@ -3,7 +3,7 @@
     width: 480px;
   }
   #img {
-    width: 480px;
+    width: 100%;
   }
 }
 
@@ -14,6 +14,18 @@
   #img {
     width: 100%;
   }
+}
+
+#image_url_input {
+}
+
+#image_url_text_box {
+  width: 480px;
+}
+
+#console_reaction_img {
+  width: 96px;
+  border: 1px solid #000000;
 }
 
 .icon {

@@ -1,9 +1,5 @@
 import $ from 'jquery'
 
-$('#switch_menu').on("click", () => {
-  switchMenu()
-});
-
 $('#image_url_add_button').on("click", () => {
   addImage()
 });
@@ -48,13 +44,6 @@ if (display_users.length == 0 ||
     document.getElementById("img").src = reaction;
     document.getElementById(reaction + "_cell").style.backgroundColor = "#ffffff";
     ts.write({from: myName, value: reaction, time: time});
-    switchMenu();
-  };
-
-  // スタンプビューの表示/非表示切り替え
-  var switchMenu = () => {
-    const obj = document.getElementById('stamp_grid_view').style;
-    obj.display = (obj.display == 'none') ? 'block' : 'none';
   };
 
   linda.io.on("connect", () => {
@@ -78,12 +67,75 @@ if (display_users.length == 0 ||
     }, 1000);
   };
 
+  const createStampCell  = (img_url) => {
+    const gridCell = document.createElement("div");
+    gridCell.setAttribute("class", "icon");
+    gridCell.setAttribute("id", img_url + "_cell");
+    gridCell.setAttribute("style", "background-color:#ffffff");
+    return gridCell;
+  };
+
+  const createStampImage = (img_url) => {
+    const img = document.createElement("img");
+    img.setAttribute("id", img_url);
+    img.setAttribute("src", img_url);
+    img.setAttribute("width", "100%");
+    img.addEventListener("mousedown", () => {
+      startCount(img_url);
+    });
+    img.addEventListener("mouseup", () => {
+      clearInterval(mousedown_id);
+      if (mousedown_count >= 5) {
+        sendReaction(img_url, 0);
+      } else if (mousedown_count >= 2) {
+        sendReaction(img_url, 600);
+      } else {
+        sendReaction(img_url, 30);
+      }
+      mousedown_count = 0;
+    });
+    return img;
+  };
+
+  // URLから画像を追加
+  // TODO: 画像URLであるかの判定をする
+  var addImage = () => {
+    console.log("addImage()");
+    const img_url = document.getElementById("image_url_text_box").value;
+    const gridCell = document.createElement("div");
+    gridCell.setAttribute("class", "icon");
+    gridCell.setAttribute("id", img_url + "_cell");
+    gridCell.setAttribute("style", "background-color:#ffffff");
+    const img = document.createElement("img");
+    img.setAttribute("id", img_url);
+    img.setAttribute("src", img_url);
+    img.setAttribute("width", "100%");
+    gridCell.appendChild(img);
+    const stamp_grid_view = document.getElementById("stamp_grid_view");
+    stamp_grid_view.insertBefore(gridCell, stamp_grid_view.firstChild);
+
+    img.addEventListener("mousedown", () => {
+      startCount(img_url);
+    });
+
+    img.addEventListener("mouseup", () => {
+      clearInterval(mousedown_id);
+      if (mousedown_count >= 5) {
+        sendReaction(img_url, 0);
+      } else if (mousedown_count >= 2) {
+        sendReaction(img_url, 600);
+      } else {
+        sendReaction(img_url, 30);
+      }
+      mousedown_count = 0;
+    });
+  };
+
   // 一覧表示は使わないので削除
   const gridView = document.getElementById("grid_view");
   gridView.parentNode.removeChild(gridView);
 
   // Gyazoコレクションから画像を追加
-  var images_url = [];
   $.ajax({
     url: '/gyazo.xml',
     type: 'GET',
@@ -92,10 +144,7 @@ if (display_users.length == 0 ||
     success: (xml) => {
       $(xml).find('link').each(function() {
         if ($(this).attr('rel') == "enclosure") {
-          const img_url = $(this).attr('href')
-          images_url.push(img_url);
-          console.log(img_url);
-
+          const img_url = $(this).attr('href');
           const gridCell = document.createElement("div");
           gridCell.setAttribute("class", "icon");
           gridCell.setAttribute("id", img_url + "_cell");
@@ -126,44 +175,6 @@ if (display_users.length == 0 ||
       })
     }
   });
-
-  // 画像URL判定
-  const isUrl = (text) => {
-    const expression = "/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi";
-    const regex = new RegExp(expression);
-    return !!text.match(regex);
-  };
-
-  // URLから画像を追加
-  var addImage = () => {
-    console.log("addImage()");
-    const img_url = document.getElementById("image_url_text_box").value;
-    const gridCell = document.createElement("div");
-    gridCell.setAttribute("class", "icon");
-    gridCell.setAttribute("id", img_url + "_cell");
-    gridCell.setAttribute("style", "background-color:#ffffff");
-    const img = document.createElement("img");
-    img.setAttribute("id", img_url);
-    img.setAttribute("src", img_url);
-    img.setAttribute("width", "100%");
-    gridCell.appendChild(img);
-    document.getElementById("stamp_grid_view").appendChild(gridCell);
-
-    img.addEventListener("mousedown", () => {
-      startCount(img_url);
-    });
-    img.addEventListener("mouseup", () => {
-      clearInterval(mousedown_id);
-      if (mousedown_count >= 5) {
-        sendReaction(img_url, 0);
-      } else if (mousedown_count >= 2) {
-        sendReaction(img_url, 600);
-      } else {
-        sendReaction(img_url, 30);
-      }
-      mousedown_count = 0;
-    });
-  };
 
 } else {
   /**
@@ -363,11 +374,8 @@ if (display_users.length == 0 ||
   });
 
   // リアクションの書き込みのViewはいらないので削除
-  const body_ids = ["name_input", "switch_menu", "stamp_grid_view", "img"];
-  for (let i in body_ids) {
-    const ele = document.getElementById(body_ids[i]);
-    ele.parentNode.removeChild(ele);
-  }
+  const ele = document.getElementById("console");
+  ele.parentNode.removeChild(document.getElementById("console"));
 
   const minCellWidth = 100; //TODO: ユーザが任意に変えられるようにしようかな
   const minCellHeight = 100;
