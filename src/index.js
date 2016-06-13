@@ -4,11 +4,11 @@ $('#switch_menu').on("click", () => {
   switchMenu()
 });
 
-import SocketIO from 'socket.io-client'
+$('#image_url_add_button').on("click", () => {
+  addImage()
+});
 
-const reactions = ["blank", "エモいね", "ひえぇ〜", "一理ある", "いい話だ", "神", "感動した", "気になる", "まじかよ",
-                   "なるほど", "乙", "知ってた", "そうだね", "そうかも", "そうかな", "すごい！", "たしかに",
-                   "たすけて", "天才", "尊い", "わからん", "わかる！", "笑", "⭕️", "❌"];
+import SocketIO from 'socket.io-client'
 
 const sensors = ["delta_light", "delta_temperature", "delta_door", "enoshima_wind", "sfc_weather",
                  "shokai_light", "shokai_temperature"];
@@ -45,7 +45,7 @@ if (display_users.length == 0 ||
   var sendReaction = (reaction, time) => {
     myName = "@" + document.getElementById("name_text_box").value;
     if (window.localStorage) localStorage.name = myName;
-    document.getElementById("img").src = `images/l/${reaction}.png`;
+    document.getElementById("img").src = reaction;
     document.getElementById(reaction + "_cell").style.backgroundColor = "#ffffff";
     ts.write({from: myName, value: reaction, time: time});
     switchMenu();
@@ -61,30 +61,9 @@ if (display_users.length == 0 ||
     console.log("connect Linda!!");
     ts.watch({from: myName}, (err, tuple) => {
       console.log(myName+" < " + tuple.data.value);
-      document.getElementById("img").src = `images/l/${tuple.data.value}.png`;
+      document.getElementById("img").src = tuple.data.value;
     });
   });
-
-  // 一覧表示は使わないので削除
-  const gridView = document.getElementById("grid_view");
-  gridView.parentNode.removeChild(gridView);
-
-  // リアクションアイコン画像を動的に追加
-  for (let i in reactions) {
-    const reaction = reactions[i];
-    const gridCell = document.createElement("div");
-    gridCell.setAttribute("class", "icon");
-    gridCell.setAttribute("id", reaction + "_cell");
-    gridCell.setAttribute("style", "background-color:#ffffff");
-
-    const img = document.createElement("img");
-    img.setAttribute("id", reaction);
-    img.setAttribute("src", `images/${reaction}.png`);
-    img.setAttribute("width", "100%");
-    
-    gridCell.appendChild(img);
-    document.getElementById("stamp_grid_view").appendChild(gridCell);
-  }
 
   let mousedown_id;
   let mousedown_count = 0;
@@ -99,23 +78,92 @@ if (display_users.length == 0 ||
     }, 1000);
   };
 
-  for (let i in reactions) {
-    const reaction = reactions[i];
-    document.getElementById(reaction + "_cell").addEventListener("mousedown", () => {
-      startCount(reaction);
+  // 一覧表示は使わないので削除
+  const gridView = document.getElementById("grid_view");
+  gridView.parentNode.removeChild(gridView);
+
+  // Gyazoコレクションから画像を追加
+  var images_url = [];
+  $.ajax({
+    url: '/gyazo.xml',
+    type: 'GET',
+    dataType:'xml',
+    timeout: 1000,
+    success: (xml) => {
+      $(xml).find('link').each(function() {
+        if ($(this).attr('rel') == "enclosure") {
+          const img_url = $(this).attr('href')
+          images_url.push(img_url);
+          console.log(img_url);
+
+          const gridCell = document.createElement("div");
+          gridCell.setAttribute("class", "icon");
+          gridCell.setAttribute("id", img_url + "_cell");
+          gridCell.setAttribute("style", "background-color:#ffffff");
+
+          const img = document.createElement("img");
+          img.setAttribute("id", img_url);
+          img.setAttribute("src", img_url);
+          img.setAttribute("width", "100%");
+          img.addEventListener("mousedown", () => {
+            startCount(img_url);
+          });
+          img.addEventListener("mouseup", () => {
+            clearInterval(mousedown_id);
+            if (mousedown_count >= 5) {
+              sendReaction(img_url, 0);
+            } else if (mousedown_count >= 2) {
+              sendReaction(img_url, 600);
+            } else {
+              sendReaction(img_url, 30);
+            }
+            mousedown_count = 0;
+          });
+
+          gridCell.appendChild(img);
+          document.getElementById("stamp_grid_view").appendChild(gridCell);
+        }
+      })
+    }
+  });
+
+  // 画像URL判定
+  const isUrl = (text) => {
+    const expression = "/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi";
+    const regex = new RegExp(expression);
+    return !!text.match(regex);
+  };
+
+  // URLから画像を追加
+  var addImage = () => {
+    console.log("addImage()");
+    const img_url = document.getElementById("image_url_text_box").value;
+    const gridCell = document.createElement("div");
+    gridCell.setAttribute("class", "icon");
+    gridCell.setAttribute("id", img_url + "_cell");
+    gridCell.setAttribute("style", "background-color:#ffffff");
+    const img = document.createElement("img");
+    img.setAttribute("id", img_url);
+    img.setAttribute("src", img_url);
+    img.setAttribute("width", "100%");
+    gridCell.appendChild(img);
+    document.getElementById("stamp_grid_view").appendChild(gridCell);
+
+    img.addEventListener("mousedown", () => {
+      startCount(img_url);
     });
-    document.getElementById(reaction + "_cell").addEventListener("mouseup", () => {
+    img.addEventListener("mouseup", () => {
       clearInterval(mousedown_id);
       if (mousedown_count >= 5) {
-        sendReaction(reaction, 0);
+        sendReaction(img_url, 0);
       } else if (mousedown_count >= 2) {
-        sendReaction(reaction, 600);
+        sendReaction(img_url, 600);
       } else {
-        sendReaction(reaction, 30);
+        sendReaction(img_url, 30);
       }
       mousedown_count = 0;
     });
-  }
+  };
 
 } else {
   /**
@@ -256,11 +304,11 @@ if (display_users.length == 0 ||
         ts.watch({from: display_users[i]}, (err, tuple) => {
           const reactor = tuple.data.from;
           if (display_users.includes(reactor)) {
-            const value = tuple.data.value;
+            const img_url = tuple.data.value;
             const time = tuple.data.time;
             const ip_address = tuple.from;
-            console.log(reactor + " < " + value + " " + time + "sec (from " + ip_address + ")");
-            document.getElementById(reactor + "_reaction").src = `../images/l/${value}.png`;
+            console.log(reactor + " < " + img_url + " " + time + "sec (from " + ip_address + ")");
+            document.getElementById(reactor + "_reaction").src = img_url;
             document.getElementById(reactor + "_image").style.opacity = 0.25;
             if (time != 0) {
               withdrawReaction(reactor, time * 1000);
