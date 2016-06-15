@@ -4,6 +4,10 @@ $('#image_url_add_button').on("click", () => {
   addImage()
 });
 
+$('#image_url_delete_button').on("click", () => {
+  removeImage()
+});
+
 import SocketIO from 'socket.io-client'
 
 const default_icons = [
@@ -61,6 +65,11 @@ if (display_users.length == 0 ||
     document.getElementById("img").src = reaction;
     document.getElementById(reaction + "_cell").style.backgroundColor = "#ffffff";
     ts.write({from: myName, value: reaction, time: time});
+    if (default_icons.includes(reaction)) {
+      document.getElementById("image_url_text_box").value = "";
+    } else {
+      document.getElementById("image_url_text_box").value = reaction;
+    }
   };
 
   linda.io.on("connect", () => {
@@ -114,6 +123,26 @@ if (display_users.length == 0 ||
 
   let my_images = "";
 
+  // 自分で追加した画像を削除
+  var removeImage = () => {
+    console.log("removeImage()");
+    const img_url = document.getElementById("image_url_text_box").value;
+    const my_images_array = Array.from(new Set(my_images.split(',')));
+    if (my_images_array.includes(img_url)) {
+      console.log("my_images_array includes " + img_url);
+      for (let i in my_images_array) {
+        console.log("my_images_array[i] = " + my_images_array[i], "img_url = " + img_url);
+        if (my_images_array[i] == img_url) {
+          console.log(img_url + " is removed!");
+          document.getElementById("stamp_grid_view").removeChild(document.getElementById(img_url + "_cell"));
+          my_images_array.splice(i, 1);
+          localStorage.images = my_images_array;
+          break;
+        }
+      }
+    }
+  };
+
   // URLから画像を追加
   var addImage = () => {
     //本当はこうしたい
@@ -121,6 +150,7 @@ if (display_users.length == 0 ||
     //const stamp_grid_view = document.getElementById("stamp_grid_view");
     //stamp_grid_view.insertBefore(cell, stamp_grid_view.firstChild);
     const img_url = document.getElementById("image_url_text_box").value;
+    if (my_images.includes(img_url)) return;
     const cell = document.createElement("div");
     cell.setAttribute("class", "icon");
     cell.setAttribute("id", img_url + "_cell");
@@ -193,10 +223,11 @@ if (display_users.length == 0 ||
   my_images = localStorage.images || my_images;
 
   if (my_images.length != "") {
-    const array = Array.from(new Set(my_images.split(',')));
-    for (let i in array) {
-      console.log(array[i]);
-      const img_url = array[i];
+    const my_images_array = Array.from(new Set(my_images.split(',')));
+    for (let i in my_images_array) {
+      console.log(my_images_array[i]);
+      //本当は（ry
+      const img_url = my_images_array[i];
       const cell = document.createElement("div");
       cell.setAttribute("class", "icon");
       cell.setAttribute("id", img_url + "_cell");
