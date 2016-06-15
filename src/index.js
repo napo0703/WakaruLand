@@ -6,8 +6,26 @@ $('#image_url_add_button').on("click", () => {
 
 import SocketIO from 'socket.io-client'
 
-const sensors = ["delta_light", "delta_temperature", "delta_door", "enoshima_wind", "sfc_weather",
-                 "shokai_light", "shokai_temperature"];
+const default_icons = [
+  "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png",
+  "https://i.gyazo.com/f461f7b9924dbc41ea5a9c745a45e34d.png",
+  "https://i.gyazo.com/1fdfa88d9051c938a8dd9b0d28d714f4.png",
+  "https://i.gyazo.com/22984674b6d0cbb46d781a70f420fbe4.png",
+  "https://i.gyazo.com/6b03c00625edc66db10d4e5f5d57ae3d.png",
+  "https://i.gyazo.com/1bc0ae9981d968a5014ebc5bd604b07e.png",
+  "https://i.gyazo.com/67e6b6b0a9af872a47576f39d6edf11f.png",
+  "https://i.gyazo.com/5beaf5e32f46a574106679b484a0546b.png",
+  "https://i.gyazo.com/12e7ec7310fee975bc9f2eb1621d6145.png",
+  "https://i.gyazo.com/4be7cfbb10dbdbba57f1388865cf6759.png",
+  "https://i.gyazo.com/3cf5a7d371b382c09c2de707515ab250.png",
+  "https://i.gyazo.com/d82fcdcd76c81aeec8077162abf21b6b.png",
+  "https://i.gyazo.com/4a7203e6b3b54a5f38ac4c4020104c9c.png",
+  "https://i.gyazo.com/ae8e5efc68b221a4321597c3e152fc90.png",
+  "https://i.gyazo.com/f583d08f717d84d97747547c75e0da64.png",
+  "https://i.gyazo.com/db030b45cbc759418719deb3f46cca39.png"
+];
+
+const sensors = ["delta_light", "delta_temperature", "delta_door", "enoshima_wind"];
 
 // connect Socket.IO & Linda
 const server_url = "//linda-server.herokuapp.com/";
@@ -17,7 +35,6 @@ const ts = linda.tuplespace("masuilab");
 
 // URL末尾のカンマ区切り文字列から表示するユーザを抽出
 const display_users = Array.from(new Set(location.search.substring(1).split(',')));
-console.log(display_users);
 
 if (display_users.length == 0 ||
     (display_users.length == 1 && (display_users[0].charAt(0) == "@" || display_users[0] == ""))) {
@@ -67,121 +84,154 @@ if (display_users.length == 0 ||
     }, 1000);
   };
 
-  const createStampCell  = (img_url) => {
-    const gridCell = document.createElement("div");
-    gridCell.setAttribute("class", "icon");
-    gridCell.setAttribute("id", img_url + "_cell");
-    gridCell.setAttribute("style", "background-color:#ffffff");
-    return gridCell;
-  };
+  // FIXME: cellの生成を関数にするとdiv要素が消失する。意味不明。
+  // const createStampCell = (img_url) => {
+  //   const gridCell = document.createElement("div");
+  //   gridCell.setAttribute("class", "icon");
+  //   gridCell.setAttribute("id", img_url + "_cell");
+  //   gridCell.setAttribute("style", "background-color:#ffffff");
+  //   const img = document.createElement("img");
+  //   img.setAttribute("id", img_url);
+  //   img.setAttribute("src", img_url);
+  //   img.setAttribute("width", "100%");
+  //   img.addEventListener("mousedown", () => {
+  //     startCount(img_url);
+  //   });
+  //
+  //   img.addEventListener("mouseup", () => {
+  //     clearInterval(mousedown_id);
+  //     if (mousedown_count >= 4) {
+  //       sendReaction(img_url, 0);
+  //     } else if (mousedown_count >= 1) {
+  //       sendReaction(img_url, 600);
+  //     } else {
+  //       sendReaction(img_url, 30);
+  //     }
+  //     mousedown_count = 0;
+  //   });
+  //   return gridCell.appendChild(img);
+  // };
 
-  const createStampImage = (img_url) => {
-    const img = document.createElement("img");
-    img.setAttribute("id", img_url);
-    img.setAttribute("src", img_url);
-    img.setAttribute("width", "100%");
-    img.addEventListener("mousedown", () => {
-      startCount(img_url);
-    });
-    img.addEventListener("mouseup", () => {
-      clearInterval(mousedown_id);
-      if (mousedown_count >= 5) {
-        sendReaction(img_url, 0);
-      } else if (mousedown_count >= 2) {
-        sendReaction(img_url, 600);
-      } else {
-        sendReaction(img_url, 30);
-      }
-      mousedown_count = 0;
-    });
-    return img;
-  };
+  let my_images = "";
 
   // URLから画像を追加
-  // TODO: 画像URLであるかの判定をする
   var addImage = () => {
-    console.log("addImage()");
+    //本当はこうしたい
+    //const cell = createStampCell(document.getElementById("image_url_text_box").value);
+    //const stamp_grid_view = document.getElementById("stamp_grid_view");
+    //stamp_grid_view.insertBefore(cell, stamp_grid_view.firstChild);
     const img_url = document.getElementById("image_url_text_box").value;
-    const gridCell = document.createElement("div");
-    gridCell.setAttribute("class", "icon");
-    gridCell.setAttribute("id", img_url + "_cell");
-    gridCell.setAttribute("style", "background-color:#ffffff");
+    const cell = document.createElement("div");
+    cell.setAttribute("class", "icon");
+    cell.setAttribute("id", img_url + "_cell");
+    cell.setAttribute("style", "background-color:#ffffff");
     const img = document.createElement("img");
     img.setAttribute("id", img_url);
     img.setAttribute("src", img_url);
     img.setAttribute("width", "100%");
-    gridCell.appendChild(img);
-    const stamp_grid_view = document.getElementById("stamp_grid_view");
-    stamp_grid_view.insertBefore(gridCell, stamp_grid_view.firstChild);
-
     img.addEventListener("mousedown", () => {
       startCount(img_url);
     });
 
     img.addEventListener("mouseup", () => {
       clearInterval(mousedown_id);
-      if (mousedown_count >= 5) {
+      if (mousedown_count >= 4) {
         sendReaction(img_url, 0);
-      } else if (mousedown_count >= 2) {
+      } else if (mousedown_count >= 1) {
         sendReaction(img_url, 600);
       } else {
         sendReaction(img_url, 30);
       }
       mousedown_count = 0;
     });
+    cell.appendChild(img);
+    const stamp_grid_view = document.getElementById("stamp_grid_view");
+    stamp_grid_view.insertBefore(cell, stamp_grid_view.firstChild);
+    if (my_images != "") {
+      my_images = my_images + ",";
+    }
+    my_images = my_images + img_url;
+    localStorage.images = my_images;
   };
 
   // 一覧表示は使わないので削除
   const gridView = document.getElementById("grid_view");
   gridView.parentNode.removeChild(gridView);
 
-  // Gyazoコレクションから画像を追加
-  $.ajax({
-    url: '/gyazo.xml',
-    type: 'GET',
-    dataType:'xml',
-    timeout: 1000,
-    success: (xml) => {
-      $(xml).find('link').each(function() {
-        if ($(this).attr('rel') == "enclosure") {
-          const img_url = $(this).attr('href');
-          const gridCell = document.createElement("div");
-          gridCell.setAttribute("class", "icon");
-          gridCell.setAttribute("id", img_url + "_cell");
-          gridCell.setAttribute("style", "background-color:#ffffff");
+  for (let i in default_icons) {
+    //本当はこうしたい
+    //const cell = createStampCell(default_icons[i]);
+    //document.getElementById("stamp_grid_view").appendChild(cell);
+    const img_url = default_icons[i];
+    const cell = document.createElement("div");
+    cell.setAttribute("class", "icon");
+    cell.setAttribute("id", img_url + "_cell");
+    cell.setAttribute("style", "background-color:#ffffff");
+    const img = document.createElement("img");
+    img.setAttribute("id", img_url);
+    img.setAttribute("src", img_url);
+    img.setAttribute("width", "100%");
+    img.addEventListener("mousedown", () => {
+      startCount(img_url);
+    });
 
-          const img = document.createElement("img");
-          img.setAttribute("id", img_url);
-          img.setAttribute("src", img_url);
-          img.setAttribute("width", "100%");
-          img.addEventListener("mousedown", () => {
-            startCount(img_url);
-          });
-          img.addEventListener("mouseup", () => {
-            clearInterval(mousedown_id);
-            if (mousedown_count >= 5) {
-              sendReaction(img_url, 0);
-            } else if (mousedown_count >= 2) {
-              sendReaction(img_url, 600);
-            } else {
-              sendReaction(img_url, 30);
-            }
-            mousedown_count = 0;
-          });
+    img.addEventListener("mouseup", () => {
+      clearInterval(mousedown_id);
+      if (mousedown_count >= 4) {
+        sendReaction(img_url, 0);
+      } else if (mousedown_count >= 1) {
+        sendReaction(img_url, 600);
+      } else {
+        sendReaction(img_url, 30);
+      }
+      mousedown_count = 0;
+    });
+    cell.appendChild(img);
+    document.getElementById("stamp_grid_view").appendChild(cell);
+  }
 
-          gridCell.appendChild(img);
-          document.getElementById("stamp_grid_view").appendChild(gridCell);
+  my_images = localStorage.images || my_images;
+
+  if (my_images.length != "") {
+    const array = Array.from(new Set(my_images.split(',')));
+    for (let i in array) {
+      console.log(array[i]);
+      const img_url = array[i];
+      const cell = document.createElement("div");
+      cell.setAttribute("class", "icon");
+      cell.setAttribute("id", img_url + "_cell");
+      cell.setAttribute("style", "background-color:#ffffff");
+      const img = document.createElement("img");
+      img.setAttribute("id", img_url);
+      img.setAttribute("src", img_url);
+      img.setAttribute("width", "100%");
+      img.addEventListener("mousedown", () => {
+        startCount(img_url);
+      });
+
+      img.addEventListener("mouseup", () => {
+        clearInterval(mousedown_id);
+        if (mousedown_count >= 4) {
+          sendReaction(img_url, 0);
+        } else if (mousedown_count >= 1) {
+          sendReaction(img_url, 600);
+        } else {
+          sendReaction(img_url, 30);
         }
-      })
+        mousedown_count = 0;
+      });
+      cell.appendChild(img);
+      const stamp_grid_view = document.getElementById("stamp_grid_view");
+      stamp_grid_view.insertBefore(cell, stamp_grid_view.firstChild);
     }
-  });
+  }
 
 } else {
   /**
    * grid ユーザの一覧ページ
    * URL末尾に2人以上Twitterユーザ名を書いたとき、1つ以上Twitterユーザ名【以外】を書いたとき
    */
-
+  console.log(display_users);
   // 表示する人/物/現象のViewを動的に生成する
   const createUserCell = (from, cellWidth, cellHeight) => {
     const cell = document.createElement("div");
