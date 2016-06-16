@@ -6,14 +6,21 @@
     <link rel="stylesheet" href="/index.css" />
   </head>
   <body>
-    <div id="name_input">
-      Twitter ID: @<input type="text" value="test" id="name_text_box">
+    <div id="console">
+      <div id="name_input">
+        Twitter ID: @<input type="text" value="test" id="name_text_box">
+      </div>
+      <div id="image_url_input">
+        Image URL: <input type="text" value="" id="image_url_text_box">
+        <button type="button" id="image_url_add_button"> + </button>
+        <button type="button" id="image_url_delete_button"> - </button>
+      </div>
+      <div id="console_reaction_img">
+        <img src="https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" id="img">
+      </div>
+      <div id="switch_menu">▼ Reaction</div>
+      <div id="stamp_grid_view"></div>
     </div>
-    <div id="switch_menu">
-      <a id="menu_button" style="cursor:pointer;">▼ Reaction</a>
-    </div>
-    <div id="stamp_grid_view" style="display:none;clear:both;"></div>
-    <img src="/images/l/blank.png" id="img" width="100%" border="1">
     <div id="grid_view"></div>
     <script src="//linda-server.herokuapp.com/linda/linda.js"></script>
     <script src="/dist/index.js"></script>

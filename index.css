@@ -1,24 +1,38 @@
-@media screen and (min-width: 481px) {
+@media screen and (min-width: 641px) {
   #stamp_grid_view {
-    width: 480px;
+    width: 640px;
   }
   #img {
-    width: 480px;
+    width: 100%;
   }
 }
 
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 640px) {
   #stamp_grid_view {
     width: 100%;
   }
   #img {
     width: 100%;
   }
+}
+
+#image_url_input {
+}
+
+#image_url_text_box {
+  width: 480px;
+}
+
+#console_reaction_img {
+  width: 80px;
+  height: 80px;
+  border: 1px solid #000000;
 }
 
 .icon {
   float: left;
-  width: 20%;
+  width: 80px;
+  height: 80px;
   box-sizing:border-box;
   border: 1px solid #000000;
 }
