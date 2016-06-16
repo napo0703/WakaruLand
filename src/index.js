@@ -31,6 +31,15 @@ const default_icons = [
 
 const sensors = ["delta_light", "delta_temperature", "delta_door", "enoshima_wind"];
 
+const sensor_images = {
+  "delta_door": "https://i.gyazo.com/a25a3fa1fabb36f01f9751d41243d6da.png",
+  "delta_door_open": "https://i.gyazo.com/a588115b69ac57165c4e0372caf6ed53.png",
+  "delta_light": "https://i.gyazo.com/d48b8b3b7027c0739fea18f1e77129af.png",
+  "delta_light_on": "https://i.gyazo.com/b0388280bee7fd4ddef5b0d85b455a35.png",
+  "delta_temperature": "https://i.gyazo.com/c74f7dbcb876de97320bbb50bf2de5ba.png",
+  "enoshima_wind": "https://i.gyazo.com/d13f222ba330bf686b6cdcd98b264464.png"
+};
+
 // connect Socket.IO & Linda
 const server_url = "//linda-server.herokuapp.com/";
 const socket = SocketIO(server_url);
@@ -57,8 +66,14 @@ if (display_users.length == 0 ||
   }
   document.getElementById("name_text_box").value = myName.substring(1);
 
-  // TODO: クリックした長さで表示時間を変える
-  // 一瞬 -> 15秒,   2秒 -> 5分,   5秒 -> ずっと
+  linda.io.on("connect", () => {
+    console.log("connect Linda!!");
+    ts.watch({from: myName}, (err, tuple) => {
+      console.log(myName+" < " + tuple.data.value);
+      document.getElementById("img").src = tuple.data.value;
+    });
+  });
+
   var sendReaction = (reaction, time) => {
     myName = "@" + document.getElementById("name_text_box").value;
     if (window.localStorage) localStorage.name = myName;
@@ -71,14 +86,6 @@ if (display_users.length == 0 ||
       document.getElementById("image_url_text_box").value = reaction;
     }
   };
-
-  linda.io.on("connect", () => {
-    console.log("connect Linda!!");
-    ts.watch({from: myName}, (err, tuple) => {
-      console.log(myName+" < " + tuple.data.value);
-      document.getElementById("img").src = tuple.data.value;
-    });
-  });
 
   let mousedown_id;
   let mousedown_count = 0;
@@ -93,33 +100,40 @@ if (display_users.length == 0 ||
     }, 1000);
   };
 
-  // FIXME: cellの生成を関数にするとdiv要素が消失する。意味不明。
-  // const createStampCell = (img_url) => {
-  //   const gridCell = document.createElement("div");
-  //   gridCell.setAttribute("class", "icon");
-  //   gridCell.setAttribute("id", img_url + "_cell");
-  //   gridCell.setAttribute("style", "background-color:#ffffff");
-  //   const img = document.createElement("img");
-  //   img.setAttribute("id", img_url);
-  //   img.setAttribute("src", img_url);
-  //   img.setAttribute("width", "100%");
-  //   img.addEventListener("mousedown", () => {
-  //     startCount(img_url);
-  //   });
-  //
-  //   img.addEventListener("mouseup", () => {
-  //     clearInterval(mousedown_id);
-  //     if (mousedown_count >= 4) {
-  //       sendReaction(img_url, 0);
-  //     } else if (mousedown_count >= 1) {
-  //       sendReaction(img_url, 600);
-  //     } else {
-  //       sendReaction(img_url, 30);
-  //     }
-  //     mousedown_count = 0;
-  //   });
-  //   return gridCell.appendChild(img);
-  // };
+  // スタンプの一覧に画像を追加する
+  const appendStampCell = (img_url, append_last) => {
+    const cell = document.createElement("div");
+    cell.setAttribute("class", "icon");
+    cell.setAttribute("id", img_url + "_cell");
+    cell.setAttribute("style", "background-color:#ffffff");
+    const img = document.createElement("img");
+    img.setAttribute("id", img_url);
+    img.setAttribute("src", img_url);
+    img.setAttribute("width", "100%");
+    img.addEventListener("mousedown", () => {
+      startCount(img_url);
+    });
+  
+    img.addEventListener("mouseup", () => {
+      clearInterval(mousedown_id);
+      if (mousedown_count >= 4) {
+        sendReaction(img_url, 0);
+      } else if (mousedown_count >= 1) {
+        sendReaction(img_url, 600);
+      } else {
+        sendReaction(img_url, 30);
+      }
+      mousedown_count = 0;
+    });
+    cell.appendChild(img);
+
+    if (append_last) {
+      document.getElementById("stamp_grid_view").appendChild(cell);
+    } else {
+      const stamp_grid_view = document.getElementById("stamp_grid_view");
+      stamp_grid_view.insertBefore(cell, stamp_grid_view.firstChild);
+    }
+  };
 
   let my_images = "";
 
@@ -145,38 +159,8 @@ if (display_users.length == 0 ||
 
   // URLから画像を追加
   var addImage = () => {
-    //本当はこうしたい
-    //const cell = createStampCell(document.getElementById("image_url_text_box").value);
-    //const stamp_grid_view = document.getElementById("stamp_grid_view");
-    //stamp_grid_view.insertBefore(cell, stamp_grid_view.firstChild);
-    const img_url = document.getElementById("image_url_text_box").value;
-    if (my_images.includes(img_url)) return;
-    const cell = document.createElement("div");
-    cell.setAttribute("class", "icon");
-    cell.setAttribute("id", img_url + "_cell");
-    cell.setAttribute("style", "background-color:#ffffff");
-    const img = document.createElement("img");
-    img.setAttribute("id", img_url);
-    img.setAttribute("src", img_url);
-    img.setAttribute("width", "100%");
-    img.addEventListener("mousedown", () => {
-      startCount(img_url);
-    });
-
-    img.addEventListener("mouseup", () => {
-      clearInterval(mousedown_id);
-      if (mousedown_count >= 4) {
-        sendReaction(img_url, 0);
-      } else if (mousedown_count >= 1) {
-        sendReaction(img_url, 600);
-      } else {
-        sendReaction(img_url, 30);
-      }
-      mousedown_count = 0;
-    });
-    cell.appendChild(img);
-    const stamp_grid_view = document.getElementById("stamp_grid_view");
-    stamp_grid_view.insertBefore(cell, stamp_grid_view.firstChild);
+    const img_url = document.getElementById("image_url_text_box").value
+    appendStampCell(img_url, false);
     if (my_images != "") {
       my_images = my_images + ",";
     }
@@ -188,72 +172,18 @@ if (display_users.length == 0 ||
   const gridView = document.getElementById("grid_view");
   gridView.parentNode.removeChild(gridView);
 
+  // デフォルトで用意してある画像を表示
   for (let i in default_icons) {
-    //本当はこうしたい
-    //const cell = createStampCell(default_icons[i]);
-    //document.getElementById("stamp_grid_view").appendChild(cell);
-    const img_url = default_icons[i];
-    const cell = document.createElement("div");
-    cell.setAttribute("class", "icon");
-    cell.setAttribute("id", img_url + "_cell");
-    cell.setAttribute("style", "background-color:#ffffff");
-    const img = document.createElement("img");
-    img.setAttribute("id", img_url);
-    img.setAttribute("src", img_url);
-    img.setAttribute("width", "100%");
-    img.addEventListener("mousedown", () => {
-      startCount(img_url);
-    });
-
-    img.addEventListener("mouseup", () => {
-      clearInterval(mousedown_id);
-      if (mousedown_count >= 4) {
-        sendReaction(img_url, 0);
-      } else if (mousedown_count >= 1) {
-        sendReaction(img_url, 600);
-      } else {
-        sendReaction(img_url, 30);
-      }
-      mousedown_count = 0;
-    });
-    cell.appendChild(img);
-    document.getElementById("stamp_grid_view").appendChild(cell);
+    appendStampCell(default_icons[i], true);
   }
 
+  // localStorageから自分で追加した画像を表示
   my_images = localStorage.images || my_images;
-
   if (my_images.length != "") {
     const my_images_array = Array.from(new Set(my_images.split(',')));
     for (let i in my_images_array) {
       console.log(my_images_array[i]);
-      //本当は（ry
-      const img_url = my_images_array[i];
-      const cell = document.createElement("div");
-      cell.setAttribute("class", "icon");
-      cell.setAttribute("id", img_url + "_cell");
-      cell.setAttribute("style", "background-color:#ffffff");
-      const img = document.createElement("img");
-      img.setAttribute("id", img_url);
-      img.setAttribute("src", img_url);
-      img.setAttribute("width", "100%");
-      img.addEventListener("mousedown", () => {
-        startCount(img_url);
-      });
-
-      img.addEventListener("mouseup", () => {
-        clearInterval(mousedown_id);
-        if (mousedown_count >= 4) {
-          sendReaction(img_url, 0);
-        } else if (mousedown_count >= 1) {
-          sendReaction(img_url, 600);
-        } else {
-          sendReaction(img_url, 30);
-        }
-        mousedown_count = 0;
-      });
-      cell.appendChild(img);
-      const stamp_grid_view = document.getElementById("stamp_grid_view");
-      stamp_grid_view.insertBefore(cell, stamp_grid_view.firstChild);
+      appendStampCell(my_images_array[i], false);
     }
   }
 
@@ -276,25 +206,18 @@ if (display_users.length == 0 ||
     const reaction_img_layer = document.createElement("img");
     reaction_img_layer.setAttribute("class", "reaction_image");
     reaction_img_layer.setAttribute("id", from + "_reaction");
-    reaction_img_layer.setAttribute("src", "/images/l/blank.png");
-
-    const reaction_text_layer = document.createElement("div");
-    reaction_text_layer.setAttribute("class", "reaction_text");
-    reaction_text_layer.setAttribute("id", from + "_reaction_text");
+    reaction_img_layer.setAttribute("src", "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png");
 
     if (cellWidth >= cellHeight) {
       user_icon_layer.setAttribute("height", "100%");
       reaction_img_layer.setAttribute("height", "100%");
-      reaction_text_layer.setAttribute("height", "100%");
     } else {
       user_icon_layer.setAttribute("width", "100%");
       reaction_img_layer.setAttribute("width", "100%");
-      reaction_text_layer.setAttribute("width", "100%");
     }
 
     cell.appendChild(user_icon_layer);
     cell.appendChild(reaction_img_layer);
-    cell.appendChild(reaction_text_layer);
     return cell;
   };
 
@@ -305,7 +228,7 @@ if (display_users.length == 0 ||
     const sensor_img_layer = document.createElement("img");
     sensor_img_layer.setAttribute("class", "sensor_image");
     sensor_img_layer.setAttribute("id", from + "_image");
-    sensor_img_layer.setAttribute("src", "images/l/" + from + ".png");
+    sensor_img_layer.setAttribute("src", sensor_images[from]);
     
     const sensor_value_text_layer = document.createElement("figcaption");
     sensor_value_text_layer.setAttribute("class", "caption");
@@ -379,9 +302,9 @@ if (display_users.length == 0 ||
       timer_ids[reactor] = window.setTimeout(() => {
         console.log("withdraw -> " + reactor);
         if (sensors.includes(reactor)) {
-          document.getElementById(reactor + "_image").src = `../images/l/${reactor}.png`;
+          document.getElementById(reactor + "_image").src = sensor_images[reactor];
         } else {
-          document.getElementById(reactor + "_reaction").src = "/images/l/blank.png";
+          document.getElementById(reactor + "_reaction").src = "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png";
           document.getElementById(reactor + "_image").style.opacity = 1.0;
         }
       }, time);
@@ -424,9 +347,9 @@ if (display_users.length == 0 ||
         console.log("delta_light = " + value);
         document.getElementById("delta_light_value_text").innerHTML = value;
         if (value <= 100) {
-          document.getElementById("delta_light_image").src = "images/l/delta_light.png";
+          document.getElementById("delta_light_image").src = sensor_images["delta_light"];
         } else {
-          document.getElementById("delta_light_image").src = "images/l/delta_light_on.png";
+          document.getElementById("delta_light_image").src = sensor_images["delta_light_on"];
         }
       });
     }
@@ -439,9 +362,9 @@ if (display_users.length == 0 ||
         const second = date.getSeconds() > 10 ? date.getSeconds() : "0" + date.getSeconds();
         document.getElementById("delta_door_value_text").innerHTML =
             "Last OPEN " + date.getHours()+ ":" + minute + ":" + second;
-        document.getElementById("delta_door_image").src = "images/l/delta_door_open.png";
+        document.getElementById("delta_door_image").src = sensor_images["delta_door_open"];
         window.setTimeout(() => {
-          document.getElementById("delta_door_image").src = "images/l/delta_door.png";
+          document.getElementById("delta_door_image").src = sensor_images["delta_door"];
         }, 10000);
       });
     }
