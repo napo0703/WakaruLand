@@ -29,6 +29,10 @@
   border: 1px solid #000000;
 }
 
+#switch_menu {
+  padding-top: 16px;
+}
+
 .icon {
   float: left;
   width: 80px;
