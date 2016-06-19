@@ -96,8 +96,8 @@ if (display_users.length == 0 ||
         const gauge = document.getElementById("gauge").innerHTML;
         const second = mousedown_count * 20;
         document.getElementById("gauge").innerHTML = gauge.slice(0, mousedown_count) + "░" + gauge.slice(mousedown_count + 1);
-        if (second <= 40) {
-          document.getElementById("display_time").innerHTML = "30秒";
+        if (second <= 20) {
+          document.getElementById("display_time").innerHTML = "20秒";
         } else if (second >= 600) {
           document.getElementById("display_time").innerHTML = "forever";
         } else {
@@ -124,9 +124,9 @@ if (display_users.length == 0 ||
     img.addEventListener("mouseup", () => {
       clearInterval(mousedown_id);
       const second = mousedown_count * 20;
-      if (second <= 40) {
-        document.getElementById("display_time").innerHTML = "30秒";
-        sendReaction(img_url, 30);
+      if (second <= 20) {
+        document.getElementById("display_time").innerHTML = "20秒";
+        sendReaction(img_url, 20);
         console.log("30sec < " + img_url);
       } else if (second >= 600) {
         sendReaction(img_url, 0);
