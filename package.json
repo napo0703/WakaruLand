@@ -8,7 +8,7 @@
     "build": "browserify --verbose -t [ babelify ] -g uglifyify src/index.js -o dist/index.js",
     "watch": "watchify --verbose --debug -t [ babelify ] -p browserify-notify src/index.js -o dist/index.js",
     "gulp": "gulp",
-    "push-gh-pages": "git add -f ./dist && git commit -m 'push gh-pages' && git push -f origin HEAD:gh-pages; git reset --hard HEAD^"
+    "push-gh-pages": "git status -s | grep '.' && echo 'you should commit before push-gh-pages' || (git add -f ./dist && git commit -m 'push gh-pages' && git push -f origin HEAD:gh-pages; git reset --hard HEAD^)"
   },
   "dependencies": {
     "babelify": "^7.3.0",
