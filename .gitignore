@@ -2,5 +2,4 @@
 .idea
 WakaruLand.iml
 node_modules/
-dist/*.js
 *.log

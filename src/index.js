@@ -89,15 +89,22 @@ if (display_users.length == 0 ||
 
   let mousedown_id;
   let mousedown_count = 0;
-  const startCount = (reaction) => {
+  const startCount = () => {
     mousedown_id = setInterval(() => {
       mousedown_count += 1;
-      if (mousedown_count >= 5) {
-        document.getElementById(reaction + "_cell").style.backgroundColor = "#ffbbbb";
-      } else if (mousedown_count >= 2) {
-        document.getElementById(reaction + "_cell").style.backgroundColor = "#bbbbff";
+      if (mousedown_count <= 30) {
+        const gauge = document.getElementById("gauge").innerHTML;
+        const second = mousedown_count * 20;
+        document.getElementById("gauge").innerHTML = gauge.slice(0, mousedown_count) + "░" + gauge.slice(mousedown_count + 1);
+        if (second <= 20) {
+          document.getElementById("display_time").innerHTML = "20秒";
+        } else if (second >= 600) {
+          document.getElementById("display_time").innerHTML = "forever";
+        } else {
+          document.getElementById("display_time").innerHTML = second + "秒";
+        }
       }
-    }, 1000);
+    }, 100);
   };
 
   // スタンプの一覧に画像を追加する
@@ -116,14 +123,20 @@ if (display_users.length == 0 ||
   
     img.addEventListener("mouseup", () => {
       clearInterval(mousedown_id);
-      if (mousedown_count >= 4) {
+      const second = mousedown_count * 20;
+      if (second <= 20) {
+        document.getElementById("display_time").innerHTML = "20秒";
+        sendReaction(img_url, 20);
+        console.log("30sec < " + img_url);
+      } else if (second >= 600) {
         sendReaction(img_url, 0);
-      } else if (mousedown_count >= 1) {
-        sendReaction(img_url, 600);
+        console.log("forever < " + img_url);
       } else {
-        sendReaction(img_url, 30);
+        sendReaction(img_url, second);
+        console.log(second + "sec < " + img_url);
       }
       mousedown_count = 0;
+      document.getElementById("gauge").innerHTML = "[⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂]";
     });
     cell.appendChild(img);
 
