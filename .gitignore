@@ -3,3 +3,4 @@
 WakaruLand.iml
 node_modules/
 *.log
+dist/
