@@ -1,26 +1,36 @@
-@media screen and (min-width: 641px) {
+#console {
+  width: 400px;
+  float: left;
+}
+
+#grid {
+  float: right;
+  width: 100%;
+  margin-left: -410px;
+  padding-left: 410px;
+  box-sizing: border-box;
+}
+
+@media screen and (min-width: 401px) {
   #stamp_grid_view {
-    width: 640px;
+    width: 400px;
   }
   #img {
     width: 100%;
   }
 }
 
-@media screen and (max-width: 640px) {
+@media screen and (max-width: 400px) {
   #stamp_grid_view {
     width: 100%;
   }
   #img {
     width: 100%;
   }
-}
-
-#image_url_input {
 }
 
 #image_url_text_box {
-  width: 480px;
+  width: 400px;
 }
 
 #console_reaction_img {
@@ -92,4 +102,8 @@
   padding: 0 0.8em;
   font-size: 200%;
   text-align: center;
+}
+
+#grid_user_input {
+  height: 24px;
 }
