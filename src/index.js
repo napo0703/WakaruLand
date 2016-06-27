@@ -260,6 +260,7 @@ console.log(display_users);
 const createUserCell = (from, cellWidth, cellHeight) => {
   const cell = document.createElement("div");
   cell.setAttribute("class", "cell");
+  cell.setAttribute("div", from);
 
   const user_icon_layer = document.createElement("img");
   user_icon_layer.setAttribute("class", "user_image");
@@ -379,13 +380,23 @@ const switch_grid = () => {
   const grid_style = document.getElementById("grid").style;
   const console_button = document.getElementById("console_switch_button");
   const grid_button = document.getElementById("grid_switch_button");
+  const stamp_grid = document.getElementById("stamp_grid_view");
+  const console = document.getElementById("console");
   if (grid_style.display == "block") {
     grid_style.display = "none";
-    grid_button.innerHTML = " 一覧表示 "
+    grid_button.innerHTML = " 一覧表示 ";
+    console.style.width = "100%";
+    stamp_grid.style.width = "100%";
   } else {
+    console.style.width = 400;
     grid_style.display = "block";
     console_button.innerHTML = " 投稿非表示 ";
     grid_button.innerHTML = " 一覧非表示 ";
+    if (window.innerWidth > 400) {
+      stamp_grid.style.width = 400;
+    } else {
+      stamp_grid.style.width = "100%";
+    }
   }
 };
 
@@ -394,13 +405,20 @@ const switch_console = () => {
   const console_style = document.getElementById("console").style;
   const console_button = document.getElementById("console_switch_button");
   const grid_button = document.getElementById("grid_switch_button");
+  const grid = document.getElementById("grid");
   if (console_style.display == "block") {
     console_style.display = "none";
-    console_button.innerHTML = " 投稿表示 "
+    console_button.innerHTML = " 投稿表示 ";
+    grid.style.float = "left";
+    grid.style.marginLeft = 0;
+    grid.style.paddingLeft = 0;
   } else {
     console_style.display = "block";
     console_button.innerHTML = " 投稿非表示 ";
     grid_button.innerHTML = " 一覧非表示 ";
+    grid.style.float = "right";
+    grid.style.marginLeft = -410;
+    grid.style.paddingLeft = 410;
   }
 };
 
