@@ -260,7 +260,7 @@ console.log(display_users);
 const createUserCell = (from, cellWidth, cellHeight) => {
   const cell = document.createElement("div");
   cell.setAttribute("class", "cell");
-  cell.setAttribute("div", from);
+  cell.setAttribute("id", from);
 
   const user_icon_layer = document.createElement("img");
   user_icon_layer.setAttribute("class", "user_image");
@@ -398,6 +398,7 @@ const switch_grid = () => {
       stamp_grid.style.width = "100%";
     }
   }
+  relayout_grid();
 };
 
 // Console表示/非表示
@@ -420,6 +421,7 @@ const switch_console = () => {
     grid.style.marginLeft = -410;
     grid.style.paddingLeft = 410;
   }
+  relayout_grid();
 };
 
 // consoleの生成
@@ -439,8 +441,8 @@ if (my_images.length != "") {
 }
 
 // Gridの生成
-let minCellWidth = 100;
-let minCellHeight = 100;
+let minCellWidth = 1;
+let minCellHeight = 1;
 const grid_width = window.innerWidth - CONSOLE_WIDTH;
 const grid_height = window.innerHeight - GRID_USER_INPUT_HEIGHT;
 console.log("grid_width =" + grid_width + ", grid_height = " + grid_height);
@@ -461,10 +463,7 @@ for (let i in display_users) {
     cell = createSensorCell(name, cellWidth, cellHeight);
   }
   document.getElementById("grid_view").appendChild(cell);
-  if (cellHeight == minCellWidth) {
-    cell.style.width = Math.floor(100 / columnCount) + "%";
-    cell.style.height = minCellHeight;
-  } else if (grid_height < cellHeight * rowCount) {
+  if (grid_height < cellHeight * rowCount) {
     cell.style.width = Math.floor(100 / rowCount) + "%";
     cell.style.height = Math.floor(100 / rowCount) + "%";
   } else {
@@ -475,3 +474,52 @@ for (let i in display_users) {
 
 document.getElementById("console").style.display = "block";
 document.getElementById("grid").style.display = "block";
+
+const relayout_grid = () => {
+  let minCellWidth = 1;
+  let minCellHeight = 1;
+  let grid_width;
+  let grid_height;
+  const console_style = document.getElementById("console").style;
+  if (console_style.display == "block") {
+    grid_width = window.innerWidth - CONSOLE_WIDTH;
+    grid_height = window.innerHeight - GRID_USER_INPUT_HEIGHT;
+  } else {
+    grid_width = window.innerWidth;
+    grid_height = window.innerHeight;
+  }
+  const gridSize = getGridSize(grid_width, grid_height, minCellWidth, display_users.length);
+  const columnCount = gridSize.columnCount;
+  const rowCount = gridSize.rowCount;
+  const cellWidth = Math.max(grid_width / columnCount, minCellWidth);
+  const cellHeight = Math.max(grid_height / rowCount, minCellHeight);
+
+  for (let i in display_users) {
+    let cell = document.getElementById(display_users[i]);
+    if (grid_height < cellHeight * rowCount) {
+      cell.style.width = Math.floor(100 / rowCount) + "%";
+      cell.style.height = Math.floor(100 / rowCount) + "%";
+    } else {
+      cell.style.width = Math.floor(100 / columnCount) + "%";
+      cell.style.height = Math.floor(100 / rowCount) + "%";
+    }
+
+    const user_icon_layer = cell.children[0];
+    const reaction_img_layer = cell.children[1];
+    if (cellWidth >= cellHeight) {
+      user_icon_layer.setAttribute("height", "100%");
+      user_icon_layer.removeAttribute("width");
+      reaction_img_layer.setAttribute("height", "100%");
+      reaction_img_layer.removeAttribute("width");
+    } else {
+      user_icon_layer.setAttribute("width", "100%");
+      user_icon_layer.removeAttribute("height");
+      reaction_img_layer.setAttribute("width", "100%");
+      reaction_img_layer.removeAttribute("height");
+    }
+  }
+};
+
+$(window).resize(() => {
+  relayout_grid();
+});
