@@ -95,12 +95,10 @@
   color: #fff;
   background: rgba(0,0,0,.8);
   width: 100%;
-  padding: 1em 0;
 }
 
 .caption p {
   margin: 0;
-  padding: 0 0.8em;
   font-size: 200%;
   text-align: center;
 }

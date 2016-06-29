@@ -112,10 +112,9 @@ linda.io.on("connect", () => {
     ts.watch({where: "delta", type: "door", cmd: "open"}, (err, tuple) => {
       console.log("delta_door_open!!");
       const date = new Date();
-      const minute = date.getMinutes() > 10 ? date.getMinutes() : "0" + date.getMinutes();
-      const second = date.getSeconds() > 10 ? date.getSeconds() : "0" + date.getSeconds();
-      document.getElementById("delta_door_value_text").innerHTML =
-          "Last OPEN " + date.getHours()+ ":" + minute + ":" + second;
+      const minute = date.getMinutes() >= 10 ? date.getMinutes() : "0" + date.getMinutes();
+      const second = date.getSeconds() >= 10 ? date.getSeconds() : "0" + date.getSeconds();
+      document.getElementById("delta_door_value_text").innerHTML = date.getHours()+ ":" + minute + ":" + second;
       document.getElementById("delta_door_image").src = sensor_images["delta_door_open"];
       window.setTimeout(() => {
         document.getElementById("delta_door_image").src = sensor_images["delta_door"];
@@ -134,19 +133,6 @@ linda.io.on("connect", () => {
 
 // URL末尾のカンマ区切り文字列から表示するユーザを抽出
 const display_users = Array.from(new Set(location.search.substring(1).split(',')));
-
-//if (display_users.length == 0 ||
-//    (display_users.length == 1 && (display_users[0].charAt(0) == "@" || display_users[0] == ""))) {
-
-let my_name = "test";
-if (display_users.length == 0 || display_users[0] == "") {
-  if (window.localStorage) {
-    my_name = localStorage.name || my_name;
-  }
-} else {
-  my_name = display_users[0];
-}
-document.getElementById("name_text_box").value = my_name.substring(1);
 
 var sendReaction = (reaction, time) => {
   my_name = "@" + document.getElementById("name_text_box").value;
@@ -257,7 +243,7 @@ var addImage = () => {
 
 console.log(display_users);
 // 表示する人/物/現象のViewを動的に生成する
-const createUserCell = (from, cellWidth, cellHeight) => {
+const appendUserCell = (from) => {
   const cell = document.createElement("div");
   cell.setAttribute("class", "cell");
   cell.setAttribute("id", from);
@@ -272,22 +258,16 @@ const createUserCell = (from, cellWidth, cellHeight) => {
   reaction_img_layer.setAttribute("id", from + "_reaction");
   reaction_img_layer.setAttribute("src", "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png");
 
-  if (cellWidth >= cellHeight) {
-    user_icon_layer.setAttribute("height", "100%");
-    reaction_img_layer.setAttribute("height", "100%");
-  } else {
-    user_icon_layer.setAttribute("width", "100%");
-    reaction_img_layer.setAttribute("width", "100%");
-  }
-
   cell.appendChild(user_icon_layer);
   cell.appendChild(reaction_img_layer);
+
   return cell;
 };
 
-const createSensorCell = (from, cellWidth, cellHeight) => {
+const appendSensorCell = (from) => {
   const cell = document.createElement("div");
   cell.setAttribute("class", "cell");
+  cell.setAttribute("id", from);
 
   const sensor_img_layer = document.createElement("img");
   sensor_img_layer.setAttribute("class", "sensor_image");
@@ -299,12 +279,6 @@ const createSensorCell = (from, cellWidth, cellHeight) => {
 
   const sensor_value_text = document.createElement("p");
   sensor_value_text.setAttribute("id", from + "_value_text");
-
-  if (cellWidth >= cellHeight) {
-    sensor_img_layer.setAttribute("height", "100%");
-  } else {
-    sensor_img_layer.setAttribute("width", "100%");
-  }
 
   sensor_value_text_layer.appendChild(sensor_value_text);
   cell.appendChild(sensor_img_layer);
@@ -424,78 +398,27 @@ const switch_console = () => {
   relayout_grid();
 };
 
-// consoleの生成
-// デフォルトで用意してある画像を表示
-for (let i in default_icons) {
-  appendStampCell(default_icons[i], true);
-}
-
-// localStorageから自分で追加した画像を表示
-my_images = localStorage.images || my_images;
-if (my_images.length != "") {
-  const my_images_array = Array.from(new Set(my_images.split(',')));
-  for (let i in my_images_array) {
-    console.log(my_images_array[i]);
-    appendStampCell(my_images_array[i], false);
-  }
-}
-
-// Gridの生成
-let minCellWidth = 1;
-let minCellHeight = 1;
-const grid_width = window.innerWidth - CONSOLE_WIDTH;
-const grid_height = window.innerHeight - GRID_USER_INPUT_HEIGHT;
-console.log("grid_width =" + grid_width + ", grid_height = " + grid_height);
-const gridSize = getGridSize(grid_width, grid_height, minCellWidth, display_users.length);
-const columnCount = gridSize.columnCount;
-const rowCount = gridSize.rowCount;
-console.log("columnCount = " + columnCount + ", rowCount = " + rowCount);
-const cellWidth = Math.max(grid_width / columnCount, minCellWidth);
-const cellHeight = Math.max(grid_height / rowCount, minCellHeight);
-console.log("cellWidth = " + cellWidth + ", cellHeight = " + cellHeight);
-
-for (let i in display_users) {
-  const name = display_users[i];
-  let cell;
-  if (name.charAt(0) == "@") {
-    cell = createUserCell(name, cellWidth, cellHeight);
-  } else {
-    cell = createSensorCell(name, cellWidth, cellHeight);
-  }
-  document.getElementById("grid_view").appendChild(cell);
-  if (grid_height < cellHeight * rowCount) {
-    cell.style.width = Math.floor(100 / rowCount) + "%";
-    cell.style.height = Math.floor(100 / rowCount) + "%";
-  } else {
-    cell.style.width = Math.floor(100 / columnCount) + "%";
-    cell.style.height = Math.floor(100 / rowCount) + "%";
-  }
-}
-
-document.getElementById("console").style.display = "block";
-document.getElementById("grid").style.display = "block";
+const MIN_CELL_WIDTH = 10;
+const MIN_CELL_HEIGHT = 10;
 
 const relayout_grid = () => {
-  let minCellWidth = 1;
-  let minCellHeight = 1;
   let grid_width;
-  let grid_height;
+  const grid_height = window.innerHeight - GRID_USER_INPUT_HEIGHT;
   const console_style = document.getElementById("console").style;
   if (console_style.display == "block") {
     grid_width = window.innerWidth - CONSOLE_WIDTH;
-    grid_height = window.innerHeight - GRID_USER_INPUT_HEIGHT;
   } else {
     grid_width = window.innerWidth;
-    grid_height = window.innerHeight;
   }
-  const gridSize = getGridSize(grid_width, grid_height, minCellWidth, display_users.length);
+  const gridSize = getGridSize(grid_width, grid_height, MIN_CELL_WIDTH, display_users.length);
   const columnCount = gridSize.columnCount;
   const rowCount = gridSize.rowCount;
-  const cellWidth = Math.max(grid_width / columnCount, minCellWidth);
-  const cellHeight = Math.max(grid_height / rowCount, minCellHeight);
+  const cellWidth = Math.max(grid_width / columnCount, MIN_CELL_WIDTH);
+  const cellHeight = Math.max(grid_height / rowCount, MIN_CELL_HEIGHT);
 
   for (let i in display_users) {
-    let cell = document.getElementById(display_users[i]);
+    const from = display_users[i];
+    let cell = document.getElementById(from);
     if (grid_height < cellHeight * rowCount) {
       cell.style.width = Math.floor(100 / rowCount) + "%";
       cell.style.height = Math.floor(100 / rowCount) + "%";
@@ -519,6 +442,49 @@ const relayout_grid = () => {
     }
   }
 };
+
+// ローカルストレージまたはURL末尾のクエリから発言者名の設定
+let my_name = "@test";
+if (display_users.length == 0) {
+  my_name = localStorage.name || my_name;
+} else if (display_users.length == 1 && display_users[0].charAt(0) == "@") {
+  my_name = display_users[0]
+} else {
+  my_name = localStorage.name || my_name;
+}
+document.getElementById("name_text_box").value = my_name.substring(1);
+
+// consoleの生成
+// デフォルトで用意してある画像を表示
+for (let i in default_icons) {
+  appendStampCell(default_icons[i], true);
+}
+
+// localStorageから自分で追加した画像を表示
+my_images = localStorage.images || my_images;
+if (my_images.length != "") {
+  const my_images_array = Array.from(new Set(my_images.split(',')));
+  for (let i in my_images_array) {
+    console.log(my_images_array[i]);
+    appendStampCell(my_images_array[i], false);
+  }
+}
+
+// Gridの生成
+for (let i in display_users) {
+  const name = display_users[i];
+  let cell;
+  if (name.charAt(0) == "@") {
+    cell = appendUserCell(name);
+  } else {
+    cell = appendSensorCell(name);
+  }
+  document.getElementById("grid_view").appendChild(cell);
+}
+
+document.getElementById("console").style.display = "block";
+document.getElementById("grid").style.display = "block";
+relayout_grid();
 
 $(window).resize(() => {
   relayout_grid();
