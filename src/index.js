@@ -16,6 +16,13 @@ $('#grid_switch_button').on("click", () => {
   switch_grid();
 });
 
+$('#cell_add_button').on("click", () => {
+  append_user(document.getElementById("twitter_id_text_box").value);
+});
+
+$('#cell_delete_button').on("click", () => {
+  remove_user(document.getElementById("twitter_id_text_box").value);
+});
 
 import SocketIO from 'socket.io-client'
 
@@ -155,7 +162,7 @@ const startCount = () => {
     if (mousedown_count <= 30) {
       const gauge = document.getElementById("gauge").innerHTML;
       const second = mousedown_count * 20;
-      document.getElementById("gauge").innerHTML = gauge.slice(0, mousedown_count) + "░" + gauge.slice(mousedown_count + 1);
+      document.getElementById("gauge").innerHTML = gauge.slice(0, mousedown_count) + "█" + gauge.slice(mousedown_count + 1);
       if (second <= 20) {
         document.getElementById("display_time").innerHTML = "20秒";
       } else if (second >= 600) {
@@ -196,7 +203,7 @@ const appendStampCell = (img_url, append_last) => {
       console.log(second + "sec < " + img_url);
     }
     mousedown_count = 0;
-    document.getElementById("gauge").innerHTML = "[⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂⠂]";
+    document.getElementById("gauge").innerHTML = "[░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]";
   });
   cell.appendChild(img);
 
@@ -441,6 +448,26 @@ const relayout_grid = () => {
       reaction_img_layer.removeAttribute("height");
     }
   }
+};
+
+var append_user = (from) => {
+  let cell;
+  if (sensors.includes(from)) {
+    cell = appendSensorCell(from);
+  } else {
+    cell = appendUserCell(from);
+  }
+  document.getElementById("grid_view").appendChild(cell);
+  display_users.push(from);
+  history.replaceState("", "", "?" + display_users.join(","));
+  relayout_grid();
+};
+
+var remove_user = (from) => {
+  // document.getElementById("grid_view").removeChild(document.getElementById(from));
+  // display_users.splice()
+  // history.replaceState("", "", "?" + display_users.join(","));
+  // relayout_grid();
 };
 
 // ローカルストレージまたはURL末尾のクエリから発言者名の設定

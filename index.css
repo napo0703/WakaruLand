@@ -11,6 +11,16 @@
   box-sizing: border-box;
 }
 
+#gauge {
+  font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
+  padding-top: 8px;
+}
+
+#display_time {
+  font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
+  padding-top: 4px;
+}
+
 @media screen and (min-width: 401px) {
   #stamp_grid_view {
     width: 400px;
