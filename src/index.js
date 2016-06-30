@@ -391,16 +391,14 @@ const switch_console = () => {
   if (console_style.display == "block") {
     console_style.display = "none";
     console_button.innerHTML = " 投稿表示 ";
-    grid.style.float = "left";
-    grid.style.marginLeft = 0;
-    grid.style.paddingLeft = 0;
+    grid.style.width = "100%";
+    grid.style.marginLeft = "0";
   } else {
     console_style.display = "block";
     console_button.innerHTML = " 投稿非表示 ";
     grid_button.innerHTML = " 一覧非表示 ";
-    grid.style.float = "right";
-    grid.style.marginLeft = -410;
-    grid.style.paddingLeft = 410;
+    grid.style.width = "";
+    grid.style.marginLeft = "410";
   }
   relayout_grid();
 };

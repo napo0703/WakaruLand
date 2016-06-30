@@ -6,31 +6,33 @@
     <style type="text/css">@import "index.css";</style>
   </head>
   <body>
-    <div id="console">
-      <div id="name_input">
-        Twitter ID: @<input type="text" value="test" id="name_text_box">
-        <button type="button" id="grid_switch_button"> 一覧非表示 </button>
+    <div id="wrapper">
+      <div id="console">
+        <div id="name_input">
+          Twitter ID: @<input type="text" value="test" id="name_text_box">
+          <button type="button" id="grid_switch_button"> 一覧非表示 </button>
+        </div>
+        <div id="console_reaction_img">
+          <img src="https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" id="img">
+        </div>
+        <div id="gauge">[░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]</div>
+        <div id="display_time">0秒</div>
+        <div id="image_url_input">
+          Image URL: <br><input type="text" value="" id="image_url_text_box"><br>
+          <button type="button" id="image_url_add_button"> 追加 </button>
+          <button type="button" id="image_url_delete_button"> 削除 </button>
+        </div>
+        <div id="stamp_grid_view"></div>
       </div>
-      <div id="console_reaction_img">
-        <img src="https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" id="img">
+      <div id="grid">
+        <div id="grid_user_input">
+          <input type="text" value="" id="twitter_id_text_box">
+          <button type="button" id="cell_add_button"> 追加 </button>
+          <button type="button" id="cell_delete_button"> 削除 </button>
+          <button type="button" id="console_switch_button"> 投稿非表示 </button>
+        </div>
+        <div id="grid_view"></div>
       </div>
-      <div id="gauge">[░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]</div>
-      <div id="display_time">0秒</div>
-      <div id="image_url_input">
-        Image URL: <br><input type="text" value="" id="image_url_text_box"><br>
-        <button type="button" id="image_url_add_button"> 追加 </button>
-        <button type="button" id="image_url_delete_button"> 削除 </button>
-      </div>
-      <div id="stamp_grid_view"></div>
-    </div>
-    <div id="grid">
-      <div id="grid_user_input">
-        <input type="text" value="" id="twitter_id_text_box">
-        <button type="button" id="cell_add_button"> 追加 </button>
-        <button type="button" id="cell_delete_button"> 削除 </button>
-        <button type="button" id="console_switch_button"> 投稿非表示 </button>
-      </div>
-      <div id="grid_view"></div>
     </div>
     <script src="//linda-server.herokuapp.com/linda/linda.js"></script>
     <script src="dist/index.js"></script>

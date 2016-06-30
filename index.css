@@ -1,14 +1,17 @@
+#wrapper {
+  float: right;
+  width: 100%;
+  margin-left: -400px;
+}
+
 #console {
-  width: 400px;
   float: left;
+  width: 400px;
 }
 
 #grid {
-  float: right;
-  width: 100%;
-  margin-left: -410px;
-  padding-left: 410px;
-  box-sizing: border-box;
+  position: relative;
+  margin-left: 410px;
 }
 
 #gauge {
