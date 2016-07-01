@@ -57,7 +57,7 @@ const sensor_images = {
 };
 
 // レイアウトの定数
-const CONSOLE_WIDTH = 410;
+const CONSOLE_WIDTH = 440;
 const GRID_USER_INPUT_HEIGHT = 24;
 
 // connect Socket.IO & Linda
@@ -361,14 +361,13 @@ const switch_grid = () => {
   const grid_style = document.getElementById("grid").style;
   const console_button = document.getElementById("console_switch_button");
   const grid_button = document.getElementById("grid_switch_button");
-  const stamp_grid = document.getElementById("stamp_grid_view");
   const console = document.getElementById("console");
   if (grid_style.display == "block") {
     console.style.width = "100%";
     grid_style.display = "none";
     grid_button.innerHTML = " 一覧表示 ";
   } else {
-    console.style.width = 410;
+    console.style.width = CONSOLE_WIDTH;
     grid_style.display = "block";
     console_button.innerHTML = " 投稿非表示 ";
     grid_button.innerHTML = " 一覧非表示 ";
@@ -438,9 +437,6 @@ const relayout_grid = () => {
   }
 };
 
-const indexOfChild = () => {
-};
-
 var append_user = (from) => {
   let cell;
   if (sensors.includes(from)) {
@@ -455,10 +451,16 @@ var append_user = (from) => {
 };
 
 var remove_user = (from) => {
-  // document.getElementById("grid_view").removeChild(document.getElementById(from));
-  // display_users.splice()
-  // history.replaceState("", "", "?" + display_users.join(","));
-  // relayout_grid();
+  document.getElementById("grid_view").removeChild(document.getElementById(from));
+  for (let i in display_users) {
+    if (from == display_users[i]) {
+      display_users.splice(i, 1);
+      break;
+    }
+  }
+  console.log(display_users);
+  history.replaceState("", "", "?" + display_users.join(","));
+  relayout_grid();
 };
 
 // ローカルストレージまたはURL末尾のクエリから発言者名の設定
@@ -500,8 +502,14 @@ for (let i in display_users) {
   document.getElementById("grid_view").appendChild(cell);
 }
 
-document.getElementById("console").style.display = "block";
-document.getElementById("grid").style.display = "block";
+if (display_users.length == 0 ||
+    (display_users.length == 1 && (display_users[0] == "" || display_users[0].charAt(0) == "@"))) {
+  document.getElementById("console").style.display = "block";
+  document.getElementById("grid").style.display = "none";
+} else {
+  document.getElementById("console").style.display = "none";
+  document.getElementById("grid").style.display = "block";
+}
 relayout_grid();
 
 $(window).resize(() => {

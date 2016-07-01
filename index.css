@@ -3,7 +3,7 @@
 }
 
 #console {
-  width: 410px; /*固定したい幅の長さ*/
+  width: 440px; /*固定したい幅の長さ*/
 }
 
 #grid {
@@ -28,7 +28,7 @@
 }
 
 #image_url_text_box {
-  width: 400px;
+  width: 432px;
 }
 
 #console_reaction_img {
@@ -47,6 +47,8 @@
   height: 80px;
   box-sizing:border-box;
   border: 1px solid #000000;
+  margin-right: 8px;
+  margin-bottom: 8px;
 }
 
 .cell {
