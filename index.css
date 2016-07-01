@@ -1,26 +1,34 @@
-@media screen and (min-width: 641px) {
-  #stamp_grid_view {
-    width: 640px;
-  }
-  #img {
-    width: 100%;
-  }
+#wrapper {
+  display: flex;
 }
 
-@media screen and (max-width: 640px) {
-  #stamp_grid_view {
-    width: 100%;
-  }
-  #img {
-    width: 100%;
-  }
+#console {
+  width: 440px; /*固定したい幅の長さ*/
 }
 
-#image_url_input {
+#grid {
+  flex: 1;
+}
+
+#gauge {
+  font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
+  padding-top: 8px;
+}
+
+#display_time {
+  font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
+  padding-top: 4px;
+}
+
+#stamp_grid_view {
+  width: 100%;
+}
+#img {
+  width: 100%;
 }
 
 #image_url_text_box {
-  width: 480px;
+  width: 432px;
 }
 
 #console_reaction_img {
@@ -39,6 +47,8 @@
   height: 80px;
   box-sizing:border-box;
   border: 1px solid #000000;
+  margin-right: 8px;
+  margin-bottom: 8px;
 }
 
 .cell {
@@ -46,6 +56,7 @@
   box-sizing:border-box;
   border: 1px solid #000000;
   position: relative;
+  overflow: hidden;
 }
 
 .user_image {
@@ -84,12 +95,14 @@
   color: #fff;
   background: rgba(0,0,0,.8);
   width: 100%;
-  padding: 1em 0;
 }
 
 .caption p {
   margin: 0;
-  padding: 0 0.8em;
   font-size: 200%;
   text-align: center;
+}
+
+#grid_user_input {
+  height: 24px;
 }
