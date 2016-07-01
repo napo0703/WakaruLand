@@ -364,20 +364,14 @@ const switch_grid = () => {
   const stamp_grid = document.getElementById("stamp_grid_view");
   const console = document.getElementById("console");
   if (grid_style.display == "block") {
+    console.style.width = "100%";
     grid_style.display = "none";
     grid_button.innerHTML = " 一覧表示 ";
-    console.style.width = "100%";
-    stamp_grid.style.width = "100%";
   } else {
-    console.style.width = 400;
+    console.style.width = 410;
     grid_style.display = "block";
     console_button.innerHTML = " 投稿非表示 ";
     grid_button.innerHTML = " 一覧非表示 ";
-    if (window.innerWidth > 400) {
-      stamp_grid.style.width = 400;
-    } else {
-      stamp_grid.style.width = "100%";
-    }
   }
   relayout_grid();
 };
@@ -391,14 +385,10 @@ const switch_console = () => {
   if (console_style.display == "block") {
     console_style.display = "none";
     console_button.innerHTML = " 投稿表示 ";
-    grid.style.width = "100%";
-    grid.style.marginLeft = "0";
   } else {
     console_style.display = "block";
     console_button.innerHTML = " 投稿非表示 ";
     grid_button.innerHTML = " 一覧非表示 ";
-    grid.style.width = "";
-    grid.style.marginLeft = "410";
   }
   relayout_grid();
 };
@@ -446,6 +436,9 @@ const relayout_grid = () => {
       reaction_img_layer.removeAttribute("height");
     }
   }
+};
+
+const indexOfChild = () => {
 };
 
 var append_user = (from) => {

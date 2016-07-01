@@ -1,17 +1,13 @@
 #wrapper {
-  float: right;
-  width: 100%;
-  margin-left: -400px;
+  display: flex;
 }
 
 #console {
-  float: left;
-  width: 400px;
+  width: 410px; /*固定したい幅の長さ*/
 }
 
 #grid {
-  position: relative;
-  margin-left: 410px;
+  flex: 1;
 }
 
 #gauge {
@@ -24,22 +20,11 @@
   padding-top: 4px;
 }
 
-@media screen and (min-width: 401px) {
-  #stamp_grid_view {
-    width: 400px;
-  }
-  #img {
-    width: 100%;
-  }
+#stamp_grid_view {
+  width: 100%;
 }
-
-@media screen and (max-width: 400px) {
-  #stamp_grid_view {
-    width: 100%;
-  }
-  #img {
-    width: 100%;
-  }
+#img {
+  width: 100%;
 }
 
 #image_url_text_box {
