@@ -70,7 +70,7 @@ linda.io.on("connect", () => {
   console.log("connect Linda!!");
   ts.watch({from: my_name}, (err, tuple) => {
     console.log(my_name+" < " + tuple.data.value);
-    document.getElementById("img").src = tuple.data.value;
+    document.getElementById("console_reaction_img").src = tuple.data.value;
   });
 
   // 一覧表示
@@ -144,7 +144,7 @@ const display_users = Array.from(new Set(location.search.substring(1).split(',')
 var sendReaction = (reaction, time) => {
   my_name = "@" + document.getElementById("name_text_box").value;
   if (window.localStorage) localStorage.name = my_name;
-  document.getElementById("img").src = reaction;
+  document.getElementById("console_reaction_img").src = reaction;
   document.getElementById(reaction + "_cell").style.backgroundColor = "#ffffff";
   ts.write({from: my_name, value: reaction, time: time});
   if (default_icons.includes(reaction)) {
@@ -177,9 +177,8 @@ const startCount = () => {
 // スタンプの一覧に画像を追加する
 const appendStampCell = (img_url, append_last) => {
   const cell = document.createElement("div");
-  cell.setAttribute("class", "icon");
+  cell.setAttribute("class", "stamp_cell");
   cell.setAttribute("id", img_url + "_cell");
-  cell.setAttribute("style", "background-color:#ffffff");
   const img = document.createElement("img");
   img.setAttribute("id", img_url);
   img.setAttribute("src", img_url);

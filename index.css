@@ -1,65 +1,88 @@
+body {
+  background-color: #e4f0ea;
+}
+
+/* console と grid を囲むdiv */
 #wrapper {
   display: flex;
   height: 100%;
 }
 
+/* 投稿画面 */
 #console {
   width: 440px; /*固定したい幅の長さ*/
 }
 
+/* 一覧画面 */
 #grid {
   flex: 1;
 }
 
+/* 投稿画面のゲージ */
 #gauge {
+  float: left;
   font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
   padding-top: 8px;
+  padding-right: 8px;
 }
 
+/* 投稿画面のリアクション表示時間 */
 #display_time {
   font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
   padding-top: 4px;
 }
 
+/* リアクション画像一覧 */
 #stamp_grid_view {
   width: 100%;
 }
-#img {
-  width: 100%;
+
+#image_url_input {
+  padding-top: 8px;
 }
 
+/* リアクション画像追加TextBox */
 #image_url_text_box {
   width: 432px;
 }
 
-#console_reaction_img {
-  width: 80px;
-  height: 80px;
-  border: 1px solid #000000;
-}
-
-#switch_menu {
-  padding-top: 16px;
-}
-
-.icon {
+/* 現在表示してるリアクションのdiv */
+#console_reaction_view {
   float: left;
-  width: 80px;
-  height: 80px;
-  box-sizing:border-box;
-  border: 1px solid #000000;
+  width: 168px;
+  height: 168px;
+  background-color:#ffffff;
   margin-right: 8px;
   margin-bottom: 8px;
 }
 
+/* 現在表示してるリアクション画像 */
+#console_reaction_img {
+  width: 100%;
+}
+
+/* スタンプのcell */
+.stamp_cell {
+  float: left;
+  width: 80px;
+  height: 80px;
+  background-color:#ffffff;
+  box-sizing:border-box;
+  border: 1px solid #000000;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+/* 一覧のcell */
 .cell {
   float: left;
   box-sizing:border-box;
-  border: 1px solid #000000;
   position: relative;
   overflow: hidden;
 }
 
+/* 一覧のTwitterアイコン */
 .user_image {
   opacity: 1.0;
   position: absolute;
@@ -90,6 +113,7 @@
   margin: auto;
 }
 
+/* センサの値表示するView */
 .caption {
   position: absolute;
   bottom: 0;
@@ -98,6 +122,7 @@
   width: 100%;
 }
 
+/* センサ値 */
 .caption p {
   margin: 0;
   font-size: 200%;
