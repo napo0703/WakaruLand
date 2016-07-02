@@ -84,9 +84,14 @@ linda.io.on("connect", () => {
           const ip_address = tuple.from;
           console.log(reactor + " < " + img_url + " " + time + "sec (from " + ip_address + ")");
           document.getElementById(reactor + "_reaction").src = img_url;
-          document.getElementById(reactor + "_image").style.opacity = 0.25;
-          if (time != 0) {
-            withdrawReaction(reactor, time * 1000);
+          // 真っ白画像をリアクションした時
+          if (img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png") {
+            document.getElementById(reactor + "_image").style.opacity = 1.0;
+          } else {
+            document.getElementById(reactor + "_image").style.opacity = 0.25;
+            if (time != 0) {
+              withdrawReaction(reactor, time * 1000);
+            }
           }
         }
       });
@@ -157,18 +162,22 @@ var sendReaction = (reaction, time) => {
 let mousedown_id;
 let mousedown_count = 0;
 const startCount = () => {
+  const progress = document.getElementById("console_reaction_progress");
+  const progress_bar = document.getElementById("console_reaction_progress_bar");
+  progress.style.visibility = "visible";
+  progress_bar.style.visibility = "visible";
   mousedown_id = setInterval(() => {
     mousedown_count += 1;
     if (mousedown_count <= 30) {
-      const gauge = document.getElementById("gauge").innerHTML;
       const second = mousedown_count * 20;
-      document.getElementById("gauge").innerHTML = gauge.slice(0, mousedown_count) + "█" + gauge.slice(mousedown_count + 1);
+      progress_bar.style.width = mousedown_count * 3.33 + "%";
+      let display_time = document.getElementById("display_time");
       if (second <= 20) {
-        document.getElementById("display_time").innerHTML = "20秒";
+        progress_bar.innerHTML = "20秒";
       } else if (second >= 600) {
-        document.getElementById("display_time").innerHTML = "forever";
+        progress_bar.innerHTML = "forever"
       } else {
-        document.getElementById("display_time").innerHTML = second + "秒";
+        progress_bar.innerHTML = second + "秒";
       }
     }
   }, 100);
@@ -202,7 +211,11 @@ const appendStampCell = (img_url, append_last) => {
       console.log(second + "sec < " + img_url);
     }
     mousedown_count = 0;
-    document.getElementById("gauge").innerHTML = "[░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]";
+    const progress = document.getElementById("console_reaction_progress");
+    const progress_bar = document.getElementById("console_reaction_progress_bar");
+    progress.style.visibility = "hidden";
+    progress_bar.style.visibility = "hidden";
+    progress_bar.style.width = 0;
   });
   cell.appendChild(img);
 
@@ -281,7 +294,7 @@ const appendSensorCell = (from) => {
   sensor_img_layer.setAttribute("src", sensor_images[from]);
 
   const sensor_value_text_layer = document.createElement("figcaption");
-  sensor_value_text_layer.setAttribute("class", "caption");
+  sensor_value_text_layer.setAttribute("class", "sensor_caption");
 
   const sensor_value_text = document.createElement("p");
   sensor_value_text.setAttribute("id", from + "_value_text");
@@ -501,15 +514,17 @@ for (let i in display_users) {
   document.getElementById("grid_view").appendChild(cell);
 }
 
+document.getElementById("console").style.display = "block";
+document.getElementById("grid").style.display = "block";
+
 if (display_users.length == 0 ||
     (display_users.length == 1 && (display_users[0] == "" || display_users[0].charAt(0) == "@"))) {
-  document.getElementById("console").style.display = "block";
-  document.getElementById("grid").style.display = "none";
+  switch_grid();
+  console.log("switch_grid");
 } else {
-  document.getElementById("console").style.display = "none";
-  document.getElementById("grid").style.display = "block";
+  switch_console();
+  console.log("switch_console");
 }
-relayout_grid();
 
 $(window).resize(() => {
   relayout_grid();

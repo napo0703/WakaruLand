@@ -3,6 +3,8 @@
     <title>わかるらんど</title>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
     <style type="text/css">@import "index.css";</style>
   </head>
   <body>
@@ -12,17 +14,18 @@
           <input type="text" value="test" id="name_text_box" placeholder="Twitterアカウント名">
           <button type="button" id="grid_switch_button"> 一覧非表示 </button>
         </div>
-        <div id="gauge_and_time">
-          <div id="gauge">[░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]</div>
-          <div id="display_time">0秒</div>
-        </div>
         <div id="image_url_input">
-          <input type="text" value="" id="image_url_text_box" placeholder="追加したい画像のURL"><br>
+          <input type="text" value="" id="image_url_text_box" placeholder="追加したい画像のURL">
           <button type="button" id="image_url_add_button"> 追加 </button>
           <button type="button" id="image_url_delete_button"> 削除 </button>
         </div>
         <div id="console_reaction_view">
           <img src="https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" id="console_reaction_img">
+          <div class="progress" id="console_reaction_progress">
+            <div class="progress-bar progress-bar-success" role="progressbar" id="console_reaction_progress_bar" aria-valuemin="0" aria-valuemax="300">
+              0秒
+            </div>
+          </div>
         </div>
         <div id="stamp_grid_view">
         </div>

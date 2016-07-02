@@ -43,15 +43,17 @@ body {
 
 /* リアクション画像追加TextBox */
 #image_url_text_box {
-  width: 432px;
+  width: 340px;
+  margin-bottom: 8px;
 }
 
 /* 現在表示してるリアクションのdiv */
 #console_reaction_view {
+  position: relative;
   float: left;
   width: 168px;
   height: 168px;
-  background-color:#ffffff;
+  background-color: #ffffff;
   margin-right: 8px;
   margin-bottom: 8px;
 }
@@ -59,6 +61,19 @@ body {
 /* 現在表示してるリアクション画像 */
 #console_reaction_img {
   width: 100%;
+}
+
+.progress {
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 0;
+  width: 100%;
+  visibility: hidden;
+}
+
+.progress-bar {
+  width: 0;
+  visibility: hidden;
 }
 
 /* スタンプのcell */
@@ -114,7 +129,7 @@ body {
 }
 
 /* センサの値表示するView */
-.caption {
+.sensor_caption {
   position: absolute;
   bottom: 0;
   color: #fff;
@@ -123,7 +138,7 @@ body {
 }
 
 /* センサ値 */
-.caption p {
+.sensor_caption p {
   margin: 0;
   font-size: 200%;
   text-align: center;
