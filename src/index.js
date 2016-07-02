@@ -10,10 +10,12 @@ $('#image_url_delete_button').on("click", () => {
 
 $('#console_switch_button').on("click", () => {
   switch_console();
+  switch_grid();
 });
 
 $('#grid_switch_button').on("click", () => {
   switch_grid();
+  switch_console();
 });
 
 $('#cell_add_button').on("click", () => {
@@ -519,11 +521,10 @@ document.getElementById("grid").style.display = "block";
 
 if (display_users.length == 0 ||
     (display_users.length == 1 && (display_users[0] == "" || display_users[0].charAt(0) == "@"))) {
+  document.getElementById("grid_switch_button").style.display = "none";
   switch_grid();
-  console.log("switch_grid");
 } else {
   switch_console();
-  console.log("switch_console");
 }
 
 $(window).resize(() => {
