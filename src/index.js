@@ -166,11 +166,11 @@ let mousedown_count = 0;
 const startCount = () => {
   const progress = document.getElementById("console_reaction_progress");
   const progress_bar = document.getElementById("console_reaction_progress_bar");
-  progress.style.visibility = "visible";
-  progress_bar.style.visibility = "visible";
   mousedown_id = setInterval(() => {
     mousedown_count += 1;
     if (mousedown_count <= 30) {
+      progress.style.visibility = "visible";
+      progress_bar.style.visibility = "visible";
       const second = mousedown_count * 20;
       progress_bar.style.width = mousedown_count * 3.33 + "%";
       let display_time = document.getElementById("display_time");
@@ -191,6 +191,7 @@ const appendStampCell = (img_url, append_last) => {
   cell.setAttribute("class", "stamp_cell");
   cell.setAttribute("id", img_url + "_cell");
   const img = document.createElement("img");
+  img.setAttribute("class", "undraggable");
   img.setAttribute("id", img_url);
   img.setAttribute("src", img_url);
   img.setAttribute("width", "100%");
@@ -202,7 +203,6 @@ const appendStampCell = (img_url, append_last) => {
     clearInterval(mousedown_id);
     const second = mousedown_count * 20;
     if (second <= 20) {
-      document.getElementById("display_time").innerHTML = "20秒";
       sendReaction(img_url, 20);
       console.log("30sec < " + img_url);
     } else if (second >= 600) {

@@ -89,6 +89,15 @@ body {
   overflow: hidden;
 }
 
+.undraggable {
+  /* For Opera and <= IE9, we need to add unselectable="on" attribute onto each element */
+  /* Check this site for more details: http://help.dottoro.com/lhwdpnva.php */
+  -moz-user-select: none; /* These user-select properties are inheritable, used to prevent text selection */
+  -webkit-user-select: none;
+  -ms-user-select: none; /* From IE10 only */
+  -webkit-user-drag: none; /* Prevents dragging of images/divs etc */
+}
+
 /* 一覧のcell */
 .cell {
   float: left;
