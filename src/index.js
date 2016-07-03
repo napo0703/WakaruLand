@@ -195,7 +195,7 @@ const appendStampCell = (img_url, append_last) => {
   cell.setAttribute("class", "stamp_cell");
   cell.setAttribute("id", img_url + "_cell");
   const img = document.createElement("img");
-  img.setAttribute("class", "undraggable");
+  img.setAttribute("class", "stamp_cell_img");
   img.setAttribute("id", img_url);
   img.setAttribute("src", img_url);
   img.setAttribute("width", "100%");

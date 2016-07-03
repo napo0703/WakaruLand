@@ -11,21 +11,26 @@
     <div id="wrapper">
       <div id="console">
         <div id="name_input">
-          <input type="text" value="test" id="name_text_box" placeholder="Twitterアカウント名">
-          <button type="button" id="grid_switch_button"> 一覧非表示 </button>
+          <form class="form-inline">
+            <div class="input-group" id="name_text_box_group">
+              <div class="input-group-addon">@</div>
+              <input type="text" class="form-control" id="name_text_box" placeholder="Twitterアカウント名">
+            </div>
+            <input type="text" class="form-control" id="image_url_text_box" placeholder="追加したい画像のURL">
+            <button type="button" class="btn btn-default" id="image_url_add_button">追加</button>
+            <button type="button" class="btn btn-default" id="image_url_delete_button">削除</button>
+            <button type="button" class="btn btn-default" id="grid_switch_button">一覧表示</button>
+          </form>
         </div>
-        <div id="image_url_input">
-          <input type="text" value="" id="image_url_text_box" placeholder="追加したい画像のURL">
-          <button type="button" id="image_url_add_button"> 追加 </button>
-          <button type="button" id="image_url_delete_button"> 削除 </button>
-        </div>
-        <div id="console_reaction_view">
-          <img src="https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" id="console_reaction_img">
-          <div class="progress" id="console_reaction_progress">
-            <div class="progress-bar progress-bar-success" role="progressbar" id="console_reaction_progress_bar" aria-valuemin="0" aria-valuemax="300">0秒</div>
+        <div id="console_reaction">
+          <div id="console_reaction_view">
+            <img src="https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" id="console_reaction_img">
+            <div class="progress" id="console_reaction_progress">
+              <div class="progress-bar progress-bar-success" role="progressbar" id="console_reaction_progress_bar" aria-valuemin="0" aria-valuemax="300">0秒</div>
+            </div>
           </div>
+          <div id="stamp_grid_view">
         </div>
-        <div id="stamp_grid_view">
         </div>
       </div>
       <div id="grid">
@@ -33,7 +38,7 @@
           <input type="text" value="" id="twitter_id_text_box">
           <button type="button" id="cell_add_button"> 追加 </button>
           <button type="button" id="cell_delete_button"> 削除 </button>
-          <button type="button" id="console_switch_button"> 投稿非表示 </button>
+          <button type="button" id="console_switch_button"> 投稿表示 </button>
         </div>
         <div id="grid_view"></div>
       </div>

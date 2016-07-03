@@ -18,33 +18,57 @@ body {
   flex: 1;
 }
 
-/* 投稿画面のゲージ */
-#gauge {
+/* Twitterユーザ名と一覧画面表示ボタンのdiv */
+#name_input {
+  height: 50px;
+  background-color: #ffffff;
+  border-bottom: 1px solid rgba(0,0,0,0.2);
+  padding-left: 8px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+#name_text_box_group {
   float: left;
-  font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
-  padding-top: 8px;
-  padding-right: 8px;
 }
 
-/* 投稿画面のリアクション表示時間 */
-#display_time {
-  font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
-  padding-top: 4px;
-}
-
-/* リアクション画像一覧 */
-#stamp_grid_view {
-  width: 100%;
-}
-
-#image_url_input {
-  padding-top: 8px;
+#name_text_box {
+  width: 131px;
 }
 
 /* リアクション画像追加TextBox */
 #image_url_text_box {
+  margin-left: 8px;
   width: 340px;
-  margin-bottom: 8px;
+}
+
+/* リアクション画像削除ボタン */
+#image_url_delete_button {
+  margin-right: 8px;
+}
+
+/* 画像追加表示切り替えボタン */
+#image_url_switch_button {
+  float: right;
+  margin-right: 8px;
+}
+
+/* 投稿画面と一覧画面の切り替えボタン */
+#grid_switch_button {
+  float: right;
+  margin-right: 8px;
+}
+
+/* リアクション画像一覧 */
+#stamp_grid_view {
+  margin-top: 8px;
+  width: 100%;
+}
+
+/* 現在表示してるリアクションとスタンプ一覧を囲むdiv */
+#console_reaction {
+  margin-top: 8px;
+  margin-left: 8px;
 }
 
 /* 現在表示してるリアクションのdiv */
@@ -56,6 +80,8 @@ body {
   background-color: #ffffff;
   margin-right: 8px;
   margin-bottom: 8px;
+  box-shadow: 0 2px 3px 2px rgba(0,0,0,0.4);
+  padding: 4px;
 }
 
 /* 現在表示してるリアクション画像 */
@@ -67,8 +93,8 @@ body {
 .progress {
   position: absolute;
   bottom: 0;
-  margin-bottom: 0;
-  width: 100%;
+  margin-bottom: 4px;
+  width: 160px;
   visibility: hidden;
 }
 
@@ -84,13 +110,14 @@ body {
   height: 80px;
   background-color:#ffffff;
   box-sizing:border-box;
-  border: 1px solid #000000;
   margin-right: 8px;
   margin-bottom: 8px;
   overflow: hidden;
+  box-shadow: 0 1px 1px 1px rgba(0,0,0,0.4);
 }
 
-.undraggable {
+.stamp_cell_img {
+  padding: 4px;
   /* For Opera and <= IE9, we need to add unselectable="on" attribute onto each element */
   /* Check this site for more details: http://help.dottoro.com/lhwdpnva.php */
   -moz-user-select: none; /* These user-select properties are inheritable, used to prevent text selection */
