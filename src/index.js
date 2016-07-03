@@ -383,7 +383,7 @@ const switch_grid = () => {
   if (grid_style.display == "block") {
     console.style.width = "100%";
     grid_style.display = "none";
-    grid_button.innerHTML = " 一覧表示 ";
+    grid_button.innerHTML = "表示切替";
   } else {
     console.style.width = CONSOLE_WIDTH;
     grid_style.display = "block";
@@ -401,7 +401,7 @@ const switch_console = () => {
   const grid = document.getElementById("grid");
   if (console_style.display == "block") {
     console_style.display = "none";
-    console_button.innerHTML = " 投稿表示 ";
+    console_button.innerHTML = "表示切替";
   } else {
     console_style.display = "block";
     console_button.innerHTML = " 投稿非表示 ";

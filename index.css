@@ -18,9 +18,9 @@ body {
   flex: 1;
 }
 
-/* Twitterユーザ名と一覧画面表示ボタンのdiv */
-#name_input {
-  height: 50px;
+/* Twitterユーザ名と画像追加と一覧画面表示ボタンのdiv */
+#console_header {
+  height: 44px;
   background-color: #ffffff;
   border-bottom: 1px solid rgba(0,0,0,0.2);
   padding-left: 8px;
@@ -28,7 +28,7 @@ body {
   padding-bottom: 8px;
 }
 
-#name_text_box_group {
+#name_input {
   float: left;
 }
 
@@ -36,26 +36,58 @@ body {
   width: 131px;
 }
 
-/* リアクション画像追加TextBox */
-#image_url_text_box {
-  margin-left: 8px;
-  width: 340px;
+@media screen and (min-width: 691px) {
+  /* リアクション画像追加TextBox */
+  #image_url_text_box {
+    float: left;
+    margin-left: 8px;
+    width: 340px;
+    display: inline;
+  }
+
+  /* リアクション画像追加ボタン */
+  #image_url_add_button {
+    float: left;
+    margin-left: 8px;
+    display: inline;
+  }
+
+  /* リアクション画像削除ボタン */
+  #image_url_delete_button {
+    float: left;
+    margin-left: 8px;
+    display: inline;
+  }
 }
 
-/* リアクション画像削除ボタン */
-#image_url_delete_button {
-  margin-right: 8px;
-}
+@media screen and (max-width: 690px) {
+  /* リアクション画像追加TextBox */
+  #image_url_text_box {
+    float: left;
+    margin-left: 8px;
+    width: 340px;
+    display: none;
+  }
 
-/* 画像追加表示切り替えボタン */
-#image_url_switch_button {
-  float: right;
-  margin-right: 8px;
+  /* リアクション画像追加ボタン */
+  #image_url_add_button {
+    float: left;
+    margin-left: 8px;
+    display: none;
+  }
+
+  /* リアクション画像削除ボタン */
+  #image_url_delete_button {
+    float: left;
+    margin-left: 8px;
+    display: none;
+  }
 }
 
 /* 投稿画面と一覧画面の切り替えボタン */
 #grid_switch_button {
   float: right;
+  margin-left: 8px;
   margin-right: 8px;
 }
 
@@ -182,5 +214,11 @@ body {
 }
 
 #grid_user_input {
-  height: 24px;
+  height: 44px;
+  width: 100%;
+}
+
+#console_switch_button {
+  float: right;
+  margin: 8px;
 }
