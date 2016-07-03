@@ -169,11 +169,13 @@ const startCount = () => {
   mousedown_id = setInterval(() => {
     mousedown_count += 1;
     if (mousedown_count <= 30) {
-      progress.style.visibility = "visible";
-      progress_bar.style.visibility = "visible";
-      progress_bar.style.width = mousedown_count * 3.33 + "%";
       let display_time = document.getElementById("display_time");
       // mousedown_count 長押し時間（1/10秒）、second 表示時間（秒）
+      if (mousedown_count >= 2) {
+        progress.style.visibility = "visible";
+        progress_bar.style.visibility = "visible";
+        progress_bar.style.width = mousedown_count * 3.33 + "%";
+      }
       if (mousedown_count <= 5) {
         progress_bar.innerHTML = "20秒";
       } else if (mousedown_count <= 15) {
@@ -201,6 +203,12 @@ const appendStampCell = (img_url, append_last) => {
   img.setAttribute("width", "100%");
   img.addEventListener("mousedown", () => {
     startCount(img_url);
+    document.getElementById("console_reaction_img").src = img_url;
+    if (default_icons.includes(img_url)) {
+      document.getElementById("image_url_text_box").value = "";
+    } else {
+      document.getElementById("image_url_text_box").value = img_url;
+    }
   });
 
   img.addEventListener("mouseup", () => {
