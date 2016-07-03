@@ -61,6 +61,7 @@ body {
 /* 現在表示してるリアクション画像 */
 #console_reaction_img {
   width: 100%;
+  overflow: hidden;
 }
 
 .progress {

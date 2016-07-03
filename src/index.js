@@ -171,15 +171,19 @@ const startCount = () => {
     if (mousedown_count <= 30) {
       progress.style.visibility = "visible";
       progress_bar.style.visibility = "visible";
-      const second = mousedown_count * 20;
       progress_bar.style.width = mousedown_count * 3.33 + "%";
       let display_time = document.getElementById("display_time");
-      if (second <= 20) {
+      // mousedown_count 長押し時間（1/10秒）、second 表示時間（秒）
+      if (mousedown_count <= 5) {
         progress_bar.innerHTML = "20秒";
-      } else if (second >= 600) {
-        progress_bar.innerHTML = "forever"
+      } else if (mousedown_count <= 15) {
+        progress_bar.innerHTML = "1分";
+      } else if (mousedown_count <= 25) {
+        progress_bar.innerHTML = "10分";
+      } else if (mousedown_count < 30) {
+        progress_bar.innerHTML = "1時間";
       } else {
-        progress_bar.innerHTML = second + "秒";
+        progress_bar.innerHTML = "forever";
       }
     }
   }, 100);
@@ -201,16 +205,16 @@ const appendStampCell = (img_url, append_last) => {
 
   img.addEventListener("mouseup", () => {
     clearInterval(mousedown_id);
-    const second = mousedown_count * 20;
-    if (second <= 20) {
+    if (mousedown_count <= 5) {
       sendReaction(img_url, 20);
-      console.log("30sec < " + img_url);
-    } else if (second >= 600) {
-      sendReaction(img_url, 0);
-      console.log("forever < " + img_url);
+    } else if (mousedown_count <= 15) {
+      sendReaction(img_url, 60);
+    } else if (mousedown_count <= 25) {
+      sendReaction(img_url, 600);
+    } else if (mousedown_count < 30) {
+      sendReaction(img_url, 3600);
     } else {
-      sendReaction(img_url, second);
-      console.log(second + "sec < " + img_url);
+      sendReaction(img_url, 0);
     }
     mousedown_count = 0;
     const progress = document.getElementById("console_reaction_progress");
