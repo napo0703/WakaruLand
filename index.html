@@ -8,34 +8,32 @@
     <style type="text/css">@import "index.css";</style>
   </head>
   <body>
-    <div id="wrapper">
-      <div id="console">
-        <div id="console_header">
-          <div id="name_input">
-            @<input type="text" id="name_text_box" placeholder="Twitterアカウント名">
-          </div>
-          <input type="text" id="image_url_text_box" placeholder="追加したい画像のURL">
-          <button type="button" id="image_url_add_button">追加</button>
-          <button type="button" id="image_url_delete_button">削除</button>
-          <button type="button" id="grid_switch_button">表示切替</button>
+    <div id="console">
+      <div id="console_header">
+        <div id="name_input">
+          @<input type="text" id="name_text_box" placeholder="Twitterアカウント名">
         </div>
-        <div id="console_reaction">
-          <div id="console_reaction_view">
-            <img src="https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" id="console_reaction_img">
-            <div class="progress" id="console_reaction_progress">
-              <div class="progress-bar progress-bar-success" role="progressbar" id="console_reaction_progress_bar" aria-valuemin="0" aria-valuemax="300">0秒</div>
-            </div>
-          </div>
-          <div id="stamp_grid_view">
-        </div>
-        </div>
+        <input type="text" id="image_url_text_box" placeholder="追加したい画像のURL">
+        <button type="button" id="image_url_add_button">追加</button>
+        <button type="button" id="image_url_delete_button">削除</button>
+        <button type="button" id="grid_switch_button">表示切替</button>
       </div>
-      <div id="grid">
-        <div id="grid_user_input">
-          <button type="button" id="console_switch_button">表示切替</button>
+      <div id="console_reaction">
+        <div id="console_reaction_view">
+          <img src="https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" id="console_reaction_img">
+          <div class="progress" id="console_reaction_progress">
+            <div class="progress-bar progress-bar-success" role="progressbar" id="console_reaction_progress_bar" aria-valuemin="0" aria-valuemax="300">0秒</div>
+          </div>
         </div>
-        <div id="grid_view"></div>
+        <div id="stamp_grid_view">
       </div>
+      </div>
+    </div>
+    <div id="grid">
+      <div id="grid_user_input">
+        <button type="button" id="console_switch_button">表示切替</button>
+      </div>
+      <div id="grid_view"></div>
     </div>
     <script src="//linda-server.herokuapp.com/linda/linda.js"></script>
     <script src="dist/index.js"></script>

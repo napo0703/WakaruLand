@@ -2,20 +2,14 @@ body {
   background-color: #e4f0ea;
 }
 
-/* console と grid を囲むdiv */
-#wrapper {
-  display: flex;
-  height: 100%;
-}
-
 /* 投稿画面 */
 #console {
-  width: 440px; /*固定したい幅の長さ*/
+  width: 100%; /*固定したい幅の長さ*/
 }
 
 /* 一覧画面 */
 #grid {
-  flex: 1;
+  width: 100%;
 }
 
 /* Twitterユーザ名と画像追加と一覧画面表示ボタンのdiv */
@@ -112,7 +106,7 @@ body {
   background-color: #ffffff;
   margin-right: 8px;
   margin-bottom: 8px;
-  box-shadow: 0 2px 3px 2px rgba(0,0,0,0.4);
+  box-shadow: 0 1px 1px 1px rgba(0,0,0,0.4);
   padding: 4px;
 }
 

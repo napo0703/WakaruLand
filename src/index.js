@@ -1,29 +1,19 @@
 import $ from 'jquery'
 
 $('#image_url_add_button').on("click", () => {
-  addImage()
+  addImage(document.getElementById("image_url_text_box").value);
 });
 
 $('#image_url_delete_button').on("click", () => {
-  removeImage()
+  removeImage(document.getElementById("image_url_text_box").value);
 });
 
 $('#console_switch_button').on("click", () => {
-  switch_console();
-  switch_grid();
+  switch_display();
 });
 
 $('#grid_switch_button').on("click", () => {
-  switch_grid();
-  switch_console();
-});
-
-$('#cell_add_button').on("click", () => {
-  append_user(document.getElementById("twitter_id_text_box").value);
-});
-
-$('#cell_delete_button').on("click", () => {
-  remove_user(document.getElementById("twitter_id_text_box").value);
+  switch_display();
 });
 
 import SocketIO from 'socket.io-client'
@@ -154,11 +144,7 @@ var sendReaction = (reaction, time) => {
   document.getElementById("console_reaction_img").src = reaction;
   document.getElementById(reaction + "_cell").style.backgroundColor = "#ffffff";
   ts.write({from: my_name, value: reaction, time: time});
-  if (default_icons.includes(reaction)) {
-    document.getElementById("image_url_text_box").value = "";
-  } else {
-    document.getElementById("image_url_text_box").value = reaction;
-  }
+  document.getElementById("image_url_text_box").value = reaction;
 };
 
 let mousedown_id;
@@ -244,34 +230,28 @@ const appendStampCell = (img_url, append_last) => {
 let my_images = "";
 
 // 自分で追加した画像を削除
-var removeImage = () => {
-  console.log("removeImage()");
-  const img_url = document.getElementById("image_url_text_box").value;
-  const my_images_array = Array.from(new Set(my_images.split(',')));
-  if (my_images_array.includes(img_url)) {
-    console.log("my_images_array includes " + img_url);
-    for (let i in my_images_array) {
-      console.log("my_images_array[i] = " + my_images_array[i], "img_url = " + img_url);
-      if (my_images_array[i] == img_url) {
-        console.log(img_url + " is removed!");
-        document.getElementById("stamp_grid_view").removeChild(document.getElementById(img_url + "_cell"));
-        my_images_array.splice(i, 1);
-        localStorage.images = my_images_array;
-        break;
-      }
+var removeImage = (img_url) => {
+  const my_images_array = Array.from(new Set(localStorage.images.split(',')));
+  const children = document.getElementById("grid_view").children;
+  for (let i in children) {
+    if (children[i].getAttribute("id") == img_url + "_cell") {
+      document.getElementById("stamp_grid_view").removeChild(document.getElementById(img_url + "_cell"));
+      my_images_array.splice(i, 1);
+      break;
     }
   }
+  localStorage.images = my_images_array;
 };
 
 // URLから画像を追加
-var addImage = () => {
-  const img_url = document.getElementById("image_url_text_box").value
+var addImage = (img_url) => {
   appendStampCell(img_url, false);
-  if (my_images != "") {
-    my_images = my_images + ",";
+  let my_images_array = [];
+  const children = document.getElementById("grid_view").children;
+  for (let i in children) {
+    my_images_array.push(children[i].getAttribute("id"));
   }
-  my_images = my_images + img_url;
-  localStorage.images = my_images;
+  localStorage.images = my_images_array;
 };
 
 console.log(display_users);
@@ -382,40 +362,18 @@ const withdrawReaction = (reactor, time) => {
   }
 };
 
-// Grid表示/非表示
-const switch_grid = () => {
-  const grid_style = document.getElementById("grid").style;
-  const console_button = document.getElementById("console_switch_button");
-  const grid_button = document.getElementById("grid_switch_button");
-  const console = document.getElementById("console");
-  if (grid_style.display == "block") {
-    console.style.width = "100%";
-    grid_style.display = "none";
-    grid_button.innerHTML = "表示切替";
-  } else {
-    console.style.width = CONSOLE_WIDTH;
-    grid_style.display = "block";
-    console_button.innerHTML = " 投稿非表示 ";
-    grid_button.innerHTML = " 一覧非表示 ";
+const switch_display = () => {
+  if (!isConsoleOnly()) {
+    const console = document.getElementById("console");
+    const grid = document.getElementById("grid");
+    if (console.style.display == "block") {
+      console.style.display = "none";
+      grid.style.display = "block";
+    } else {
+      console.style.display = "block";
+      grid.style.display = "none";
+    }
   }
-  relayout_grid();
-};
-
-// Console表示/非表示
-const switch_console = () => {
-  const console_style = document.getElementById("console").style;
-  const console_button = document.getElementById("console_switch_button");
-  const grid_button = document.getElementById("grid_switch_button");
-  const grid = document.getElementById("grid");
-  if (console_style.display == "block") {
-    console_style.display = "none";
-    console_button.innerHTML = "表示切替";
-  } else {
-    console_style.display = "block";
-    console_button.innerHTML = " 投稿非表示 ";
-    grid_button.innerHTML = " 一覧非表示 ";
-  }
-  relayout_grid();
 };
 
 const MIN_CELL_WIDTH = 10;
@@ -463,30 +421,9 @@ const relayout_grid = () => {
   }
 };
 
-var append_user = (from) => {
-  let cell;
-  if (sensors.includes(from)) {
-    cell = appendSensorCell(from);
-  } else {
-    cell = appendUserCell(from);
-  }
-  document.getElementById("grid_view").appendChild(cell);
-  display_users.push(from);
-  history.replaceState("", "", "?" + display_users.join(","));
-  relayout_grid();
-};
-
-var remove_user = (from) => {
-  document.getElementById("grid_view").removeChild(document.getElementById(from));
-  for (let i in display_users) {
-    if (from == display_users[i]) {
-      display_users.splice(i, 1);
-      break;
-    }
-  }
-  console.log(display_users);
-  history.replaceState("", "", "?" + display_users.join(","));
-  relayout_grid();
+const isConsoleOnly = () => {
+  return !!(display_users.length == 0 ||
+  (display_users.length == 1 && (display_users[0] == "" || display_users[0].charAt(0) == "@")));
 };
 
 // ローカルストレージまたはURL末尾のクエリから発言者名の設定
@@ -516,29 +453,32 @@ if (my_images.length != "") {
   }
 }
 
-// Gridの生成
-for (let i in display_users) {
-  const name = display_users[i];
-  let cell;
-  if (name.charAt(0) == "@") {
-    cell = appendUserCell(name);
-  } else {
-    cell = appendSensorCell(name);
-  }
-  document.getElementById("grid_view").appendChild(cell);
-}
-
-document.getElementById("console").style.display = "block";
-document.getElementById("grid").style.display = "block";
-
-if (display_users.length == 0 ||
-    (display_users.length == 1 && (display_users[0] == "" || display_users[0].charAt(0) == "@"))) {
-  document.getElementById("grid_switch_button").style.display = "none";
-  switch_grid();
+if (isConsoleOnly()) {
+  const console = document.getElementById("console");
+  const grid = document.getElementById("grid");
+  const switch_button = document.getElementById("grid_switch_button");
+  console.style.display = "block";
+  grid.style.display = "none";
+  switch_button.style.display = "none";
 } else {
-  switch_console();
+  // Gridの生成
+  for (let i in display_users) {
+    const name = display_users[i];
+    let cell;
+    if (name.charAt(0) == "@") {
+      cell = appendUserCell(name);
+    } else {
+      cell = appendSensorCell(name);
+    }
+    document.getElementById("grid_view").appendChild(cell);
+  }
+  document.getElementById("console").style.display = "none";
+  document.getElementById("grid").style.display = "block";
+  relayout_grid();
 }
 
 $(window).resize(() => {
-  relayout_grid();
+  if (document.getElementById("grid").style.display == "block") {
+    relayout_grid();
+  }
 });
