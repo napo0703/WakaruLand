@@ -140,13 +140,23 @@ linda.io.on("connect", () => {
 // URL末尾のカンマ区切り文字列から表示するユーザを抽出
 const display_users = Array.from(new Set(location.search.substring(1).split(',')));
 
-var sendReaction = (reaction, time) => {
+var sendReaction = (img_url, time) => {
   my_name = "@" + document.getElementById("name_text_box").value;
   if (window.localStorage) localStorage.name = my_name;
-  document.getElementById("console_reaction_img").src = reaction;
-  document.getElementById(reaction + "_cell").style.backgroundColor = "#ffffff";
-  ts.write({from: my_name, value: reaction, time: time});
-  document.getElementById("image_url_text_box").value = reaction;
+  document.getElementById("console_reaction_img").src = img_url;
+  document.getElementById(img_url + "_cell").style.backgroundColor = "#ffffff";
+  ts.write({from: my_name, value: img_url, time: time});
+  document.getElementById("image_url_text_box").value = img_url;
+  // クリックしたスタンプ画像を先頭に移動
+  const stamp_grid = document.getElementById("stamp_grid_view");
+  stamp_grid.removeChild(document.getElementById(img_url + "_cell"));
+  const my_images = Array.from(new Set(localStorage.images.split(',')));
+  my_images.some((v, i) => {
+    if (v == img_url) my_images.splice(i, 1);
+  });
+  my_images.unshift(img_url); //先頭に追加
+  localStorage.images = my_images;
+  appendStampCell(img_url, false);
 };
 
 let mousedown_id;
