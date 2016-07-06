@@ -1,11 +1,11 @@
 import $ from 'jquery'
 
 $('#image_url_add_button').on("click", () => {
-  addImage(document.getElementById("image_url_text_box").value);
+  addStampImage(document.getElementById("image_url_text_box").value);
 });
 
 $('#image_url_delete_button').on("click", () => {
-  removeImage(document.getElementById("image_url_text_box").value);
+  removeStampImage(document.getElementById("image_url_text_box").value);
 });
 
 $('#console_switch_button').on("click", () => {
@@ -60,78 +60,80 @@ const ts = linda.tuplespace("masuilab");
 
 linda.io.on("connect", () => {
   console.log("connect Linda!!");
-  ts.watch({from: my_name}, (err, tuple) => {
-    console.log(my_name+" < " + tuple.data.value);
-    document.getElementById("console_reaction_img").src = tuple.data.value;
-  });
+  if (!isConsoleOnly()) {
+    ts.watch({from: my_name}, (err, tuple) => {
+      console.log(my_name + " < " + tuple.data.value);
+      document.getElementById("console_reaction_img").src = tuple.data.value;
+    });
 
-  // 一覧表示
-  for (let i in display_users) {
-    if (display_users[i].charAt(0) == "@") {
-      ts.watch({from: display_users[i]}, (err, tuple) => {
-        const reactor = tuple.data.from;
-        if (display_users.includes(reactor)) {
-          const img_url = tuple.data.value;
-          const time = tuple.data.time;
-          const ip_address = tuple.from;
-          console.log(reactor + " < " + img_url + " " + time + "sec (from " + ip_address + ")");
-          document.getElementById(reactor + "_reaction").src = img_url;
-          // 真っ白画像をリアクションした時
-          if (img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png") {
-            document.getElementById(reactor + "_image").style.opacity = 1.0;
-          } else {
-            document.getElementById(reactor + "_image").style.opacity = 0.25;
-            if (time != 0) {
-              withdrawReaction(reactor, time * 1000);
+    // 一覧表示
+    for (let i in display_users) {
+      if (display_users[i].charAt(0) == "@") {
+        ts.watch({from: display_users[i]}, (err, tuple) => {
+          const reactor = tuple.data.from;
+          if (display_users.includes(reactor)) {
+            const img_url = tuple.data.value;
+            const time = tuple.data.time;
+            const ip_address = tuple.from;
+            console.log(reactor + " < " + img_url + " " + time + "sec (from " + ip_address + ")");
+            document.getElementById(reactor + "_reaction").src = img_url;
+            // 真っ白画像をリアクションした時
+            if (img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png") {
+              document.getElementById(reactor + "_image").style.opacity = 1.0;
+            } else {
+              document.getElementById(reactor + "_image").style.opacity = 0.25;
+              if (time != 0) {
+                withdrawReaction(reactor, time * 1000);
+              }
             }
           }
+        });
+      }
+    }
+
+    // デルタのセンサ
+    if (display_users.includes("delta_temperature")) {
+      ts.watch({where: "delta", type: "sensor", name: "temperature"}, (err, tuple) => {
+        const temp = Math.round(tuple.data.value * 10) / 10;
+        console.log("delta_temperature = " + temp);
+        document.getElementById("delta_temperature_value_text").innerHTML = temp + "℃";
+      });
+    }
+
+    if (display_users.includes("delta_light")) {
+      ts.watch({where: "delta", type: "sensor", name: "light"}, (err, tuple) => {
+        const value = tuple.data.value;
+        console.log("delta_light = " + value);
+        document.getElementById("delta_light_value_text").innerHTML = value;
+        if (value <= 100) {
+          document.getElementById("delta_light_image").src = sensor_images["delta_light"];
+        } else {
+          document.getElementById("delta_light_image").src = sensor_images["delta_light_on"];
         }
       });
     }
-  }
 
-  // デルタのセンサ
-  if (display_users.includes("delta_temperature")) {
-    ts.watch({where: "delta", type: "sensor", name: "temperature"}, (err, tuple) => {
-      const temp = Math.round(tuple.data.value * 10) / 10;
-      console.log("delta_temperature = " + temp);
-      document.getElementById("delta_temperature_value_text").innerHTML = temp + "℃";
-    });
-  }
+    if (display_users.includes("delta_door")) {
+      ts.watch({where: "delta", type: "door", cmd: "open"}, (err, tuple) => {
+        console.log("delta_door_open!!");
+        const date = new Date();
+        const minute = date.getMinutes() >= 10 ? date.getMinutes() : "0" + date.getMinutes();
+        const second = date.getSeconds() >= 10 ? date.getSeconds() : "0" + date.getSeconds();
+        document.getElementById("delta_door_value_text").innerHTML = date.getHours() + ":" + minute + ":" + second;
+        document.getElementById("delta_door_image").src = sensor_images["delta_door_open"];
+        window.setTimeout(() => {
+          document.getElementById("delta_door_image").src = sensor_images["delta_door"];
+        }, 10000);
+      });
+    }
 
-  if (display_users.includes("delta_light")) {
-    ts.watch({where: "delta", type: "sensor", name: "light"}, (err, tuple) => {
-      const value = tuple.data.value;
-      console.log("delta_light = " + value);
-      document.getElementById("delta_light_value_text").innerHTML = value;
-      if (value <= 100) {
-        document.getElementById("delta_light_image").src = sensor_images["delta_light"];
-      } else {
-        document.getElementById("delta_light_image").src = sensor_images["delta_light_on"];
-      }
-    });
-  }
-
-  if (display_users.includes("delta_door")) {
-    ts.watch({where: "delta", type: "door", cmd: "open"}, (err, tuple) => {
-      console.log("delta_door_open!!");
-      const date = new Date();
-      const minute = date.getMinutes() >= 10 ? date.getMinutes() : "0" + date.getMinutes();
-      const second = date.getSeconds() >= 10 ? date.getSeconds() : "0" + date.getSeconds();
-      document.getElementById("delta_door_value_text").innerHTML = date.getHours()+ ":" + minute + ":" + second;
-      document.getElementById("delta_door_image").src = sensor_images["delta_door_open"];
-      window.setTimeout(() => {
-        document.getElementById("delta_door_image").src = sensor_images["delta_door"];
-      }, 10000);
-    });
-  }
-
-  // 江ノ島の風
-  if (display_users.includes("enoshima_wind")) {
-    ts.watch({where: "enoshima", type: "sensor", name: "wind"}, (err, tuple) => {
-      document.getElementById("enoshima_wind_value_text").innerHTML =
-          tuple.data.direction + " の風 " + tuple.data.speed + "m/s";
-    });
+    // 江ノ島の風
+    if (display_users.includes("enoshima_wind")) {
+      ts.watch({where: "enoshima", type: "sensor", name: "wind"}, (err, tuple) => {
+        document.getElementById("enoshima_wind_value_text").innerHTML =
+            tuple.data.direction + " の風 " + tuple.data.speed + "m/s";
+      });
+    }
   }
 });
 
@@ -227,31 +229,32 @@ const appendStampCell = (img_url, append_last) => {
   }
 };
 
-let my_images = "";
-
 // 自分で追加した画像を削除
-var removeImage = (img_url) => {
-  const my_images_array = Array.from(new Set(localStorage.images.split(',')));
-  const children = document.getElementById("grid_view").children;
-  for (let i in children) {
-    if (children[i].getAttribute("id") == img_url + "_cell") {
-      document.getElementById("stamp_grid_view").removeChild(document.getElementById(img_url + "_cell"));
-      my_images_array.splice(i, 1);
-      break;
-    }
-  }
-  localStorage.images = my_images_array;
+var removeStampImage = (img_url) => {
+  const stamp_grid = document.getElementById("stamp_grid_view");
+  // TODO: elementの存在チェック
+  stamp_grid.removeChild(document.getElementById(img_url + "_cell"));
+  const my_images = Array.from(new Set(localStorage.images.split(',')));
+  my_images.some((v, i) => {
+    if (v == img_url) my_images.splice(i, 1);
+  });
+  localStorage.images = my_images;
 };
 
 // URLから画像を追加
-var addImage = (img_url) => {
-  appendStampCell(img_url, false);
-  let my_images_array = [];
-  const children = document.getElementById("grid_view").children;
-  for (let i in children) {
-    my_images_array.push(children[i].getAttribute("id"));
+var addStampImage = (img_url) => {
+  let my_images = Array.from(new Set(localStorage.images.split(',')));
+  if (my_images.includes(img_url)) {
+    const stamp_grid = document.getElementById("stamp_grid_view");
+    stamp_grid.removeChild(document.getElementById(img_url + "_cell"));
+    const my_images = Array.from(new Set(localStorage.images.split(',')));
+    my_images.some((v, i) => {
+      if (v == img_url) my_images.splice(i, 1);
+    });
   }
-  localStorage.images = my_images_array;
+  my_images.unshift(img_url); //先頭に追加
+  localStorage.images = my_images;
+  appendStampCell(img_url, false);
 };
 
 console.log(display_users);
@@ -428,30 +431,25 @@ const isConsoleOnly = () => {
 
 // ローカルストレージまたはURL末尾のクエリから発言者名の設定
 let my_name = "@test";
-if (display_users.length == 0) {
-  my_name = localStorage.name || my_name;
-} else if (display_users.length == 1 && display_users[0].charAt(0) == "@") {
+if (display_users.length == 1 && display_users[0].charAt(0) == "@") {
   my_name = display_users[0]
 } else {
   my_name = localStorage.name || my_name;
 }
 document.getElementById("name_text_box").value = my_name.substring(1);
 
-// consoleの生成
-// デフォルトで用意してある画像を表示
-for (let i in default_icons) {
-  appendStampCell(default_icons[i], true);
+// localStorageから自分で追加した画像を表示
+if (localStorage.images == null) {
+  localStorage.images = default_icons;
 }
 
-// localStorageから自分で追加した画像を表示
-my_images = localStorage.images || my_images;
-if (my_images.length != "") {
-  const my_images_array = Array.from(new Set(my_images.split(',')));
-  for (let i in my_images_array) {
-    console.log(my_images_array[i]);
-    appendStampCell(my_images_array[i], false);
+const appendStampFromLocalStorage = (() => {
+  const my_images = Array.from(new Set(localStorage.images.split(',')));
+  for (let i in my_images) {
+    appendStampCell(my_images[i], true);
   }
-}
+  localStorage.images = Array.from(new Set(my_images));
+})();
 
 if (isConsoleOnly()) {
   const console = document.getElementById("console");
