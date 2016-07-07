@@ -49,8 +49,9 @@ const sensor_images = {
 };
 
 // レイアウトの定数
-const CONSOLE_WIDTH = 440;
-const GRID_USER_INPUT_HEIGHT = 24;
+const GRID_USER_INPUT_HEIGHT = 44;
+const MIN_CELL_WIDTH = 10;
+const MIN_CELL_HEIGHT = 10;
 
 // connect Socket.IO & Linda
 const server_url = "//linda-server.herokuapp.com/";
@@ -389,33 +390,25 @@ const switch_display = () => {
   }
 };
 
-const MIN_CELL_WIDTH = 10;
-const MIN_CELL_HEIGHT = 10;
-
 const relayout_grid = () => {
-  let grid_width;
+  const grid_width = window.innerWidth;
   const grid_height = window.innerHeight - GRID_USER_INPUT_HEIGHT;
-  const console_style = document.getElementById("console").style;
-  if (console_style.display == "block") {
-    grid_width = window.innerWidth - CONSOLE_WIDTH;
-  } else {
-    grid_width = window.innerWidth;
-  }
   const gridSize = getGridSize(grid_width, grid_height, MIN_CELL_WIDTH, display_users.length);
   const columnCount = gridSize.columnCount;
   const rowCount = gridSize.rowCount;
   const cellWidth = Math.max(grid_width / columnCount, MIN_CELL_WIDTH);
   const cellHeight = Math.max(grid_height / rowCount, MIN_CELL_HEIGHT);
+  const gridHeightProportion = (grid_height / window.innerHeight) * 100;
 
   for (let i in display_users) {
     const from = display_users[i];
     let cell = document.getElementById(from);
     if (grid_height < cellHeight * rowCount) {
       cell.style.width = Math.floor(100 / rowCount) + "%";
-      cell.style.height = Math.floor(100 / rowCount) + "%";
+      cell.style.height = Math.floor(gridHeightProportion / rowCount) + "%";
     } else {
       cell.style.width = Math.floor(100 / columnCount) + "%";
-      cell.style.height = Math.floor(100 / rowCount) + "%";
+      cell.style.height = Math.floor(gridHeightProportion / rowCount) + "%";
     }
 
     const user_icon_layer = cell.children[0];
