@@ -275,6 +275,10 @@ const appendUserCell = (from) => {
   cell.setAttribute("class", "cell");
   cell.setAttribute("id", from);
 
+  const background_layer = document.createElement("div");
+  background_layer.setAttribute("class", "cell_background");
+  background_layer.setAttribute("id", from + "_background");
+
   const user_icon_layer = document.createElement("img");
   user_icon_layer.setAttribute("class", "user_image");
   user_icon_layer.setAttribute("id", from + "_image");
@@ -285,9 +289,9 @@ const appendUserCell = (from) => {
   reaction_img_layer.setAttribute("id", from + "_reaction");
   reaction_img_layer.setAttribute("src", "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png");
 
-  cell.appendChild(user_icon_layer);
-  cell.appendChild(reaction_img_layer);
-
+  background_layer.appendChild(user_icon_layer);
+  background_layer.appendChild(reaction_img_layer);
+  cell.appendChild(background_layer);
   return cell;
 };
 
@@ -296,10 +300,19 @@ const appendSensorCell = (from) => {
   cell.setAttribute("class", "cell");
   cell.setAttribute("id", from);
 
+  const background_layer = document.createElement("div");
+  background_layer.setAttribute("class", "cell_background");
+  background_layer.setAttribute("id", from + "_background");
+
+  const sensor_icon_layer = document.createElement("img");
+  sensor_icon_layer.setAttribute("class", "sensor_image");
+  sensor_icon_layer.setAttribute("id", from + "_image");
+  sensor_icon_layer.setAttribute("src", sensor_images[from]);
+
   const sensor_img_layer = document.createElement("img");
-  sensor_img_layer.setAttribute("class", "sensor_image");
-  sensor_img_layer.setAttribute("id", from + "_image");
-  sensor_img_layer.setAttribute("src", sensor_images[from]);
+  sensor_img_layer.setAttribute("class", "sensor_reaction");
+  sensor_img_layer.setAttribute("id", from + "_reaction");
+  sensor_img_layer.setAttribute("src", "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png");
 
   const sensor_value_text_layer = document.createElement("figcaption");
   sensor_value_text_layer.setAttribute("class", "sensor_caption");
@@ -308,8 +321,9 @@ const appendSensorCell = (from) => {
   sensor_value_text.setAttribute("id", from + "_value_text");
 
   sensor_value_text_layer.appendChild(sensor_value_text);
-  cell.appendChild(sensor_img_layer);
-  cell.appendChild(sensor_value_text_layer);
+  background_layer.appendChild(sensor_icon_layer);
+  background_layer.appendChild(sensor_value_text_layer);
+  cell.appendChild(background_layer);
   return cell;
 };
 
@@ -398,31 +412,44 @@ const relayout_grid = () => {
   const rowCount = gridSize.rowCount;
   const cellWidth = Math.max(grid_width / columnCount, MIN_CELL_WIDTH);
   const cellHeight = Math.max(grid_height / rowCount, MIN_CELL_HEIGHT);
-  const gridHeightProportion = (grid_height / window.innerHeight) * 100;
+  const gridHeightProportion = (grid_height / window.innerHeight);
+
+  let cellWidthProportion;
+  let cellHeightProportion;
+  if (grid_height < cellHeight * rowCount) {
+    cellWidthProportion = 1 / rowCount;
+    cellHeightProportion = gridHeightProportion / rowCount;
+  } else {
+    cellWidthProportion = 1 / columnCount;
+    cellHeightProportion = gridHeightProportion / rowCount;
+  }
 
   for (let i in display_users) {
     const from = display_users[i];
     let cell = document.getElementById(from);
-    if (grid_height < cellHeight * rowCount) {
-      cell.style.width = Math.floor(100 / rowCount) + "%";
-      cell.style.height = Math.floor(gridHeightProportion / rowCount) + "%";
-    } else {
-      cell.style.width = Math.floor(100 / columnCount) + "%";
-      cell.style.height = Math.floor(gridHeightProportion / rowCount) + "%";
-    }
-
-    const user_icon_layer = cell.children[0];
-    const reaction_img_layer = cell.children[1];
+    cell.style.width = Math.floor(cellWidthProportion * 1000) / 10 + "%";
+    cell.style.height = Math.floor(cellHeightProportion * 1000) / 10 + "%";
+    const background_layer = document.getElementById(from + "_background");
+    const user_icon_layer = document.getElementById(from + "_image");
+    const reaction_img_layer = document.getElementById(from + "_reaction");
     if (cellWidth >= cellHeight) {
-      user_icon_layer.setAttribute("height", "100%");
-      user_icon_layer.removeAttribute("width");
-      reaction_img_layer.setAttribute("height", "100%");
-      reaction_img_layer.removeAttribute("width");
+      background_layer.style.width = cellHeight - 16;
+      background_layer.style.height = cellHeight - 16;
+      user_icon_layer.style.width = cellHeight - 16;
+      user_icon_layer.style.height = cellHeight - 16;
+      if (!sensors.includes(from)) {
+        reaction_img_layer.style.width = "100%";
+        reaction_img_layer.style.height = "";
+      }
     } else {
-      user_icon_layer.setAttribute("width", "100%");
-      user_icon_layer.removeAttribute("height");
-      reaction_img_layer.setAttribute("width", "100%");
-      reaction_img_layer.removeAttribute("height");
+      background_layer.style.width = cellWidth - 16;
+      background_layer.style.height = cellWidth - 16;
+      user_icon_layer.style.width = cellWidth - 16;
+      user_icon_layer.style.height = cellWidth - 16;
+      if (!sensors.includes(from)) {
+        reaction_img_layer.style.width = "100%";
+        reaction_img_layer.style.height = "";
+      }
     }
   }
 };
