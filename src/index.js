@@ -77,7 +77,8 @@ linda.io.on("connect", () => {
             const time = tuple.data.time;
             const ip_address = tuple.from;
             console.log(reactor + " < " + img_url + " " + time + "sec (from " + ip_address + ")");
-            document.getElementById(reactor + "_reaction").src = img_url;
+            const style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
+            document.getElementById(reactor + "_reaction").setAttribute("style", style);
             // 真っ白画像をリアクションした時
             if (img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png") {
               document.getElementById(reactor + "_image").style.opacity = 1.0;
@@ -195,12 +196,9 @@ const appendStampCell = (img_url, append_last) => {
   const cell = document.createElement("div");
   cell.setAttribute("class", "stamp_cell");
   cell.setAttribute("id", img_url + "_cell");
-  const img = document.createElement("img");
-  img.setAttribute("class", "stamp_cell_img");
-  img.setAttribute("id", img_url);
-  img.setAttribute("src", img_url);
-  img.setAttribute("width", "100%");
-  img.addEventListener("mousedown", () => {
+  const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #dedede;";
+  cell.setAttribute("style", cell_style);
+  cell.addEventListener("mousedown", () => {
     startCount(img_url);
     document.getElementById("console_reaction_img").src = img_url;
     if (default_icons.includes(img_url)) {
@@ -210,7 +208,7 @@ const appendStampCell = (img_url, append_last) => {
     }
   });
 
-  img.addEventListener("mouseup", () => {
+  cell.addEventListener("mouseup", () => {
     clearInterval(mousedown_id);
     if (mousedown_count <= 5) {
       sendReaction(img_url, 20);
@@ -230,7 +228,6 @@ const appendStampCell = (img_url, append_last) => {
     progress_bar.style.visibility = "hidden";
     progress_bar.style.width = 0;
   });
-  cell.appendChild(img);
 
   if (append_last) {
     document.getElementById("stamp_grid_view").appendChild(cell);
@@ -279,15 +276,16 @@ const appendUserCell = (from) => {
   background_layer.setAttribute("class", "cell_background");
   background_layer.setAttribute("id", from + "_background");
 
-  const user_icon_layer = document.createElement("img");
-  user_icon_layer.setAttribute("class", "user_image");
+  const user_icon_layer = document.createElement("div");
+  user_icon_layer.setAttribute("class", "cell_image");
   user_icon_layer.setAttribute("id", from + "_image");
-  user_icon_layer.setAttribute("src", "http://www.paper-glasses.com/api/twipi/" + from.substring(1) + "/original");
+  const icon_style = "background:url('http://www.paper-glasses.com/api/twipi/" + from.substring(1) +"/original') center center no-repeat; background-size:contain";
+  user_icon_layer.setAttribute("style", icon_style);
 
-  const reaction_img_layer = document.createElement("img");
-  reaction_img_layer.setAttribute("class", "reaction_image");
+  const reaction_img_layer = document.createElement("div");
+  reaction_img_layer.setAttribute("class", "cell_image");
   reaction_img_layer.setAttribute("id", from + "_reaction");
-  reaction_img_layer.setAttribute("src", "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png");
+  reaction_img_layer.setAttribute("style", "background:url('https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png') center center no-repeat; background-size:contain");
 
   background_layer.appendChild(user_icon_layer);
   background_layer.appendChild(reaction_img_layer);
@@ -304,15 +302,11 @@ const appendSensorCell = (from) => {
   background_layer.setAttribute("class", "cell_background");
   background_layer.setAttribute("id", from + "_background");
 
-  const sensor_icon_layer = document.createElement("img");
-  sensor_icon_layer.setAttribute("class", "sensor_image");
+  const sensor_icon_layer = document.createElement("div");
+  sensor_icon_layer.setAttribute("class", "cell_image");
   sensor_icon_layer.setAttribute("id", from + "_image");
-  sensor_icon_layer.setAttribute("src", sensor_images[from]);
-
-  const sensor_img_layer = document.createElement("img");
-  sensor_img_layer.setAttribute("class", "sensor_reaction");
-  sensor_img_layer.setAttribute("id", from + "_reaction");
-  sensor_img_layer.setAttribute("src", "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png");
+  const icon_style = "background:url('" + sensor_images[from] +"') center center no-repeat; background-size:contain";
+  sensor_icon_layer.setAttribute("style", icon_style);
 
   const sensor_value_text_layer = document.createElement("figcaption");
   sensor_value_text_layer.setAttribute("class", "sensor_caption");
@@ -383,7 +377,8 @@ const withdrawReaction = (reactor, time) => {
       if (sensors.includes(reactor)) {
         document.getElementById(reactor + "_image").src = sensor_images[reactor];
       } else {
-        document.getElementById(reactor + "_reaction").src = "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png";
+        const style = "background:url('https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png') center center no-repeat; background-size:contain";
+        document.getElementById(reactor + "_reaction").setAttribute("style", style);
         document.getElementById(reactor + "_image").style.opacity = 1.0;
       }
     }, time);
@@ -430,26 +425,12 @@ const relayout_grid = () => {
     cell.style.width = Math.floor(cellWidthProportion * 1000) / 10 + "%";
     cell.style.height = Math.floor(cellHeightProportion * 1000) / 10 + "%";
     const background_layer = document.getElementById(from + "_background");
-    const user_icon_layer = document.getElementById(from + "_image");
-    const reaction_img_layer = document.getElementById(from + "_reaction");
     if (cellWidth >= cellHeight) {
-      background_layer.style.width = cellHeight - 16;
-      background_layer.style.height = cellHeight - 16;
-      user_icon_layer.style.width = cellHeight - 16;
-      user_icon_layer.style.height = cellHeight - 16;
-      if (!sensors.includes(from)) {
-        reaction_img_layer.style.width = "100%";
-        reaction_img_layer.style.height = "";
-      }
+      background_layer.style.width = cellHeight - 8;
+      background_layer.style.height = cellHeight - 8;
     } else {
-      background_layer.style.width = cellWidth - 16;
-      background_layer.style.height = cellWidth - 16;
-      user_icon_layer.style.width = cellWidth - 16;
-      user_icon_layer.style.height = cellWidth - 16;
-      if (!sensors.includes(from)) {
-        reaction_img_layer.style.width = "100%";
-        reaction_img_layer.style.height = "";
-      }
+      background_layer.style.width = cellWidth - 8;
+      background_layer.style.height = cellWidth - 8;
     }
   }
 };
@@ -469,7 +450,7 @@ if (display_users.length == 1 && display_users[0].charAt(0) == "@") {
 document.getElementById("name_text_box").value = my_name.substring(1);
 
 // localStorageから自分で追加した画像を表示
-if (localStorage.images == null) {
+if (localStorage.images == null || localStorage.images == "") {
   localStorage.images = default_icons;
 }
 

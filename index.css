@@ -108,12 +108,12 @@ body {
   margin-bottom: 8px;
   box-shadow: 0 1px 1px 1px rgba(0,0,0,0.4);
   padding: 4px;
-  overflow: hidden;
 }
 
 /* 現在表示してるリアクション画像 */
 #console_reaction_img {
   width: 100%;
+  overflow: hidden;
 }
 
 .progress {
@@ -131,25 +131,14 @@ body {
 
 /* スタンプのcell */
 .stamp_cell {
-  float: left;
+  position: relative;
   width: 80px;
   height: 80px;
-  background-color:#ffffff;
-  box-sizing:border-box;
+  border: 4px solid #fff;
   margin-right: 8px;
   margin-bottom: 8px;
-  overflow: hidden;
+  float:left;
   box-shadow: 0 1px 1px 1px rgba(0,0,0,0.4);
-}
-
-.stamp_cell_img {
-  padding: 4px;
-  /* For Opera and <= IE9, we need to add unselectable="on" attribute onto each element */
-  /* Check this site for more details: http://help.dottoro.com/lhwdpnva.php */
-  -moz-user-select: none; /* These user-select properties are inheritable, used to prevent text selection */
-  -webkit-user-select: none;
-  -ms-user-select: none; /* From IE10 only */
-  -webkit-user-drag: none; /* Prevents dragging of images/divs etc */
 }
 
 /* 一覧のcell */
@@ -162,48 +151,22 @@ body {
 /* 一覧のcellのBackground */
 .cell_background {
   position: absolute;
-  overflow: hidden;
-  background-color:#ffffff;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  margin: auto;
+  background-color: #ffffff;
+  border: 4px solid #fff;
   box-shadow: 0 2px 2px 2px rgba(0,0,0,0.4);
-}
-
-/* 一覧のTwitterアイコン */
-.user_image {
-  opacity: 1.0;
-  position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
   margin: auto;
-  padding: 4px;
+  float:left;
 }
 
-.reaction_image {
-  opacity: 1.0;
+.cell_image {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  margin: auto;
-  padding: 4px;
-}
-
-.sensor_image {
-  opacity: 1.0;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  margin: auto;
-  padding: 4px;
+  width: 100%;
+  height: 100%;
+  content: "";
 }
 
 /* センサの値表示するView */
