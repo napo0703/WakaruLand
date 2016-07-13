@@ -14,7 +14,7 @@ body {
 
 /* Twitterユーザ名と画像追加と一覧画面表示ボタンのdiv */
 #console_header {
-  height: 44px;
+  height: 41px;
   background-color: #ffffff;
   border-bottom: 1px solid rgba(0,0,0,0.2);
   padding-left: 8px;
@@ -103,24 +103,30 @@ body {
   float: left;
   width: 168px;
   height: 168px;
-  background-color: #ffffff;
   margin-right: 8px;
   margin-bottom: 8px;
+  background-color: #ffffff;
+  border: 4px solid #74a78b;
   box-shadow: 0 1px 1px 1px rgba(0,0,0,0.4);
-  padding: 4px;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 
 /* 現在表示してるリアクション画像 */
 #console_reaction_img {
+  position: absolute;
   width: 100%;
-  overflow: hidden;
+  height: 100%;
+  content: "";
 }
 
 .progress {
   position: absolute;
   bottom: 0;
   margin-bottom: 4px;
-  width: 160px;
+  width: 100%;
   visibility: hidden;
 }
 
@@ -153,7 +159,7 @@ body {
   position: absolute;
   background-color: #ffffff;
   border: 4px solid #fff;
-  box-shadow: 0 2px 2px 2px rgba(0,0,0,0.4);
+  box-shadow: 0 1px 1px 1px rgba(0,0,0,0.4);
   top: 0;
   right: 0;
   bottom: 0;
@@ -185,8 +191,8 @@ body {
   text-align: center;
 }
 
-#grid_user_input {
-  height: 44px;
+#grid_header {
+  height: 41px;
   width: 100%;
 }
 

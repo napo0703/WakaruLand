@@ -49,7 +49,7 @@ const sensor_images = {
 };
 
 // レイアウトの定数
-const GRID_USER_INPUT_HEIGHT = 44;
+const GRID_USER_INPUT_HEIGHT = 41;
 const MIN_CELL_WIDTH = 10;
 const MIN_CELL_HEIGHT = 10;
 
@@ -145,7 +145,8 @@ const display_users = Array.from(new Set(location.search.substring(1).split(',')
 var sendReaction = (img_url, time) => {
   my_name = "@" + document.getElementById("name_text_box").value;
   if (window.localStorage) localStorage.name = my_name;
-  document.getElementById("console_reaction_img").src = img_url;
+  const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
+  document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
   document.getElementById(img_url + "_cell").style.backgroundColor = "#ffffff";
   ts.write({from: my_name, value: img_url, time: time});
   document.getElementById("image_url_text_box").value = img_url;
@@ -196,7 +197,7 @@ const appendStampCell = (img_url, append_last) => {
   const cell = document.createElement("div");
   cell.setAttribute("class", "stamp_cell");
   cell.setAttribute("id", img_url + "_cell");
-  const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #dedede;";
+  const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
   cell.setAttribute("style", cell_style);
   cell.addEventListener("mousedown", () => {
     startCount(img_url);
