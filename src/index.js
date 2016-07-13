@@ -5,7 +5,7 @@ $('#image_url_add_button').on("click", () => {
 });
 
 $('#image_url_delete_button').on("click", () => {
-  removeStampImage(document.getElementById("image_url_text_box").value);
+  displayDeleteDialog(document.getElementById("image_url_text_box").value);
 });
 
 $('#console_switch_button').on("click", () => {
@@ -439,6 +439,12 @@ const relayout_grid = () => {
 const isConsoleOnly = () => {
   return !!(display_users.length == 0 ||
   (display_users.length == 1 && (display_users[0] == "" || display_users[0].charAt(0) == "@")));
+};
+
+var displayDeleteDialog = (img_url) => {
+  if (window.confirm(img_url + "\nを削除します。よろしいですか？")) {
+    removeStampImage(img_url);
+  }
 };
 
 // ローカルストレージまたはURL末尾のクエリから発言者名の設定
