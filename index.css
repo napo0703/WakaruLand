@@ -1,96 +1,182 @@
-#wrapper {
-  display: flex;
-  height: 100%;
+body {
+  background-color: #e4f0ea;
 }
 
+/* 投稿画面 */
 #console {
-  width: 440px; /*固定したい幅の長さ*/
+  width: 100%; /*固定したい幅の長さ*/
 }
 
+/* 一覧画面 */
 #grid {
-  flex: 1;
+  width: 100%;
 }
 
-#gauge {
-  font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
+/* Twitterユーザ名と画像追加と一覧画面表示ボタンのdiv */
+#console_header {
+  height: 41px;
+  background-color: #ffffff;
+  border-bottom: 1px solid rgba(0,0,0,0.2);
+  padding-left: 8px;
   padding-top: 8px;
+  padding-bottom: 8px;
 }
 
-#display_time {
-  font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
-  padding-top: 4px;
-}
-
-#stamp_grid_view {
-  width: 100%;
-}
-#img {
-  width: 100%;
-}
-
-#image_url_text_box {
-  width: 432px;
-}
-
-#console_reaction_img {
-  width: 80px;
-  height: 80px;
-  border: 1px solid #000000;
-}
-
-#switch_menu {
-  padding-top: 16px;
-}
-
-.icon {
+#name_input {
   float: left;
-  width: 80px;
-  height: 80px;
-  box-sizing:border-box;
-  border: 1px solid #000000;
+}
+
+#name_text_box {
+  width: 131px;
+}
+
+@media screen and (min-width: 691px) {
+  /* リアクション画像追加TextBox */
+  #image_url_text_box {
+    float: left;
+    margin-left: 8px;
+    width: 340px;
+    display: inline;
+  }
+
+  /* リアクション画像追加ボタン */
+  #image_url_add_button {
+    float: left;
+    margin-left: 8px;
+    display: inline;
+  }
+
+  /* リアクション画像削除ボタン */
+  #image_url_delete_button {
+    float: left;
+    margin-left: 8px;
+    display: inline;
+  }
+}
+
+@media screen and (max-width: 690px) {
+  /* リアクション画像追加TextBox */
+  #image_url_text_box {
+    float: left;
+    margin-left: 8px;
+    width: 340px;
+    display: none;
+  }
+
+  /* リアクション画像追加ボタン */
+  #image_url_add_button {
+    float: left;
+    margin-left: 8px;
+    display: none;
+  }
+
+  /* リアクション画像削除ボタン */
+  #image_url_delete_button {
+    float: left;
+    margin-left: 8px;
+    display: none;
+  }
+}
+
+/* 投稿画面と一覧画面の切り替えボタン */
+#grid_switch_button {
+  float: right;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+/* リアクション画像一覧 */
+#stamp_grid_view {
+  margin-top: 8px;
+  width: 100%;
+}
+
+/* 現在表示してるリアクションとスタンプ一覧を囲むdiv */
+#console_reaction {
+  margin-top: 8px;
+  margin-left: 8px;
+}
+
+/* 現在表示してるリアクションのdiv */
+#console_reaction_view {
+  position: relative;
+  float: left;
+  width: 168px;
+  height: 168px;
   margin-right: 8px;
   margin-bottom: 8px;
+  background-color: #ffffff;
+  border: 4px solid #74a78b;
+  box-shadow: 0 1px 1px 1px rgba(0,0,0,0.4);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 
+/* 現在表示してるリアクション画像 */
+#console_reaction_img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  content: "";
+}
+
+.progress {
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 4px;
+  width: 100%;
+  visibility: hidden;
+}
+
+.progress-bar {
+  width: 0;
+  visibility: hidden;
+}
+
+/* スタンプのcell */
+.stamp_cell {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border: 4px solid #fff;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  float:left;
+  box-shadow: 0 1px 1px 1px rgba(0,0,0,0.4);
+}
+
+/* 一覧のcell */
 .cell {
   float: left;
   box-sizing:border-box;
-  border: 1px solid #000000;
   position: relative;
-  overflow: hidden;
 }
 
-.user_image {
-  opacity: 1.0;
+/* 一覧のcellのBackground */
+.cell_background {
   position: absolute;
+  background-color: #ffffff;
+  border: 4px solid #fff;
+  box-shadow: 0 1px 1px 1px rgba(0,0,0,0.4);
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
   margin: auto;
+  float:left;
 }
 
-.reaction_image {
-  opacity: 1.0;
+.cell_image {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  margin: auto;
+  width: 100%;
+  height: 100%;
+  content: "";
 }
 
-.sensor_image {
-  opacity: 1.0;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  margin: auto;
-}
-
-.caption {
+/* センサの値表示するView */
+.sensor_caption {
   position: absolute;
   bottom: 0;
   color: #fff;
@@ -98,12 +184,19 @@
   width: 100%;
 }
 
-.caption p {
+/* センサ値 */
+.sensor_caption p {
   margin: 0;
   font-size: 200%;
   text-align: center;
 }
 
-#grid_user_input {
-  height: 24px;
+#grid_header {
+  height: 41px;
+  width: 100%;
+}
+
+#console_switch_button {
+  float: right;
+  margin: 8px;
 }

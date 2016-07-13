@@ -3,36 +3,37 @@
     <title>わかるらんど</title>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
     <style type="text/css">@import "index.css";</style>
   </head>
   <body>
-    <div id="wrapper">
-      <div id="console">
+    <div id="console">
+      <div id="console_header">
         <div id="name_input">
-          Twitter ID: @<input type="text" value="test" id="name_text_box">
-          <button type="button" id="grid_switch_button"> 一覧非表示 </button>
+          @<input type="text" id="name_text_box" placeholder="Twitterアカウント名">
         </div>
-        <div id="console_reaction_img">
-          <img src="https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" id="img">
-        </div>
-        <div id="gauge">[░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]</div>
-        <div id="display_time">0秒</div>
-        <div id="image_url_input">
-          Image URL: <br><input type="text" value="" id="image_url_text_box"><br>
-          <button type="button" id="image_url_add_button"> 追加 </button>
-          <button type="button" id="image_url_delete_button"> 削除 </button>
-        </div>
-        <div id="stamp_grid_view"></div>
+        <input type="text" id="image_url_text_box" placeholder="追加したい画像のURL">
+        <button type="button" id="image_url_add_button">追加</button>
+        <button type="button" id="image_url_delete_button">削除</button>
+        <button type="button" id="grid_switch_button">表示切替</button>
       </div>
-      <div id="grid">
-        <div id="grid_user_input">
-          <input type="text" value="" id="twitter_id_text_box">
-          <button type="button" id="cell_add_button"> 追加 </button>
-          <button type="button" id="cell_delete_button"> 削除 </button>
-          <button type="button" id="console_switch_button"> 投稿非表示 </button>
+      <div id="console_reaction">
+        <div id="console_reaction_view">
+          <div id="console_reaction_img" style="background:url('https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png') center center no-repeat; background-size:contain"></div>
+          <div class="progress" id="console_reaction_progress">
+            <div class="progress-bar progress-bar-success" role="progressbar" id="console_reaction_progress_bar" aria-valuemin="0" aria-valuemax="300">0秒</div>
+          </div>
         </div>
-        <div id="grid_view"></div>
+        <div id="stamp_grid_view">
       </div>
+      </div>
+    </div>
+    <div id="grid">
+      <div id="grid_header">
+        <button type="button" id="console_switch_button">表示切替</button>
+      </div>
+      <div id="grid_view"></div>
     </div>
     <script src="//linda-server.herokuapp.com/linda/linda.js"></script>
     <script src="dist/index.js"></script>
