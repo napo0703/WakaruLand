@@ -1,11 +1,26 @@
 import $ from 'jquery'
 
+$('#image_url_text_box').keypress(function(e){
+  const image_url = document.getElementById("image_url_text_box").value;
+  if(e.which && e.which === 13 || e.keyCode && e.keyCode === 13){
+    if(image_url){
+      addStampImage(image_url);
+    }
+  }
+});
+
 $('#image_url_add_button').on("click", () => {
-  addStampImage(document.getElementById("image_url_text_box").value);
+  const image_url = document.getElementById("image_url_text_box").value;
+  if(image_url){
+    addStampImage(image_url);
+  }
 });
 
 $('#image_url_delete_button').on("click", () => {
-  displayDeleteDialog(document.getElementById("image_url_text_box").value);
+  const image_url = document.getElementById("image_url_text_box").value;
+  if(image_url){
+    displayDeleteDialog(image_url);
+  }
 });
 
 $('#console_switch_button').on("click", () => {
@@ -445,6 +460,7 @@ var displayDeleteDialog = (img_url) => {
   if (window.confirm(img_url + "\nを削除します。よろしいですか？")) {
     removeStampImage(img_url);
   }
+  document.getElementById("image_url_text_box").value = "";
 };
 
 // ローカルストレージまたはURL末尾のクエリから発言者名の設定
