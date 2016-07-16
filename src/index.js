@@ -122,10 +122,11 @@ linda.io.on("connect", () => {
         const value = tuple.data.value;
         console.log("delta_light = " + value);
         document.getElementById("delta_light_value_text").innerHTML = value;
+        const ele = document.getElementById("delta_light_image");
         if (value <= 100) {
-          document.getElementById("delta_light_image").src = sensor_images["delta_light"];
+          ele.setAttribute("style", "background:url('" + sensor_images["delta_light"] +"') center center no-repeat; background-size:contain");
         } else {
-          document.getElementById("delta_light_image").src = sensor_images["delta_light_on"];
+          ele.setAttribute("style", "background:url('" + sensor_images["delta_light_on"] +"') center center no-repeat; background-size:contain");
         }
       });
     }
@@ -137,9 +138,10 @@ linda.io.on("connect", () => {
         const minute = date.getMinutes() >= 10 ? date.getMinutes() : "0" + date.getMinutes();
         const second = date.getSeconds() >= 10 ? date.getSeconds() : "0" + date.getSeconds();
         document.getElementById("delta_door_value_text").innerHTML = date.getHours() + ":" + minute + ":" + second;
-        document.getElementById("delta_door_image").src = sensor_images["delta_door_open"];
+        const ele = document.getElementById("delta_door_image");
+        ele.setAttribute("style", "background:url('" + sensor_images["delta_door_open"] +"') center center no-repeat; background-size:contain");
         window.setTimeout(() => {
-          document.getElementById("delta_door_image").src = sensor_images["delta_door"];
+          ele.setAttribute("style", "background:url('" + sensor_images["delta_door"] +"') center center no-repeat; background-size:contain");
         }, 10000);
       });
     }
