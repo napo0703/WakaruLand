@@ -83,14 +83,12 @@ linda.io.on("connect", () => {
       const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
       const now_unix_time = Math.floor(new Date().getTime() / 1000);
       const display_time = (reaction_unix_time + tuple.data.display) - now_unix_time;
-      if (img_url != "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png") {
-        if (display_time > 1) {
-          const reaction_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
-          document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
-          document.getElementById("image_url_text_box").value = img_url;
-          if (tuple.data.display != 0) {
-            withdrawReaction(my_name, display_time);
-          }
+      if (img_url != "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" && display_time > 1) {
+        const reaction_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
+        document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+        document.getElementById("image_url_text_box").value = img_url;
+        if (tuple.data.display != 0) {
+          withdrawReaction(my_name, display_time);
         }
       }
     });
@@ -100,23 +98,12 @@ linda.io.on("connect", () => {
 
     // Watch
     ts.watch({from: my_name}, (err, tuple) => {
-      const reactor = tuple.data.from;
-      if (display_users.includes(reactor)) {
-        const img_url = tuple.data.value;
-        const time = tuple.data.time;
-        const ip_address = tuple.from;
-        console.log(reactor + " < " + img_url + " " + time + "sec (from " + ip_address + ")");
-        const style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
-        document.getElementById(reactor + "_reaction").setAttribute("style", style);
-        // 真っ白画像をリアクションした時
-        if (img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png") {
-          document.getElementById(reactor + "_image").style.opacity = 1.0;
-        } else {
-          document.getElementById(reactor + "_image").style.opacity = 0.25;
-          if (tuple.data.display != 0) {
-            withdrawReaction(reactor, tuple.data.display);
-          }
-        }
+      const img_url = tuple.data.value;
+      const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
+      const now_unix_time = Math.floor(new Date().getTime() / 1000);
+      const display_time = (reaction_unix_time + tuple.data.display) - now_unix_time;
+      if (img_url != "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" && display_time > 1 && tuple.data.display != 0) {
+        withdrawReaction(my_name, display_time);
       }
     });
 
@@ -233,12 +220,10 @@ var sendReaction = (img_url, display_time) => {
   const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
   document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
   const date = new Date();
-  console.log(date);
 
   //自分の最新の発言を削除してからwriteする
   const cid = ts.take({from: my_name, type: "wakari"});
   setTimeout( () => {
-    console.log("take cancel!");
     ts.cancel(cid);
   }, 3000);
   if (display_time == 0) {
