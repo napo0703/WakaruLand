@@ -217,8 +217,6 @@ const display_users = Array.from(new Set(location.search.substring(1).split(',')
 var sendReaction = (img_url, display_time) => {
   my_name = "@" + document.getElementById("name_text_box").value;
   if (window.localStorage) localStorage.name = my_name;
-  const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
-  document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
   const date = new Date();
 
   //自分の最新の発言を削除してからwriteする
@@ -226,23 +224,13 @@ var sendReaction = (img_url, display_time) => {
   setTimeout( () => {
     ts.cancel(cid);
   }, 3000);
-  if (display_time == 0) {
-    ts.write({
-      from: my_name,
-      display: display_time,
-      time: date,
-      value: img_url,
-      type: "wakari"
-    }, {expire: display_time});
-  } else {
-    ts.write({
-      from: my_name,
-      display: display_time,
-      time: date,
-      value: img_url,
-      type: "wakari"
-    }, {expire: 86400});
-  }
+  ts.write({
+    from: my_name,
+    display: display_time,
+    time: date,
+    value: img_url,
+    type: "wakari"
+  }, {expire: display_time});
 
   document.getElementById("image_url_text_box").value = img_url;
   // クリックしたスタンプ画像を先頭に移動
@@ -274,14 +262,14 @@ const startCount = () => {
       }
       if (mousedown_count <= 5) {
         progress_bar.innerHTML = "20秒";
-      } else if (mousedown_count <= 15) {
+      } else if (mousedown_count <= 14) {
         progress_bar.innerHTML = "1分";
-      } else if (mousedown_count <= 25) {
+      } else if (mousedown_count <= 23) {
         progress_bar.innerHTML = "10分";
       } else if (mousedown_count < 30) {
         progress_bar.innerHTML = "1時間";
       } else {
-        progress_bar.innerHTML = "forever";
+        progress_bar.innerHTML = "1日";
       }
     }
   }, 100);
@@ -303,17 +291,19 @@ const appendStampCell = (img_url, append_last) => {
 
   cell.addEventListener("mouseup", () => {
     clearInterval(mousedown_id);
+    let display_time;
     if (mousedown_count <= 5) {
-      sendReaction(img_url, 20);
-    } else if (mousedown_count <= 15) {
-      sendReaction(img_url, 60);
-    } else if (mousedown_count <= 25) {
-      sendReaction(img_url, 600);
+      display_time = 20;
+    } else if (mousedown_count <= 14) {
+      display_time = 60;
+    } else if (mousedown_count <= 23) {
+      display_time = 600;
     } else if (mousedown_count < 30) {
-      sendReaction(img_url, 3600);
+      display_time = 3600;
     } else {
-      sendReaction(img_url, 0);
+      display_time = 86400;
     }
+    sendReaction(img_url, display_time);
     mousedown_count = 0;
     const progress = document.getElementById("console_reaction_progress");
     const progress_bar = document.getElementById("console_reaction_progress_bar");
