@@ -76,12 +76,67 @@ const ts = linda.tuplespace("masuilab");
 
 linda.io.on("connect", () => {
   console.log("connect Linda!!");
-  if (!isConsoleOnly()) {
+  if (isConsoleOnly()) {
+    // Read
+    const cid = ts.read({from: my_name}, (err, tuple) => {
+      const img_url = tuple.data.value;
+      const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
+      const now_unix_time = Math.floor(new Date().getTime() / 1000);
+      const display_time = (reaction_unix_time + tuple.data.display) - now_unix_time;
+      if (img_url != "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" && display_time > 1) {
+        const reaction_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
+        document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+        document.getElementById("image_url_text_box").value = img_url;
+        if (tuple.data.display != 0) {
+          withdrawReaction(my_name, display_time);
+        }
+      }
+    });
+    setTimeout(() => {
+      ts.cancel(cid);
+    }, 3000);
+
+    // Watch
     ts.watch({from: my_name}, (err, tuple) => {
-      console.log(my_name + " < " + tuple.data.value);
-      document.getElementById("console_reaction_img").src = tuple.data.value;
+      const img_url = tuple.data.value;
+      const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
+      const now_unix_time = Math.floor(new Date().getTime() / 1000);
+      const display_time = (reaction_unix_time + tuple.data.display) - now_unix_time;
+      if (img_url != "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" && display_time > 1 && tuple.data.display != 0) {
+        withdrawReaction(my_name, display_time);
+      }
     });
 
+  } else {
+    // Read
+    for (let i in display_users) {
+      if (display_users[i].charAt(0) == "@") {
+        const cid = ts.read({from: display_users[i]}, (err, tuple) => {
+          const reactor = tuple.data.from;
+          const img_url = tuple.data.value;
+          const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
+          const now_unix_time = Math.floor(new Date().getTime() / 1000);
+          const display_time = (reaction_unix_time + tuple.data.display) - now_unix_time;
+          if (img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png") {
+            document.getElementById(reactor + "_image").style.opacity = 1.0;
+          } else {
+            if (display_time > 1) {
+              const style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
+              document.getElementById(reactor + "_reaction").setAttribute("style", style);
+              document.getElementById(reactor + "_image").style.opacity = 0.25;
+              if (tuple.data.display != 0) {
+                withdrawReaction(reactor, display_time);
+              }
+            }
+          }
+        });
+        setTimeout(() => {
+          ts.cancel(cid);
+        }, 3000);
+      }
+    }
+
+    // Watch
     // 一覧表示
     for (let i in display_users) {
       if (display_users[i].charAt(0) == "@") {
@@ -99,8 +154,8 @@ linda.io.on("connect", () => {
               document.getElementById(reactor + "_image").style.opacity = 1.0;
             } else {
               document.getElementById(reactor + "_image").style.opacity = 0.25;
-              if (time != 0) {
-                withdrawReaction(reactor, time * 1000);
+              if (tuple.data.display != 0) {
+                withdrawReaction(reactor, tuple.data.display);
               }
             }
           }
@@ -159,13 +214,24 @@ linda.io.on("connect", () => {
 // URL末尾のカンマ区切り文字列から表示するユーザを抽出
 const display_users = Array.from(new Set(location.search.substring(1).split(',')));
 
-var sendReaction = (img_url, time) => {
+var sendReaction = (img_url, display_time) => {
   my_name = "@" + document.getElementById("name_text_box").value;
   if (window.localStorage) localStorage.name = my_name;
-  const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
-  document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
-  document.getElementById(img_url + "_cell").style.backgroundColor = "#ffffff";
-  ts.write({from: my_name, value: img_url, time: time});
+  const date = new Date();
+
+  //自分の最新の発言を削除してからwriteする
+  const cid = ts.take({from: my_name, type: "wakari"});
+  setTimeout( () => {
+    ts.cancel(cid);
+  }, 3000);
+  ts.write({
+    from: my_name,
+    display: display_time,
+    time: date,
+    value: img_url,
+    type: "wakari"
+  }, {expire: display_time});
+
   document.getElementById("image_url_text_box").value = img_url;
   // クリックしたスタンプ画像を先頭に移動
   const stamp_grid = document.getElementById("stamp_grid_view");
@@ -196,14 +262,14 @@ const startCount = () => {
       }
       if (mousedown_count <= 5) {
         progress_bar.innerHTML = "20秒";
-      } else if (mousedown_count <= 15) {
+      } else if (mousedown_count <= 14) {
         progress_bar.innerHTML = "1分";
-      } else if (mousedown_count <= 25) {
+      } else if (mousedown_count <= 23) {
         progress_bar.innerHTML = "10分";
       } else if (mousedown_count < 30) {
         progress_bar.innerHTML = "1時間";
       } else {
-        progress_bar.innerHTML = "forever";
+        progress_bar.innerHTML = "1日";
       }
     }
   }, 100);
@@ -218,27 +284,26 @@ const appendStampCell = (img_url, append_last) => {
   cell.setAttribute("style", cell_style);
   cell.addEventListener("mousedown", () => {
     startCount(img_url);
-    document.getElementById("console_reaction_img").src = img_url;
-    if (default_icons.includes(img_url)) {
-      document.getElementById("image_url_text_box").value = "";
-    } else {
-      document.getElementById("image_url_text_box").value = img_url;
-    }
+    const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
+    document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+    document.getElementById("image_url_text_box").value = img_url;
   });
 
   cell.addEventListener("mouseup", () => {
     clearInterval(mousedown_id);
+    let display_time;
     if (mousedown_count <= 5) {
-      sendReaction(img_url, 20);
-    } else if (mousedown_count <= 15) {
-      sendReaction(img_url, 60);
-    } else if (mousedown_count <= 25) {
-      sendReaction(img_url, 600);
+      display_time = 20;
+    } else if (mousedown_count <= 14) {
+      display_time = 60;
+    } else if (mousedown_count <= 23) {
+      display_time = 600;
     } else if (mousedown_count < 30) {
-      sendReaction(img_url, 3600);
+      display_time = 3600;
     } else {
-      sendReaction(img_url, 0);
+      display_time = 86400;
     }
+    sendReaction(img_url, display_time);
     mousedown_count = 0;
     const progress = document.getElementById("console_reaction_progress");
     const progress_bar = document.getElementById("console_reaction_progress_bar");
@@ -389,17 +454,21 @@ const withdrawReaction = (reactor, time) => {
     if (reactor in timer_ids) {
       window.clearTimeout(timer_ids[reactor]);
     }
-    console.log("time = " + time + "msec");
     timer_ids[reactor] = window.setTimeout(() => {
       console.log("withdraw -> " + reactor);
-      if (sensors.includes(reactor)) {
-        document.getElementById(reactor + "_image").src = sensor_images[reactor];
-      } else {
-        const style = "background:url('https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png') center center no-repeat; background-size:contain";
-        document.getElementById(reactor + "_reaction").setAttribute("style", style);
-        document.getElementById(reactor + "_image").style.opacity = 1.0;
+      const reaction_style = "background:url('https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png') center center no-repeat; background-size:contain";
+      document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+      document.getElementById("image_url_text_box").value = "";
+      if (!isConsoleOnly()) {
+        if (sensors.includes(reactor)) {
+          document.getElementById(reactor + "_image").src = sensor_images[reactor];
+        } else {
+          const style = "background:url('https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png') center center no-repeat; background-size:contain";
+          document.getElementById(reactor + "_reaction").setAttribute("style", style);
+          document.getElementById(reactor + "_image").style.opacity = 1.0;
+        }
       }
-    }, time);
+    }, time * 1000);
   }
 };
 
