@@ -85,6 +85,21 @@ body {
   margin-right: 8px;
 }
 
+/* 投稿画面のヘッダーを除いた部分 */
+#wrapper {
+  display: flex;
+  height: 100%;
+}
+
+#console_reaction {
+  flex: 1;
+}
+
+#gyamoji {
+  background-color: #ffffff;
+  width: 150px;
+}
+
 /* リアクション画像一覧 */
 #stamp_grid_view {
   margin-top: 8px;

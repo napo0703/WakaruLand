@@ -585,3 +585,32 @@ $(window).resize(() => {
     relayout_grid();
   }
 });
+
+// Gyamoji
+function onOkButtonClicked() {
+  const text = document.getElementById("gyamoji_text_area").value.split(/\r\n|\r|\n/);
+  console.log(text);
+  const column_counts = [];
+  for (let i in text) {
+    column_counts.push(text[i].length);
+  }
+  const max_text_count = Math.max(Math.max.apply(null, column_counts), text.length);
+  const font_size = 128 / max_text_count;
+  const y_coordinate = 128 / max_text_count;
+  let svg = '<svg id="svg" width="100%" height="100%">';
+  let i = 0;
+  while (i < text.length) {
+    const add_text = '<text class="svg_text" id="svg_text" x="0" y="'+ y_coordinate * (i + 1) +'" font-size="' + font_size + '">' + text[i] +'</text>';
+    svg += add_text;
+    i += 1;
+  }
+  svg += '</svg>';
+  console.log(svg);
+  canvg(document.getElementById("canvas"), svg);
+  const png = document.getElementById("canvas").toDataURL();
+  const base64 = png.split(',')[1];
+  console.log(base64);
+}
+onOkButtonClicked();
+var button = document.getElementById("gyamoji_add_button");
+button.addEventListener("click", onOkButtonClicked, false);
