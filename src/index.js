@@ -1,25 +1,23 @@
 import $ from 'jquery'
 
 $('#image_url_text_box').keypress(function(e){
-  const image_url = document.getElementById("image_url_text_box").value;
-  if(e.which && e.which === 13 || e.keyCode && e.keyCode === 13){
-    if(image_url){
-      addStampImage(image_url);
-    }
+  const url = validate_url(document.getElementById("text_text_box").value);
+  if(url){
+    addStampImage(url);
   }
 });
 
 $('#image_url_add_button').on("click", () => {
-  const image_url = document.getElementById("image_url_text_box").value;
-  if(image_url){
-    addStampImage(image_url);
+  const url = validate_url(document.getElementById("image_url_text_box").value);
+  if(url){
+    addStampImage(url);
   }
 });
 
 $('#image_url_delete_button').on("click", () => {
-  const image_url = document.getElementById("image_url_text_box").value;
-  if(image_url){
-    displayDeleteDialog(image_url);
+  const url = validate_url(document.getElementById("image_url_text_box").value);
+  if(url){
+    addStampImage(url);
   }
 });
 
@@ -79,7 +77,7 @@ linda.io.on("connect", () => {
   if (isConsoleOnly()) {
     // Read
     const cid = ts.read({from: my_name}, (err, tuple) => {
-      const img_url = tuple.data.value;
+      const img_url = validate_url(tuple.data.value);
       const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
       const now_unix_time = Math.floor(new Date().getTime() / 1000);
       const display_time = (reaction_unix_time + tuple.data.display) - now_unix_time;
@@ -98,7 +96,7 @@ linda.io.on("connect", () => {
 
     // Watch
     ts.watch({from: my_name}, (err, tuple) => {
-      const img_url = tuple.data.value;
+      const img_url = validate_url(tuple.data.value);
       const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
       const now_unix_time = Math.floor(new Date().getTime() / 1000);
       const display_time = (reaction_unix_time + tuple.data.display) - now_unix_time;
@@ -113,7 +111,7 @@ linda.io.on("connect", () => {
       if (display_users[i].charAt(0) == "@") {
         const cid = ts.read({from: display_users[i]}, (err, tuple) => {
           const reactor = tuple.data.from;
-          const img_url = tuple.data.value;
+          const img_url = validate_url(tuple.data.value);
           const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
           const now_unix_time = Math.floor(new Date().getTime() / 1000);
           const display_time = (reaction_unix_time + tuple.data.display) - now_unix_time;
@@ -143,7 +141,7 @@ linda.io.on("connect", () => {
         ts.watch({from: display_users[i]}, (err, tuple) => {
           const reactor = tuple.data.from;
           if (display_users.includes(reactor)) {
-            const img_url = tuple.data.value;
+            const img_url = validate_url(tuple.data.value);
             const time = tuple.data.time;
             const ip_address = tuple.from;
             console.log(reactor + " < " + img_url + " " + time + "sec (from " + ip_address + ")");
@@ -214,6 +212,21 @@ linda.io.on("connect", () => {
 // URL末尾のカンマ区切り文字列から表示するユーザを抽出
 const display_users = Array.from(new Set(location.search.substring(1).split(',')));
 
+//URL判定。不完全なbase64の場合有効なものに修正したものを返す
+const validate_url = (text) => {
+  if(e.which && e.which === 13 || e.keyCode && e.keyCode === 13){
+    if (text.match('https?://[\w/:%#\$&\?\(\)~\.=\+\-]+') || text.match('iVBORw0KGgoAAAA')) {
+      url = text;
+    } else if (text.match("data:image/png;base64,")) {
+      url = Array.from(text)[1];
+    } else {
+      console.log(text + " isn't URL!");
+      return "";
+    }
+    return url;
+  }
+};
+
 var sendReaction = (img_url, display_time) => {
   my_name = "@" + document.getElementById("name_text_box").value;
   if (window.localStorage) localStorage.name = my_name;
@@ -280,13 +293,24 @@ const appendStampCell = (img_url, append_last) => {
   const cell = document.createElement("div");
   cell.setAttribute("class", "stamp_cell");
   cell.setAttribute("id", img_url + "_cell");
-  const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
+  let cell_style;
+  if (img_url.match('iVBORw0KGgoAAAA')) {
+    cell_style = "background:url('data:image/png;base64," + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
+  } else {
+    cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
+  }
   cell.setAttribute("style", cell_style);
   cell.addEventListener("mousedown", () => {
     startCount(img_url);
-    const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
+    let reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
+    if (img_url.match('iVBORw0KGgoAAAA')) {
+      reaction_style = "background:url('data:image/png;base64," + img_url +"') center center no-repeat; background-size:contain";
+    } else {
+      reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
+    }
+
     document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
-    document.getElementById("image_url_text_box").value = img_url;
+    document.getElementById("image_url_text_box").value = url;
   });
 
   cell.addEventListener("mouseup", () => {
@@ -334,18 +358,29 @@ var removeStampImage = (img_url) => {
 
 // URLから画像を追加
 var addStampImage = (img_url) => {
+  //URL判定
+  let url = img_url;
+  if (url.match('https?://[\w/:%#\$&\?\(\)~\.=\+\-]+')) {
+    console.log(url + " is URL!");
+  } else if (url.match('iVBORw0KGgoAAAA')) {
+    console.log(url + " is Base64 URL!");
+    url = "data:image/png;base64," + url;
+  } else {
+    console.log(url + " isn't URL!");
+    return;
+  }
   let my_images = Array.from(new Set(localStorage.images.split(',')));
-  if (my_images.includes(img_url)) {
+  if (my_images.includes(url)) {
     const stamp_grid = document.getElementById("stamp_grid_view");
-    stamp_grid.removeChild(document.getElementById(img_url + "_cell"));
+    stamp_grid.removeChild(document.getElementById(url + "_cell"));
     const my_images = Array.from(new Set(localStorage.images.split(',')));
     my_images.some((v, i) => {
-      if (v == img_url) my_images.splice(i, 1);
+      if (v == url) my_images.splice(i, 1);
     });
   }
-  my_images.unshift(img_url); //先頭に追加
+  my_images.unshift(url); //先頭に追加
   localStorage.images = my_images;
-  appendStampCell(img_url, false);
+  appendStampCell(url, false);
 };
 
 console.log(display_users);
