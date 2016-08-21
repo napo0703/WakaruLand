@@ -1,16 +1,18 @@
 import $ from 'jquery'
 
 $('#image_url_text_box').keypress(function(e){
-  const image_url = document.getElementById("image_url_text_box").value;
-  if(e.which && e.which === 13 || e.keyCode && e.keyCode === 13){
-    if(image_url){
+  if(e.which && e.which === 13 || e.keyCode && e.keyCode === 13) {
+    const image_url = toZenkaku(document.getElementById("image_url_text_box").value);
+    document.getElementById("image_url_text_box").value = image_url;
+    if (image_url) {
       addStampImage(image_url);
     }
   }
 });
 
 $('#image_url_add_button').on("click", () => {
-  const image_url = document.getElementById("image_url_text_box").value;
+  const image_url = toZenkaku(document.getElementById("image_url_text_box").value);
+  document.getElementById("image_url_text_box").value = image_url;
   if(image_url){
     addStampImage(image_url);
   }
@@ -665,3 +667,17 @@ $(window).resize(() => {
     relayout_grid();
   }
 });
+
+var toZenkaku = (strVal) => {
+  var value = strVal.replace(/[!-~]/g,
+      function( tmpStr ) {
+        return String.fromCharCode(tmpStr.charCodeAt(0) + 0xFEE0);
+      }
+  );
+
+  return value.replace(/”/g, "\"")
+      .replace(/'/g, "’")
+      .replace(/`/g, "｀")
+      .replace(/\\/g, "＼")
+      .replace(/~/g, "〜");
+};
