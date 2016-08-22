@@ -1,16 +1,18 @@
 import $ from 'jquery'
 
 $('#image_url_text_box').keypress(function(e){
-  const image_url = document.getElementById("image_url_text_box").value;
-  if(e.which && e.which === 13 || e.keyCode && e.keyCode === 13){
-    if(image_url){
+  if(e.which && e.which === 13 || e.keyCode && e.keyCode === 13) {
+    const image_url = toZenkaku(document.getElementById("image_url_text_box").value);
+    document.getElementById("image_url_text_box").value = image_url;
+    if (image_url) {
       addStampImage(image_url);
     }
   }
 });
 
 $('#image_url_add_button').on("click", () => {
-  const image_url = document.getElementById("image_url_text_box").value;
+  const image_url = toZenkaku(document.getElementById("image_url_text_box").value);
+  document.getElementById("image_url_text_box").value = image_url;
   if(image_url){
     addStampImage(image_url);
   }
@@ -79,7 +81,14 @@ linda.io.on("connect", () => {
   if (isConsoleOnly()) {
     // Read
     const cid = ts.read({from: my_name}, (err, tuple) => {
-      const img_url = tuple.data.value;
+      const value = tuple.data.value;
+      let img_url;
+      console.log(value);
+      if (value.match('^(https?|ftp)')) {
+        img_url = tuple.data.value;
+      } else {
+        img_url = createImage(createSvg(value));
+      }
       const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
       const now_unix_time = Math.floor(new Date().getTime() / 1000);
       const display_time = (reaction_unix_time + tuple.data.display) - now_unix_time;
@@ -98,7 +107,14 @@ linda.io.on("connect", () => {
 
     // Watch
     ts.watch({from: my_name}, (err, tuple) => {
-      const img_url = tuple.data.value;
+      const value = tuple.data.value;
+      let img_url;
+      console.log(value);
+      if (value.match('^(https?|ftp)')) {
+        img_url = tuple.data.value;
+      } else {
+        img_url = createImage(createSvg(value));
+      }
       const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
       const now_unix_time = Math.floor(new Date().getTime() / 1000);
       const display_time = (reaction_unix_time + tuple.data.display) - now_unix_time;
@@ -111,9 +127,16 @@ linda.io.on("connect", () => {
     // Read
     for (let i in display_users) {
       if (display_users[i].charAt(0) == "@") {
-        const cid = ts.read({from: display_users[i]}, (err, tuple) => {
+        const cancel_id = ts.read({from: display_users[i]}, (err, tuple) => {
           const reactor = tuple.data.from;
-          const img_url = tuple.data.value;
+          const value = tuple.data.value;
+          let img_url;
+          console.log(value);
+          if (value.match('^(https?|ftp)')) {
+            img_url = tuple.data.value;
+          } else {
+            img_url = createImage(createSvg(value));
+          }
           const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
           const now_unix_time = Math.floor(new Date().getTime() / 1000);
           const display_time = (reaction_unix_time + tuple.data.display) - now_unix_time;
@@ -131,7 +154,7 @@ linda.io.on("connect", () => {
           }
         });
         setTimeout(() => {
-          ts.cancel(cid);
+          ts.cancel(cancel_id);
         }, 3000);
       }
     }
@@ -143,7 +166,14 @@ linda.io.on("connect", () => {
         ts.watch({from: display_users[i]}, (err, tuple) => {
           const reactor = tuple.data.from;
           if (display_users.includes(reactor)) {
-            const img_url = tuple.data.value;
+            const value = tuple.data.value;
+            let img_url;
+            console.log(value);
+            if (value.match('^(https?|ftp)')) {
+              img_url = tuple.data.value;
+            } else {
+              img_url = createImage(createSvg(value));
+            }
             const time = tuple.data.time;
             const ip_address = tuple.from;
             console.log(reactor + " < " + img_url + " " + time + "sec (from " + ip_address + ")");
@@ -214,6 +244,46 @@ linda.io.on("connect", () => {
 // URL末尾のカンマ区切り文字列から表示するユーザを抽出
 const display_users = Array.from(new Set(location.search.substring(1).split(',')));
 
+// Gyamoji
+const createSvg = (text) => {
+  const text_array = text.split(" ");
+  console.log(text_array);
+  const column_counts = [];
+  for (let i in text_array) {
+    column_counts.push(text_array[i].length);
+  }
+  const column_count = Math.max.apply(null, column_counts);
+  const row_count = text_array.length;
+  const max_text_count = Math.max(column_count, row_count);
+  const font_size = 124 / max_text_count;
+
+  let x_coordinate;
+  let y_coordinate;
+  if (column_count >= row_count) {
+    x_coordinate = 0;
+    y_coordinate = (128 - (font_size * row_count)) / 2 + font_size;
+  } else {
+    x_coordinate = (128 - (font_size * column_count)) / 2;
+    y_coordinate = font_size;
+  }
+
+  let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">';
+  let i = 0;
+  while (i < text_array.length) {
+    const y = y_coordinate + (font_size * i);
+    const add_text = '<text font-family="Times New Roman" x="' + x_coordinate + '" y="' + y + '" font-size="' + font_size + '">' + text_array[i] + '</text>';
+    svg += add_text;
+    i += 1;
+  }
+  svg += '</svg>';
+  return svg;
+};
+
+const createImage = (svg) => {
+  const svg_data_uri = "data:image/svg+xml;utf8;base64," + btoa(unescape(encodeURIComponent(svg)));
+  return svg_data_uri;
+};
+
 var sendReaction = (img_url, display_time) => {
   my_name = "@" + document.getElementById("name_text_box").value;
   if (window.localStorage) localStorage.name = my_name;
@@ -276,18 +346,36 @@ const startCount = () => {
 };
 
 // スタンプの一覧に画像を追加する
-const appendStampCell = (img_url, append_last) => {
-  const cell = document.createElement("div");
-  cell.setAttribute("class", "stamp_cell");
-  cell.setAttribute("id", img_url + "_cell");
-  const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
-  cell.setAttribute("style", cell_style);
-  cell.addEventListener("mousedown", () => {
-    startCount(img_url);
-    const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
-    document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
-    document.getElementById("image_url_text_box").value = img_url;
-  });
+const appendStampCell = (value, append_last) => {
+  let img_url;
+  let cell;
+  if (value.match('^(https?|ftp)')) {
+    img_url = value;
+    cell = document.createElement("div");
+    cell.setAttribute("class", "stamp_cell");
+    cell.setAttribute("id", img_url + "_cell");
+    const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
+    cell.setAttribute("style", cell_style);
+    cell.addEventListener("mousedown", () => {
+      startCount(img_url);
+      const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
+      document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+      document.getElementById("image_url_text_box").value = img_url;
+    });
+  } else {
+    img_url = createImage(createSvg(value));
+    cell = document.createElement("div");
+    cell.setAttribute("class", "stamp_cell");
+    cell.setAttribute("id", value + "_cell");
+    const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
+    cell.setAttribute("style", cell_style);
+    cell.addEventListener("mousedown", () => {
+      startCount(img_url);
+      const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
+      document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+      document.getElementById("image_url_text_box").value = value.replace("|", "\n");
+    });
+  }
 
   cell.addEventListener("mouseup", () => {
     clearInterval(mousedown_id);
@@ -303,7 +391,11 @@ const appendStampCell = (img_url, append_last) => {
     } else {
       display_time = 86400;
     }
-    sendReaction(img_url, display_time);
+    if (value.match('^(https?|ftp)')) {
+      sendReaction(img_url, display_time);
+    } else {
+      sendReaction(value, display_time);
+    }
     mousedown_count = 0;
     const progress = document.getElementById("console_reaction_progress");
     const progress_bar = document.getElementById("console_reaction_progress_bar");
@@ -585,3 +677,17 @@ $(window).resize(() => {
     relayout_grid();
   }
 });
+
+var toZenkaku = (strVal) => {
+  var value = strVal.replace(/[!-~]/g,
+      function( tmpStr ) {
+        return String.fromCharCode(tmpStr.charCodeAt(0) + 0xFEE0);
+      }
+  );
+
+  return value.replace(/”/g, "\"")
+      .replace(/'/g, "’")
+      .replace(/`/g, "｀")
+      .replace(/\\/g, "＼")
+      .replace(/~/g, "〜");
+};
