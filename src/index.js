@@ -252,13 +252,26 @@ const createSvg = (text) => {
   for (let i in text_array) {
     column_counts.push(text_array[i].length);
   }
-  const max_text_count = Math.max(Math.max.apply(null, column_counts), text_array.length);
-  const font_size = 128 / max_text_count;
-  const y_coordinate = 128 / max_text_count;
+  const column_count = Math.max.apply(null, column_counts);
+  const row_count = text_array.length;
+  const max_text_count = Math.max(column_count, row_count);
+  const font_size = 124 / max_text_count;
+
+  let x_coordinate;
+  let y_coordinate;
+  if (column_count >= row_count) {
+    x_coordinate = 0;
+    y_coordinate = (128 - (font_size * row_count)) / 2 + font_size;
+  } else {
+    x_coordinate = (128 - (font_size * column_count)) / 2;
+    y_coordinate = font_size;
+  }
+
   let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">';
   let i = 0;
   while (i < text_array.length) {
-    const add_text = '<text font-family="Times New Roman" x="0" y="'+ y_coordinate * (i + 1) +'" font-size="' + font_size + '">' + text_array[i] +'</text>';
+    const y = y_coordinate + (font_size * i);
+    const add_text = '<text font-family="Times New Roman" x="' + x_coordinate + '" y="' + y + '" font-size="' + font_size + '">' + text_array[i] + '</text>';
     svg += add_text;
     i += 1;
   }
@@ -268,7 +281,6 @@ const createSvg = (text) => {
 
 const createImage = (svg) => {
   const svg_data_uri = "data:image/svg+xml;utf8;base64," + btoa(unescape(encodeURIComponent(svg)));
-  console.log(svg_data_uri);
   return svg_data_uri;
 };
 
@@ -338,7 +350,6 @@ const appendStampCell = (value, append_last) => {
   let img_url;
   let cell;
   if (value.match('^(https?|ftp)')) {
-    console.log(value + " is URL!");
     img_url = value;
     cell = document.createElement("div");
     cell.setAttribute("class", "stamp_cell");
@@ -352,7 +363,6 @@ const appendStampCell = (value, append_last) => {
       document.getElementById("image_url_text_box").value = img_url;
     });
   } else {
-    console.log(value + " is text!");
     img_url = createImage(createSvg(value));
     cell = document.createElement("div");
     cell.setAttribute("class", "stamp_cell");
