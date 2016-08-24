@@ -691,3 +691,90 @@ var toZenkaku = (strVal) => {
       .replace(/\\/g, "＼")
       .replace(/~/g, "〜");
 };
+
+const keydown = () => {
+  const current = document.activeElement.id;
+  if (current != "image_url_text_box" || current != "name_text_box") {
+    let reaction;
+    switch (event.keyCode) {
+      case 8: // BS
+        reaction = "エモ いね";
+        break;
+      case 9: // Tab
+        reaction = "https://i.gyazo.com/f461f7b9924dbc41ea5a9c745a45e34d.png";
+        break;
+      case 13: // Enter
+        reaction = "笑";
+        break;
+      case 96: // 0
+        reaction = "いい 話だ";
+        break;
+      case 97: // 1
+        reaction = "たし かに";
+        break;
+      case 98: // 2
+        reaction = "わか らん";
+        break;
+      case 99: // 3
+        reaction = "わか る";
+        break;
+      case 100: // 4
+        reaction = "そう だね";
+        break;
+      case 101: // 5
+        reaction = "そう かも";
+        break;
+      case 102: // 6
+        reaction = "そう かな";
+        break;
+      case 103: // 7
+        reaction = "ひえ ぇ〜";
+        break;
+      case 104: // 8
+        reaction = "まじ かよ";
+        break;
+      case 105: // 9
+        reaction = "なる ほど";
+        break;
+      case 106: // *
+        reaction = "気に なる";
+        break;
+      case 107: // +
+        reaction = "すご い！";
+        break;
+      case 109: // -
+        reaction = "知っ てた";
+        break;
+      case 110: // .
+        reaction = "感動 した";
+        break;
+      case 111: // /
+        reaction = "https://i.gyazo.com/1fdfa88d9051c938a8dd9b0d28d714f4.png";
+        break;
+      default:
+        return;
+    }
+    sendReactionFrom10Key(reaction)
+  }
+};
+
+document.onkeydown = keydown;
+
+const sendReactionFrom10Key = (img_url) => {
+  my_name = "@" + document.getElementById("name_text_box").value;
+  if (window.localStorage) localStorage.name = my_name;
+  const date = new Date();
+
+  //自分の最新の発言を削除してからwriteする
+  const cid = ts.take({from: my_name, type: "wakari"});
+  setTimeout(() => {
+    ts.cancel(cid);
+  }, 3000);
+  ts.write({
+    from: my_name,
+    display: 20,
+    time: date,
+    value: img_url,
+    type: "wakari"
+  }, {expire: 20});
+};
