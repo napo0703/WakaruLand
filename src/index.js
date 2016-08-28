@@ -2,8 +2,14 @@ import $ from 'jquery'
 
 $('#image_url_text_box').keypress(function(e){
   if(e.which && e.which === 13 || e.keyCode && e.keyCode === 13) {
-    const image_url = toZenkaku(document.getElementById("image_url_text_box").value);
-    document.getElementById("image_url_text_box").value = image_url;
+    const value = document.getElementById("image_url_text_box").value;
+    let image_url;
+    if (value.match('^(https?|ftp)')) {
+      image_url = value;
+    } else {
+      image_url = toZenkaku(value);
+      document.getElementById("image_url_text_box").value = image_url;
+    }
     if (image_url) {
       addStampImage(image_url);
     }
@@ -11,9 +17,15 @@ $('#image_url_text_box').keypress(function(e){
 });
 
 $('#image_url_add_button').on("click", () => {
-  const image_url = toZenkaku(document.getElementById("image_url_text_box").value);
-  document.getElementById("image_url_text_box").value = image_url;
-  if(image_url){
+  const value = document.getElementById("image_url_text_box").value;
+  let image_url;
+  if (value.match('^(https?|ftp)')) {
+    image_url = value;
+  } else {
+    image_url = toZenkaku(value);
+    document.getElementById("image_url_text_box").value = image_url;
+  }
+  if (image_url) {
     addStampImage(image_url);
   }
 });
