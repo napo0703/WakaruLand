@@ -262,7 +262,7 @@ const createSvg = (text) => {
   console.log(text_array);
   const column_counts = [];
   for (let i in text_array) {
-    column_counts.push(text_array[i].length);
+    column_counts.push(Array.from(text_array[i]).length);
   }
   const column_count = Math.max.apply(null, column_counts);
   const row_count = text_array.length;
