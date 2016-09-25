@@ -1,4 +1,5 @@
 body {
+  font-family: "-apple-system", "Yu Gothic", YuGothic, Verdana, Meiryo, "M+ 1p", sans-serif;
   background-color: #e4f0ea;
 }
 
@@ -180,7 +181,7 @@ body {
   position: absolute;
   bottom: 0;
   color: #fff;
-  background: rgba(0,0,0,.8);
+  background: rgba(0,0,0,.7);
   width: 100%;
 }
 

@@ -83,7 +83,7 @@ const MIN_CELL_WIDTH = 10;
 const MIN_CELL_HEIGHT = 10;
 
 // connect Socket.IO & Linda
-const server_url = "//linda-server.herokuapp.com/";
+const server_url = "//wakaruland-linda.herokuapp.com";
 const socket = SocketIO(server_url);
 const linda = new Linda().connect(socket);
 const ts = linda.tuplespace("masuilab");
@@ -247,7 +247,7 @@ linda.io.on("connect", () => {
     if (display_users.includes("enoshima_wind")) {
       ts.watch({where: "enoshima", type: "sensor", name: "wind"}, (err, tuple) => {
         document.getElementById("enoshima_wind_value_text").innerHTML =
-            tuple.data.direction + " の風 " + tuple.data.speed + "m/s";
+            tuple.data.direction + " " + tuple.data.speed + "m/s";
       });
     }
   }
@@ -267,27 +267,27 @@ const createSvg = (text) => {
   const column_count = Math.max.apply(null, column_counts);
   const row_count = text_array.length;
   const max_text_count = Math.max(column_count, row_count);
-  const font_size = 124 / max_text_count;
+  const font_size = 128 / max_text_count;
 
   let x_coordinate;
   let y_coordinate;
   if (column_count >= row_count) {
     x_coordinate = 0;
-    y_coordinate = (128 - (font_size * row_count)) / 2 + font_size;
+    y_coordinate = (114 - (font_size * row_count)) / 2 + font_size;
   } else {
     x_coordinate = (128 - (font_size * column_count)) / 2;
-    y_coordinate = font_size;
+    y_coordinate = font_size - 4;
   }
 
-  let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">';
+  let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><g font-size="' + font_size +'px" font-family="YuGothic" font-weight="bold">';
   let i = 0;
   while (i < text_array.length) {
     const y = y_coordinate + (font_size * i);
-    const add_text = '<text font-family="Times New Roman" x="' + x_coordinate + '" y="' + y + '" font-size="' + font_size + '">' + text_array[i] + '</text>';
+    const add_text = '<text x="' + x_coordinate + '" y="' + y + '">' + text_array[i] + '</text>';
     svg += add_text;
     i += 1;
   }
-  svg += '</svg>';
+  svg += '</g></svg>';
   return svg;
 };
 
