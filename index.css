@@ -31,12 +31,12 @@ body {
   width: 131px;
 }
 
-@media screen and (min-width: 691px) {
+@media screen and (min-width: 500px) {
   /* リアクション画像追加TextBox */
   #image_url_text_box {
     float: left;
     margin-left: 8px;
-    width: 340px;
+    width: 300px;
     display: inline;
   }
 
@@ -55,7 +55,7 @@ body {
   }
 }
 
-@media screen and (max-width: 690px) {
+@media screen and (max-width: 600px) {
   /* リアクション画像追加TextBox */
   #image_url_text_box {
     float: left;
@@ -148,6 +148,18 @@ body {
   margin-bottom: 8px;
   float:left;
   box-shadow: 0 1px 1px 1px rgba(0,0,0,0.4);
+}
+
+.stamp_cell:hover .cell_delete_button {
+  display: block;
+}
+
+
+.cell_delete_button {
+  position:absolute;
+  top:0%;
+  right:0%;
+  display: none;
 }
 
 /* 一覧のcell */

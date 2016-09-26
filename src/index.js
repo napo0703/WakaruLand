@@ -8,10 +8,10 @@ $('#image_url_text_box').keypress(function(e){
       image_url = value;
     } else {
       image_url = toZenkaku(value);
-      document.getElementById("image_url_text_box").value = image_url;
     }
     if (image_url) {
       addStampImage(image_url);
+      document.getElementById("image_url_text_box").value = "";
     }
   }
 });
@@ -23,17 +23,10 @@ $('#image_url_add_button').on("click", () => {
     image_url = value;
   } else {
     image_url = toZenkaku(value);
-    document.getElementById("image_url_text_box").value = image_url;
   }
   if (image_url) {
     addStampImage(image_url);
-  }
-});
-
-$('#image_url_delete_button').on("click", () => {
-  const image_url = document.getElementById("image_url_text_box").value;
-  if(image_url){
-    displayDeleteDialog(image_url);
+    document.getElementById("image_url_text_box").value = "";
   }
 });
 
@@ -107,7 +100,6 @@ linda.io.on("connect", () => {
       if (img_url != "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" && display_time > 1) {
         const reaction_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
         document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
-        document.getElementById("image_url_text_box").value = img_url;
         if (tuple.data.display != 0) {
           withdrawReaction(my_name, display_time);
         }
@@ -314,7 +306,6 @@ var sendReaction = (img_url, display_time) => {
     type: "wakari"
   }, {expire: display_time});
 
-  document.getElementById("image_url_text_box").value = img_url;
   // クリックしたスタンプ画像を先頭に移動
   const stamp_grid = document.getElementById("stamp_grid_view");
   stamp_grid.removeChild(document.getElementById(img_url + "_cell"));
@@ -360,6 +351,7 @@ const startCount = () => {
 // スタンプの一覧に画像を追加する
 const appendStampCell = (value, append_last) => {
   let img_url;
+  let id;
   let cell;
   if (value.match('^(https?|ftp)')) {
     img_url = value;
@@ -372,7 +364,6 @@ const appendStampCell = (value, append_last) => {
       startCount(img_url);
       const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
       document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
-      document.getElementById("image_url_text_box").value = img_url;
     });
   } else {
     img_url = createImage(createSvg(value));
@@ -385,9 +376,18 @@ const appendStampCell = (value, append_last) => {
       startCount(img_url);
       const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
       document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
-      document.getElementById("image_url_text_box").value = value.replace("|", "\n");
     });
   }
+
+  const delete_button = document.createElement("img");
+  delete_button.setAttribute("class", "cell_delete_button");
+  delete_button.setAttribute("width", "20px");
+  delete_button.setAttribute("src", "images/delete.png");
+  delete_button.addEventListener("mousedown", (event) => {
+    displayDeleteDialog(value);
+    event.stopPropagation();
+  });
+  cell.appendChild(delete_button);
 
   cell.addEventListener("mouseup", () => {
     clearInterval(mousedown_id);
@@ -562,7 +562,6 @@ const withdrawReaction = (reactor, time) => {
       console.log("withdraw -> " + reactor);
       const reaction_style = "background:url('https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png') center center no-repeat; background-size:contain";
       document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
-      document.getElementById("image_url_text_box").value = "";
       if (!isConsoleOnly()) {
         if (sensors.includes(reactor)) {
           document.getElementById(reactor + "_image").src = sensor_images[reactor];
@@ -635,7 +634,6 @@ var displayDeleteDialog = (img_url) => {
   if (window.confirm(img_url + "\nを削除します。よろしいですか？")) {
     removeStampImage(img_url);
   }
-  document.getElementById("image_url_text_box").value = "";
 };
 
 // ローカルストレージまたはURL末尾のクエリから発言者名の設定
