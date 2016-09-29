@@ -59,7 +59,7 @@ const default_icons = [
   "https://i.gyazo.com/db030b45cbc759418719deb3f46cca39.png"
 ];
 
-const sensors = ["delta_light", "delta_temperature", "delta_door", "enoshima_wind"];
+const sensors = ["delta_light", "delta_temperature", "delta_door", "enoshima_wind", "korin"];
 
 const sensor_images = {
   "delta_door": "https://i.gyazo.com/a25a3fa1fabb36f01f9751d41243d6da.png",
@@ -67,7 +67,8 @@ const sensor_images = {
   "delta_light": "https://i.gyazo.com/d48b8b3b7027c0739fea18f1e77129af.png",
   "delta_light_on": "https://i.gyazo.com/b0388280bee7fd4ddef5b0d85b455a35.png",
   "delta_temperature": "https://i.gyazo.com/c74f7dbcb876de97320bbb50bf2de5ba.png",
-  "enoshima_wind": "https://i.gyazo.com/d13f222ba330bf686b6cdcd98b264464.png"
+  "enoshima_wind": "https://i.gyazo.com/d13f222ba330bf686b6cdcd98b264464.png",
+  "korin": "http://masuilab.org:8765/videofeed"
 };
 
 // レイアウトの定数
@@ -237,7 +238,7 @@ linda.io.on("connect", () => {
 
     // 江ノ島の風
     if (display_users.includes("enoshima_wind")) {
-      ts.watch({where: "enoshima", type: "sensor", name: "wind"}, (err, tuple) => {
+      ts.watch({where: "enoshima", type: "web", name: "wind"}, (err, tuple) => {
         document.getElementById("enoshima_wind_value_text").innerHTML =
             tuple.data.direction + " " + tuple.data.speed + "m/s";
       });

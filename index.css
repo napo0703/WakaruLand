@@ -162,6 +162,11 @@ body {
   display: none;
 }
 
+#copyright {
+  clear: left;
+  padding-left: 8px;
+}
+
 /* 一覧のcell */
 .cell {
   float: left;
