@@ -77,7 +77,7 @@ const MIN_CELL_WIDTH = 10;
 const MIN_CELL_HEIGHT = 10;
 
 // connect Socket.IO & Linda
-const server_url = "//wakaruland-linda.herokuapp.com";
+const server_url = "//linda-server.herokuapp.com";
 const socket = SocketIO(server_url);
 const linda = new Linda().connect(socket);
 const ts = linda.tuplespace("masuilab");
