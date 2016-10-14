@@ -59,7 +59,7 @@ const default_icons = [
   "https://i.gyazo.com/db030b45cbc759418719deb3f46cca39.png"
 ];
 
-const sensors = ["delta_light", "delta_temperature", "delta_door", "enoshima_wind", "korin"];
+const sensors = ["delta_light", "delta_temperature", "delta_door", "enoshima_wind", "korin", "zushi"];
 
 const sensor_images = {
   "delta_door": "https://i.gyazo.com/a25a3fa1fabb36f01f9751d41243d6da.png",
@@ -68,7 +68,8 @@ const sensor_images = {
   "delta_light_on": "https://i.gyazo.com/b0388280bee7fd4ddef5b0d85b455a35.png",
   "delta_temperature": "https://i.gyazo.com/c74f7dbcb876de97320bbb50bf2de5ba.png",
   "enoshima_wind": "https://i.gyazo.com/d13f222ba330bf686b6cdcd98b264464.png",
-  "korin": "http://masuilab.org:8765/videofeed"
+  "korin": "http://masuilab.org:8765/videofeed",
+  "zushi": "http://113.32.231.147/nphMotionJpeg?Resolution=320x240&Quality=Standard&Framerate=30"
 };
 
 // レイアウトの定数
