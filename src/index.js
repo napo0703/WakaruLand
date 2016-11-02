@@ -1,33 +1,14 @@
 import $ from 'jquery'
+import SocketIO from 'socket.io-client'
 
 $('#image_url_text_box').keypress(function(e){
   if(e.which && e.which === 13 || e.keyCode && e.keyCode === 13) {
-    const value = document.getElementById("image_url_text_box").value;
-    let image_url;
-    if (value.match('^(https?|ftp)')) {
-      image_url = value;
-    } else {
-      image_url = toZenkaku(value);
-    }
-    if (image_url) {
-      addStampImage(image_url);
-      document.getElementById("image_url_text_box").value = "";
-    }
+    addStampFromTextBox();
   }
 });
 
 $('#image_url_add_button').on("click", () => {
-  const value = document.getElementById("image_url_text_box").value;
-  let image_url;
-  if (value.match('^(https?|ftp)')) {
-    image_url = value;
-  } else {
-    image_url = toZenkaku(value);
-  }
-  if (image_url) {
-    addStampImage(image_url);
-    document.getElementById("image_url_text_box").value = "";
-  }
+  addStampFromTextBox();
 });
 
 $('#console_switch_button').on("click", () => {
@@ -37,8 +18,6 @@ $('#console_switch_button').on("click", () => {
 $('#grid_switch_button').on("click", () => {
   switch_display();
 });
-
-import SocketIO from 'socket.io-client'
 
 const default_icons = [
   "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png",
@@ -702,4 +681,20 @@ var toZenkaku = (strVal) => {
       .replace(/`/g, "｀")
       .replace(/\\/g, "＼")
       .replace(/~/g, "〜");
+};
+
+var addStampFromTextBox = () => {
+  const value = document.getElementById("image_url_text_box").value;
+  let image_url;
+  if (value.match('^https://gyazo.com')) {
+    image_url = value + ".png";
+  } else if (value.match('^(https?|ftp).+?\.(jpg|jpeg|png|gif|bmp|svg)')) {
+    image_url = value;
+  } else {
+    image_url = toZenkaku(value);
+  }
+  if (image_url) {
+    addStampImage(image_url);
+    document.getElementById("image_url_text_box").value = "";
+  }
 };
