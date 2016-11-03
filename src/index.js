@@ -39,6 +39,8 @@ const default_icons = [
   "https://i.gyazo.com/db030b45cbc759418719deb3f46cca39.png"
 ];
 
+let listeners = {};
+
 // レイアウトの定数
 const GRID_USER_INPUT_HEIGHT = 41;
 const MIN_CELL_WIDTH = 10;
@@ -115,10 +117,12 @@ const readData = (tuple) => {
   const background = textToImgUrl(tuple.data.background);
   const style = "background:url('" + background + "') center center no-repeat; background-size:contain";
   document.getElementById(from + "_image").setAttribute("style", style);
-  document.getElementById(from).addEventListener("click", () => {
-    console.log(from + " clicked!!");
-    ts.write(tuple.data.onclick);
-  });
+  // 設定されているlistenerを削除してから新しいlistenerをセットする
+  const from_cell = document.getElementById(from);
+  from_cell.removeEventListener("click", listeners[from], false);
+  const listener = () => {ts.write(tuple.data.onclick);};
+  from_cell.addEventListener("click", listener, false);
+  listeners[from] = listener;
   if (display > 0) {
     document.getElementById(from + "_value_text").innerHTML = value;
     withdrawData(from, display);
@@ -154,10 +158,12 @@ const watchData = (tuple) => {
   const style = "background:url('" + background + "') center center no-repeat; background-size:contain";
   document.getElementById(from + "_image").setAttribute("style", style);
   document.getElementById(from + "_value_text").innerHTML = value;
-  document.getElementById(from).addEventListener("click", () => {
-    console.log(from + " clicked!!");
-    ts.write(tuple.data.onclick);
-  });
+  // 設定されているlistenerを削除してから新しいlistenerをセットする
+  const from_cell = document.getElementById(from);
+  from_cell.removeEventListener("click", listeners[from], false);
+  const listener = () => {ts.write(tuple.data.onclick);};
+  from_cell.addEventListener("click", listener, false);
+  listeners[from] = listener;
   let display_time;
   if (display == "") {
     display_time = 20;
@@ -649,13 +655,20 @@ if (isConsoleOnly()) {
   relayout_grid();
 }
 
-// Motion JPEG画像の表示
+// Motion JPEG画像の表示とdataのclickリスナの一覧の生成
 for (let i in display_users) {
-  if (display_users[i].match('^(https?)')) {
-    const url = display_users[i];
-    const style = "background:url('" + url + "') center center no-repeat; background-size:contain";
-    document.getElementById(url + "_image").setAttribute("style", style);
-    document.getElementById(url + "_value_text").innerHTML = "";
+  const from = display_users[i];
+  if (from.charAt(0) == "@") {
+    //
+  } else if (from.match('^(https?)')) {
+    const style = "background:url('" + from + "') center center no-repeat; background-size:contain";
+    document.getElementById(from + "_image").setAttribute("style", style);
+    document.getElementById(from + "_value_text").innerHTML = "";
+  } else {
+    // FIXME: ヤバイ？
+    const dummy_listener = () => {};
+    document.getElementById(from).addEventListener("click", dummy_listener, false);
+    listeners[from] = dummy_listener();
   }
 }
 
