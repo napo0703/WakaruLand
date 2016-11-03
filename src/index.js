@@ -39,19 +39,6 @@ const default_icons = [
   "https://i.gyazo.com/db030b45cbc759418719deb3f46cca39.png"
 ];
 
-//const sensors = ["delta_light", "delta_temperature", "delta_door", "enoshima_wind", "korin", "zushi"];
-
-// const sensor_images = {
-//   "delta_door": "https://i.gyazo.com/a25a3fa1fabb36f01f9751d41243d6da.png",
-//   "delta_door_open": "https://i.gyazo.com/a588115b69ac57165c4e0372caf6ed53.png",
-//   "delta_light": "https://i.gyazo.com/d48b8b3b7027c0739fea18f1e77129af.png",
-//   "delta_light_on": "https://i.gyazo.com/b0388280bee7fd4ddef5b0d85b455a35.png",
-//   "delta_temperature": "https://i.gyazo.com/c74f7dbcb876de97320bbb50bf2de5ba.png",
-//   "enoshima_wind": "https://i.gyazo.com/d13f222ba330bf686b6cdcd98b264464.png",
-//   "korin": "http://masuilab.org:8765/videofeed",
-//   "zushi": "http://113.32.231.147/nphMotionJpeg?Resolution=320x240&Quality=Standard&Framerate=30"
-// };
-
 // レイアウトの定数
 const GRID_USER_INPUT_HEIGHT = 41;
 const MIN_CELL_WIDTH = 10;
@@ -65,137 +52,94 @@ const ts = linda.tuplespace("masuilab");
 
 linda.io.on("connect", () => {
   console.log("connect Linda!!");
-  // if (isConsoleOnly()) {
-  //   // Read
-  //   const cid = ts.read({from: my_name}, (err, tuple) => {
-  //     const value = tuple.data.value;
-  //     let img_url;
-  //     console.log(value);
-  //     if (value.match('^(https?|ftp)')) {
-  //       img_url = tuple.data.value;
-  //     } else {
-  //       img_url = createImage(createSvg(value));
-  //     }
-  //     const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
-  //     const now_unix_time = Math.floor(new Date().getTime() / 1000);
-  //     const display_time = (reaction_unix_time + tuple.data.display) - now_unix_time;
-  //     if (img_url != "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" && display_time > 1) {
-  //       const reaction_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
-  //       document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
-  //       if (tuple.data.display != 0) {
-  //         withdrawReaction(my_name, display_time);
-  //       }
-  //     }
-  //   });
-  //   setTimeout(() => {
-  //     ts.cancel(cid);
-  //   }, 3000);
-  //
-  //   // Watch
-  //   ts.watch({from: my_name}, (err, tuple) => {
-  //     const value = tuple.data.value;
-  //     let img_url;
-  //     console.log(value);
-  //     if (value.match('^(https?|ftp)')) {
-  //       img_url = tuple.data.value;
-  //     } else {
-  //       img_url = createImage(createSvg(value));
-  //     }
-  //     const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
-  //     const now_unix_time = Math.floor(new Date().getTime() / 1000);
-  //     const display_time = (reaction_unix_time + tuple.data.display) - now_unix_time;
-  //     if (img_url != "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" && display_time > 1 && tuple.data.display != 0) {
-  //       withdrawReaction(my_name, display_time);
-  //     }
-  //   });
-  //
-  // } else {
-  //   // Read
-  //   for (let i in display_users) {
-  //     if (display_users[i].charAt(0) == "@") {
-  //       const cancel_id = ts.read({from: display_users[i]}, (err, tuple) => {
-  //         const reactor = tuple.data.from;
-  //         const value = tuple.data.value;
-  //         let img_url;
-  //         console.log(value);
-  //         if (value.match('^(https?|ftp)')) {
-  //           img_url = tuple.data.value;
-  //         } else {
-  //           img_url = createImage(createSvg(value));
-  //         }
-  //         const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
-  //         const now_unix_time = Math.floor(new Date().getTime() / 1000);
-  //         const display_time = (reaction_unix_time + tuple.data.display) - now_unix_time;
-  //         if (img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png") {
-  //           document.getElementById(reactor + "_image").style.opacity = 1.0;
-  //         } else {
-  //           if (display_time > 1) {
-  //             const style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
-  //             document.getElementById(reactor + "_reaction").setAttribute("style", style);
-  //             document.getElementById(reactor + "_image").style.opacity = 0.25;
-  //             if (tuple.data.display != 0) {
-  //               withdrawReaction(reactor, display_time);
-  //             }
-  //           }
-  //         }
-  //       });
-  //       setTimeout(() => {
-  //         ts.cancel(cancel_id);
-  //       }, 3000);
-  //     }
-  //   }
+  // FIXME: ループではなくて動的にJSを書き換えてwatchするタプルを列挙できないか？
 
-    // Watch
-    // 一覧表示
-    // FIXME: ループではなくて動的にJSのコードを書き換えてwatchするタプルを列挙できないか？
-    for (let i in display_users) {
-      if (display_users[i].charAt(0) == "@") {
-        ts.watch({wakaruland: "reaction", from: display_users[i]}, (err, tuple) => {
-          watchReaction(tuple);
-        });
-      } else {
-        ts.watch({wakaruland: "data", from: display_users[i]}, (err, tuple) => {
-          watchData(tuple);
-        })
-      }
+  // Read
+  for (let i in display_users) {
+    if (display_users[i].charAt(0) == "@") {
+      const cancel_id = ts.read({wakaruland: "reaction", from: display_users[i]}, (err, tuple) => {
+        readReaction(tuple);
+        setTimeout(() => {
+          ts.cancel(cancel_id);
+        }, 3000);
+      })
+    } else {
+      const cancel_id = ts.read({wakaruland: "data", from: display_users[i]}, (err, tuple) => {
+        readData(tuple);
+        setTimeout(() => {
+          ts.cancel(cancel_id);
+        }, 3000);
+      })
     }
-  //}
+  }
+
+  // Watch
+  for (let i in display_users) {
+    if (display_users[i].charAt(0) == "@") {
+      ts.watch({wakaruland: "reaction", from: display_users[i]}, (err, tuple) => {
+        watchReaction(tuple);
+      });
+    } else {
+      ts.watch({wakaruland: "data", from: display_users[i]}, (err, tuple) => {
+        watchData(tuple);
+      })
+    }
+  }
 });
 
 //lindaのネストが深くて見にくいので関数にした
 const readReaction = (tuple) => {
-
+  const reactor = tuple.data.from;
+  const img_url = textToImgUrl(tuple.data.value);
+  const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
+  const now_unix_time = Math.floor(new Date().getTime() / 1000);
+  const display = (reaction_unix_time + tuple.data.display) - now_unix_time;
+  if (img_url == "" || display < 2 || display == "") {
+    const style = "background:url('') center center no-repeat; background-size:contain";
+    document.getElementById(reactor + "_reaction").setAttribute("style", style);
+    document.getElementById(reactor + "_image").style.opacity = 1.0;
+  } else {
+    const style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
+    document.getElementById(reactor + "_reaction").setAttribute("style", style);
+    document.getElementById(reactor + "_image").style.opacity = 0.25;
+    withdrawReaction(reactor, display);
+  }
 };
 
 const readData = (tuple) => {
-
+  const from = tuple.data.from;
+  const value = tuple.data.value;
+  const written_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
+  const now_unix_time = Math.floor(new Date().getTime() / 1000);
+  const display = (written_unix_time + tuple.data.display) - now_unix_time;
+  const background = textToImgUrl(tuple.data.background);
+  const style = "background:url('" + background + "') center center no-repeat; background-size:contain";
+  document.getElementById(from + "_image").setAttribute("style", style);
+  document.getElementById(from).addEventListener("click", () => {
+    console.log(from + " clicked!!");
+    ts.write(tuple.data.onclick);
+  });
+  if (display > 0) {
+    document.getElementById(from + "_value_text").innerHTML = value;
+    withdrawData(from, display);
+  }
 };
 
 const watchReaction = (tuple) => {
   const reactor = tuple.data.from;
-  const value = tuple.data.value;
   const display = tuple.data.display;
   const ip_address = tuple.from;
-  let img_url;
-  if (value.match('^(https?|ftp)')) {
-    img_url = tuple.data.value;
-  } else {
-    img_url = createImage(createSvg(value));
-  }
+  const img_url = textToImgUrl(tuple.data.value);
   console.log(reactor + " < " + img_url + " " + display + "sec (from " + ip_address + ")");
-  if (img_url == "" || display == 0) {
+  if (img_url == "" || display == "") {
+    const style = "background:url('') center center no-repeat; background-size:contain";
+    document.getElementById(reactor + "_reaction").setAttribute("style", style);
     document.getElementById(reactor + "_image").style.opacity = 1.0;
   } else {
-    document.getElementById(reactor + "_image").style.opacity = 0.25;
     const style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
-    let display_time;
-    if (display == "" || display == 0) {
-      display_time = 20;
-    } else {
-      display_time = display
-    }
-  withdrawReaction(reactor, display_time);
+    document.getElementById(reactor + "_image").style.opacity = 0.25;
+    withdrawReaction(reactor, display);
   }
 };
 
@@ -215,7 +159,7 @@ const watchData = (tuple) => {
     ts.write(tuple.data.onclick);
   });
   let display_time;
-  if (display == "" || display == 0) {
+  if (display == "") {
     display_time = 20;
   } else {
     display_time = display
@@ -272,16 +216,16 @@ var sendReaction = (img_url, display_time) => {
   const date = new Date();
 
   //自分の最新の発言を削除してからwriteする
-  const cid = ts.take({from: my_name, type: "wakari"});
+  const cid = ts.take({wakaruland: "reaction", from: my_name});
   setTimeout( () => {
     ts.cancel(cid);
   }, 3000);
   ts.write({
+    wakaruland: "reaction",
     from: my_name,
     display: display_time,
     time: date,
     value: img_url,
-    type: "wakari"
   }, {expire: display_time});
 
   // クリックしたスタンプ画像を先頭に移動
@@ -613,6 +557,49 @@ var displayDeleteDialog = (img_url) => {
   }
 };
 
+var toZenkaku = (strVal) => {
+  var value = strVal.replace(/[!-~]/g,
+      function( tmpStr ) {
+        return String.fromCharCode(tmpStr.charCodeAt(0) + 0xFEE0);
+      }
+  );
+
+  return value.replace(/”/g, "\"")
+      .replace(/'/g, "’")
+      .replace(/`/g, "｀")
+      .replace(/\\/g, "＼")
+      .replace(/~/g, "〜");
+};
+
+var addStampFromTextBox = () => {
+  const value = document.getElementById("image_url_text_box").value;
+  let image_url;
+  if (value.match('^https://gyazo.com')) {
+    image_url = value + ".png";
+  } else if (value.match('^(https?|ftp).+?\.(jpg|jpeg|png|gif|bmp|svg)')) {
+    image_url = value;
+  } else {
+    image_url = toZenkaku(value);
+  }
+  if (image_url) {
+    addStampImage(image_url);
+    document.getElementById("image_url_text_box").value = "";
+  }
+};
+
+// テキストを渡すと画像のURLが返ってくる
+var textToImgUrl = (text) => {
+  let url;
+  if (text.match('^https://gyazo.com')) {
+    url = text + ".png";
+  } else if (text.match('^(https?|ftp).+?\.(jpg|jpeg|png|gif|bmp|svg)')) {
+    url = text;
+  } else {
+    url = createImage(createSvg(toZenkaku(text)));
+  }
+  return url;
+};
+
 /**
  *  ここから下はページを開いた時に実行されるもの
  */
@@ -667,46 +654,3 @@ $(window).resize(() => {
     relayout_grid();
   }
 });
-
-var toZenkaku = (strVal) => {
-  var value = strVal.replace(/[!-~]/g,
-      function( tmpStr ) {
-        return String.fromCharCode(tmpStr.charCodeAt(0) + 0xFEE0);
-      }
-  );
-
-  return value.replace(/”/g, "\"")
-      .replace(/'/g, "’")
-      .replace(/`/g, "｀")
-      .replace(/\\/g, "＼")
-      .replace(/~/g, "〜");
-};
-
-var addStampFromTextBox = () => {
-  const value = document.getElementById("image_url_text_box").value;
-  let image_url;
-  if (value.match('^https://gyazo.com')) {
-    image_url = value + ".png";
-  } else if (value.match('^(https?|ftp).+?\.(jpg|jpeg|png|gif|bmp|svg)')) {
-    image_url = value;
-  } else {
-    image_url = toZenkaku(value);
-  }
-  if (image_url) {
-    addStampImage(image_url);
-    document.getElementById("image_url_text_box").value = "";
-  }
-};
-
-// テキストを渡すと画像のURLが返ってくる
-var textToImgUrl = (text) => {
-  let url;
-  if (text.match('^https://gyazo.com')) {
-    url = text + ".png";
-  } else if (text.match('^(https?|ftp).+?\.(jpg|jpeg|png|gif|bmp|svg)')) {
-    url = text;
-  } else {
-    url = createImage(createSvg(toZenkaku(text)));
-  }
-  return url;
-};
