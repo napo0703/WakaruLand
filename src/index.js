@@ -54,21 +54,21 @@ linda.io.on("connect", () => {
   console.log("connect Linda!!");
   // FIXME: ループではなくて動的にJSを書き換えてwatchするタプルを列挙できないか？
 
-  // Read
+  // Read ページを開いた時に1回だけ実行される
   for (let i in display_users) {
     if (display_users[i].charAt(0) == "@") {
       const cancel_id = ts.read({wakaruland: "reaction", from: display_users[i]}, (err, tuple) => {
         readReaction(tuple);
         setTimeout(() => {
           ts.cancel(cancel_id);
-        }, 3000);
+        }, 2000);
       })
-    } else {
+    } else if (!display_users[i].match('^(https?)')) {
       const cancel_id = ts.read({wakaruland: "data", from: display_users[i]}, (err, tuple) => {
         readData(tuple);
         setTimeout(() => {
           ts.cancel(cancel_id);
-        }, 3000);
+        }, 2000);
       })
     }
   }
@@ -79,7 +79,7 @@ linda.io.on("connect", () => {
       ts.watch({wakaruland: "reaction", from: display_users[i]}, (err, tuple) => {
         watchReaction(tuple);
       });
-    } else {
+    } else if (!display_users[i].match('^(https?)')) {
       ts.watch({wakaruland: "data", from: display_users[i]}, (err, tuple) => {
         watchData(tuple);
       })
@@ -647,6 +647,16 @@ if (isConsoleOnly()) {
   document.getElementById("console").style.display = "none";
   document.getElementById("grid").style.display = "block";
   relayout_grid();
+}
+
+// Motion JPEG画像の表示
+for (let i in display_users) {
+  if (display_users[i].match('^(https?)')) {
+    const url = display_users[i];
+    const style = "background:url('" + url + "') center center no-repeat; background-size:contain";
+    document.getElementById(url + "_image").setAttribute("style", style);
+    document.getElementById(url + "_value_text").innerHTML = "";
+  }
 }
 
 $(window).resize(() => {
