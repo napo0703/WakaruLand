@@ -55,7 +55,6 @@ const ts = linda.tuplespace("masuilab");
 linda.io.on("connect", () => {
   console.log("connect Linda!!");
   // FIXME: ループではなくて動的にJSを書き換えてwatchするタプルを列挙できないか？
-
   // Read ページを開いた時に1回だけ実行される
   for (let i in display_users) {
     if (display_users[i].charAt(0) == "@") {
@@ -96,7 +95,7 @@ const readReaction = (tuple) => {
   const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
   const now_unix_time = Math.floor(new Date().getTime() / 1000);
   const display = (reaction_unix_time + tuple.data.display) - now_unix_time;
-  if (img_url == "" || display < 2 || display == "") {
+  if (img_url == "" || img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" || display < 2 || display == "") {
     const style = "background:url('') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
     document.getElementById(reactor + "_image").style.opacity = 1.0;
@@ -104,6 +103,9 @@ const readReaction = (tuple) => {
     const style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
     document.getElementById(reactor + "_image").style.opacity = 0.25;
+    if (reactor == my_name) {
+      document.getElementById("console_reaction_img").setAttribute("style", style);
+    }
     withdrawReaction(reactor, display);
   }
 };
@@ -117,6 +119,7 @@ const readData = (tuple) => {
   const background = textToImgUrl(tuple.data.background);
   const style = "background:url('" + background + "') center center no-repeat; background-size:contain";
   document.getElementById(from + "_image").setAttribute("style", style);
+  document.getElementById(from + "_value_text").innerHTML = value;
   // 設定されているlistenerを削除してから新しいlistenerをセットする
   const from_cell = document.getElementById(from);
   from_cell.removeEventListener("click", listeners[from], false);
@@ -135,14 +138,20 @@ const watchReaction = (tuple) => {
   const ip_address = tuple.from;
   const img_url = textToImgUrl(tuple.data.value);
   console.log(reactor + " < " + img_url + " " + display + "sec (from " + ip_address + ")");
-  if (img_url == "" || display == "") {
+  if (img_url == "" || img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" || display == "") {
     const style = "background:url('') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
     document.getElementById(reactor + "_image").style.opacity = 1.0;
+    if (reactor == my_name) {
+      document.getElementById("console_reaction_img").setAttribute("style", style);
+    }
   } else {
     const style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
     document.getElementById(reactor + "_image").style.opacity = 0.25;
+    if (reactor == my_name) {
+      document.getElementById("console_reaction_img").setAttribute("style", style);
+    }
     withdrawReaction(reactor, display);
   }
 };
@@ -154,7 +163,6 @@ const watchData = (tuple) => {
   const background = textToImgUrl(tuple.data.background);
   const ip_address = tuple.from;
   console.log(from + " < " + value + " " + display + "sec (from " + ip_address + ")");
-
   const style = "background:url('" + background + "') center center no-repeat; background-size:contain";
   document.getElementById(from + "_image").setAttribute("style", style);
   document.getElementById(from + "_value_text").innerHTML = value;
@@ -489,6 +497,10 @@ const withdrawReaction = (reactor, time) => {
     const reaction_style = "background:url('') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", reaction_style);
     document.getElementById(reactor + "_image").style.opacity = 1.0;
+    if (reactor == my_name) {
+      const reaction_style = "background:url('') center center no-repeat; background-size:contain";
+      document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+    }
   }, time * 1000); //ミリ秒
 };
 
@@ -553,7 +565,7 @@ const relayout_grid = () => {
 };
 
 const isConsoleOnly = () => {
-  return !!(display_users.length == 0 ||
+  return (display_users.length == 0 ||
   (display_users.length == 1 && (display_users[0] == "" || display_users[0].charAt(0) == "@")));
 };
 
