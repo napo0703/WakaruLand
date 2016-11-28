@@ -152,6 +152,8 @@ body {
 
 .stamp_cell:hover .cell_delete_button {
   display: block;
+  margin-top: -8px;
+  margin-right: -8px;
 }
 
 
