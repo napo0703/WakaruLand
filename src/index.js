@@ -91,7 +91,6 @@ linda.io.on("connect", () => {
   }
 });
 
-//lindaのネストが深くて見にくいので関数にした
 const readReaction = (tuple) => {
   const reactor = tuple.data.from;
   const img_url = textToImgUrl(tuple.data.value);
@@ -329,6 +328,16 @@ const appendStampCell = (value, append_last) => {
     displayDeleteDialog(value);
     event.stopPropagation();
   });
+  if (support_touch) {
+    delete_button.style.display = "inline";
+  } else {
+    cell.addEventListener("mouseover", function() {
+      delete_button.style.display = "inline";
+    });
+    cell.addEventListener("mouseout", function() {
+      delete_button.style.display = "none";
+    });
+  }
 
   cell.appendChild(delete_button);
 
@@ -689,12 +698,6 @@ for (let i in display_users) {
     document.getElementById(from).addEventListener("click", dummy_listener, false);
     listeners[from] = dummy_listener();
   }
-}
-
-if (support_touch) {
-  Array.prototype.forEach.call(document.getElementsByClassName("cell_delete_button"), function(e) {
-    e.style.display = "inline";
-  });
 }
 
 $(window).resize(() => {

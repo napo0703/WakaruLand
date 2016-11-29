@@ -1,6 +1,8 @@
 body {
   font-family: "-apple-system", "Yu Gothic", YuGothic, Verdana, Meiryo, "M+ 1p", sans-serif;
   background-color: #e4f0ea;
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
 }
 
 /* 投稿画面 */
@@ -148,12 +150,6 @@ body {
   margin-bottom: 8px;
   float:left;
   box-shadow: 0 1px 1px 1px rgba(0,0,0,0.4);
-}
-
-.stamp_cell:hover .cell_delete_button {
-  display: inline;
-  margin-top: -10px;
-  margin-right: -10px;
 }
 
 .cell_delete_button {
