@@ -46,6 +46,9 @@ const GRID_USER_INPUT_HEIGHT = 41;
 const MIN_CELL_WIDTH = 10;
 const MIN_CELL_HEIGHT = 10;
 
+// タッチパネル対応判定
+const support_touch = 'ontouchend' in document;
+
 // connect Socket.IO & Linda
 const server_url = "//linda-server.herokuapp.com";
 const socket = SocketIO(server_url);
@@ -286,6 +289,9 @@ const startCount = () => {
 
 // スタンプの一覧に画像を追加する
 const appendStampCell = (value, append_last) => {
+  const down = support_touch ? "touchstart" : "mousedown";
+  const up = support_touch ? "touchend" : "mouseup";
+
   let img_url;
   let id;
   let cell;
@@ -296,7 +302,7 @@ const appendStampCell = (value, append_last) => {
     cell.setAttribute("id", img_url + "_cell");
     const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
     cell.setAttribute("style", cell_style);
-    cell.addEventListener("mousedown", () => {
+    cell.addEventListener(down, () => {
       startCount(img_url);
       const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
       document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
@@ -308,7 +314,7 @@ const appendStampCell = (value, append_last) => {
     cell.setAttribute("id", value + "_cell");
     const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
     cell.setAttribute("style", cell_style);
-    cell.addEventListener("mousedown", () => {
+    cell.addEventListener(down, () => {
       startCount(img_url);
       const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
       document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
@@ -319,13 +325,14 @@ const appendStampCell = (value, append_last) => {
   delete_button.setAttribute("class", "cell_delete_button");
   delete_button.setAttribute("width", "20px");
   delete_button.setAttribute("src", "images/delete.png");
-  delete_button.addEventListener("mousedown", (event) => {
+  delete_button.addEventListener(down, (event) => {
     displayDeleteDialog(value);
     event.stopPropagation();
   });
+
   cell.appendChild(delete_button);
 
-  cell.addEventListener("mouseup", () => {
+  cell.addEventListener(up, () => {
     clearInterval(mousedown_id);
     let display_time;
     if (mousedown_count <= 5) {
@@ -682,6 +689,12 @@ for (let i in display_users) {
     document.getElementById(from).addEventListener("click", dummy_listener, false);
     listeners[from] = dummy_listener();
   }
+}
+
+if (support_touch) {
+  Array.prototype.forEach.call(document.getElementsByClassName("cell_delete_button"), function(e) {
+    e.style.display = "inline";
+  });
 }
 
 $(window).resize(() => {

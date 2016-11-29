@@ -151,16 +151,17 @@ body {
 }
 
 .stamp_cell:hover .cell_delete_button {
-  display: block;
-  margin-top: -8px;
-  margin-right: -8px;
+  display: inline;
+  margin-top: -10px;
+  margin-right: -10px;
 }
-
 
 .cell_delete_button {
   position:absolute;
   top:0%;
   right:0%;
+  margin-top: -10px;
+  margin-right: -10px;
   display: none;
 }
 
