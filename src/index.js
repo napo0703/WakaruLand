@@ -60,6 +60,16 @@ const MIN_CELL_HEIGHT = 10;
 // タッチパネル対応判定
 const support_touch = 'ontouchend' in document;
 
+// マウス押されているかチェック
+let mousedown_cell = "";
+let mouseDown = 0;
+document.body.onmousedown = function() {
+  ++mouseDown;
+};
+document.body.onmouseup = function() {
+  --mouseDown;
+};
+
 // connect Socket.IO & Linda
 const server_url = "//linda-server.herokuapp.com";
 const socket = SocketIO(server_url);
@@ -313,6 +323,8 @@ const appendStampCell = (value, append_last) => {
     const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
     cell.setAttribute("style", cell_style);
     cell.addEventListener(down, () => {
+      console.log("mousedown " + value);
+      mousedown_cell = value;
       startCount(img_url);
       const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
       document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
@@ -325,6 +337,8 @@ const appendStampCell = (value, append_last) => {
     const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
     cell.setAttribute("style", cell_style);
     cell.addEventListener(down, () => {
+      console.log("mousedown " + value);
+      mousedown_cell = value;
       startCount(img_url);
       const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
       document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
@@ -343,40 +357,58 @@ const appendStampCell = (value, append_last) => {
     delete_button.style.display = "inline";
   } else {
     cell.addEventListener("mouseover", function() {
+      console.log("mouseover " + value);
       delete_button.style.display = "inline";
     });
     cell.addEventListener("mouseout", function() {
+      console.log("mouseout " + value);
       delete_button.style.display = "none";
+      if (mouseDown) {
+        mousedown_cell = "";
+        clearInterval(mousedown_id);
+        mousedown_count = 0;
+        const progress = document.getElementById("console_reaction_progress");
+        const progress_bar = document.getElementById("console_reaction_progress_bar");
+        progress.style.visibility = "hidden";
+        progress_bar.style.visibility = "hidden";
+        progress_bar.style.width = 0;
+        const reaction_style = "background:url('') center center no-repeat; background-size:contain";
+        document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+      }
     });
   }
 
   cell.appendChild(delete_button);
 
   cell.addEventListener(up, () => {
-    clearInterval(mousedown_id);
-    let display_time;
-    if (mousedown_count <= 5) {
-      display_time = 20;
-    } else if (mousedown_count <= 14) {
-      display_time = 60;
-    } else if (mousedown_count <= 23) {
-      display_time = 600;
-    } else if (mousedown_count < 30) {
-      display_time = 3600;
-    } else {
-      display_time = 86400;
+    if (mousedown_cell == value) {
+      mousedown_cell = "";
+      console.log("mouseup " + value);
+      clearInterval(mousedown_id);
+      let display_time;
+      if (mousedown_count <= 5) {
+        display_time = 20;
+      } else if (mousedown_count <= 14) {
+        display_time = 60;
+      } else if (mousedown_count <= 23) {
+        display_time = 600;
+      } else if (mousedown_count < 30) {
+        display_time = 3600;
+      } else {
+        display_time = 86400;
+      }
+      if (value.match('^(https?|ftp)')) {
+        sendReaction(img_url, display_time);
+      } else {
+        sendReaction(value, display_time);
+      }
+      mousedown_count = 0;
+      const progress = document.getElementById("console_reaction_progress");
+      const progress_bar = document.getElementById("console_reaction_progress_bar");
+      progress.style.visibility = "hidden";
+      progress_bar.style.visibility = "hidden";
+      progress_bar.style.width = 0;
     }
-    if (value.match('^(https?|ftp)')) {
-      sendReaction(img_url, display_time);
-    } else {
-      sendReaction(value, display_time);
-    }
-    mousedown_count = 0;
-    const progress = document.getElementById("console_reaction_progress");
-    const progress_bar = document.getElementById("console_reaction_progress_bar");
-    progress.style.visibility = "hidden";
-    progress_bar.style.visibility = "hidden";
-    progress_bar.style.width = 0;
   });
 
   if (append_last) {
