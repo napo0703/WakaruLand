@@ -324,14 +324,10 @@ const appendStampCell = (value, append_last) => {
     cell.setAttribute("id", value + "_cell");
     const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
     cell.setAttribute("style", cell_style);
-    cell.addEventListener(down, (e) => {
-    if (e.which === 3 || e.button === 2) {
-      e.preventDefault();
-    } else if (!support_touch && e.button == 0) {
-        startCount(img_url);
-        const reaction_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
-        document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
-      }
+    cell.addEventListener(down, () => {
+      startCount(img_url);
+      const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
+      document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
     });
   }
 
@@ -356,35 +352,31 @@ const appendStampCell = (value, append_last) => {
 
   cell.appendChild(delete_button);
 
-  cell.addEventListener(up, (e) => {
-    if (e.which === 3 || e.button === 2) {
-      e.preventDefault();
-    } else if (!support_touch && e.button == 0) {
-      clearInterval(mousedown_id);
-      let display_time;
-      if (mousedown_count <= 5) {
-        display_time = 20;
-      } else if (mousedown_count <= 14) {
-        display_time = 60;
-      } else if (mousedown_count <= 23) {
-        display_time = 600;
-      } else if (mousedown_count < 30) {
-        display_time = 3600;
-      } else {
-        display_time = 86400;
-      }
-      if (value.match('^(https?|ftp)')) {
-        sendReaction(img_url, display_time);
-      } else {
-        sendReaction(value, display_time);
-      }
-      mousedown_count = 0;
-      const progress = document.getElementById("console_reaction_progress");
-      const progress_bar = document.getElementById("console_reaction_progress_bar");
-      progress.style.visibility = "hidden";
-      progress_bar.style.visibility = "hidden";
-      progress_bar.style.width = 0;
+  cell.addEventListener(up, () => {
+    clearInterval(mousedown_id);
+    let display_time;
+    if (mousedown_count <= 5) {
+      display_time = 20;
+    } else if (mousedown_count <= 14) {
+      display_time = 60;
+    } else if (mousedown_count <= 23) {
+      display_time = 600;
+    } else if (mousedown_count < 30) {
+      display_time = 3600;
+    } else {
+      display_time = 86400;
     }
+    if (value.match('^(https?|ftp)')) {
+      sendReaction(img_url, display_time);
+    } else {
+      sendReaction(value, display_time);
+    }
+    mousedown_count = 0;
+    const progress = document.getElementById("console_reaction_progress");
+    const progress_bar = document.getElementById("console_reaction_progress_bar");
+    progress.style.visibility = "hidden";
+    progress_bar.style.visibility = "hidden";
+    progress_bar.style.width = 0;
   });
 
   if (append_last) {
@@ -627,10 +619,10 @@ var toZenkaku = (strVal) => {
 var addStampFromTextBox = () => {
   const value = document.getElementById("image_url_text_box").value;
   let image_url;
-  if (value.match('^(https?|ftp).+?\.(jpg|jpeg|png|gif|bmp|svg)')) {
-    image_url = value;
-  } else if (value.match('^https://gyazo.com')) {
+  if (value.match('^https://gyazo.com')) {
     image_url = value + ".png";
+  } else if (value.match('^(https?|ftp).+?\.(jpg|jpeg|png|gif|bmp|svg)')) {
+    image_url = value;
   } else {
     image_url = toZenkaku(value);
   }
@@ -643,10 +635,10 @@ var addStampFromTextBox = () => {
 // テキストを渡すと画像のURLが返ってくる
 var textToImgUrl = (text) => {
   let url;
-  if (text.match('^(https?|ftp).+?\.(jpg|jpeg|png|gif|bmp|svg)')) {
-    url = text;
-  } else if (text.match('^https://gyazo.com')) {
+  if (text.match('^https://gyazo.com')) {
     url = text + ".png";
+  } else if (text.match('^(https?|ftp).+?\.(jpg|jpeg|png|gif|bmp|svg)')) {
+    url = text;
   } else {
     url = createImage(createSvg(toZenkaku(text)));
   }
