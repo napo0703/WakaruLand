@@ -148,17 +148,20 @@ body {
   margin-bottom: 8px;
   float:left;
   box-shadow: 0 1px 1px 1px rgba(0,0,0,0.4);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -webkit-user-drag:none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
-
-.stamp_cell:hover .cell_delete_button {
-  display: block;
-}
-
 
 .cell_delete_button {
   position:absolute;
   top:0%;
   right:0%;
+  margin-top: -10px;
+  margin-right: -10px;
   display: none;
 }
 

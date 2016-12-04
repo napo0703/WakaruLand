@@ -21,22 +21,33 @@ $('#grid_switch_button').on("click", () => {
 });
 
 const default_icons = [
-  "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png",
+  "",
   "https://i.gyazo.com/f461f7b9924dbc41ea5a9c745a45e34d.png",
   "https://i.gyazo.com/1fdfa88d9051c938a8dd9b0d28d714f4.png",
-  "https://i.gyazo.com/22984674b6d0cbb46d781a70f420fbe4.png",
-  "https://i.gyazo.com/6b03c00625edc66db10d4e5f5d57ae3d.png",
-  "https://i.gyazo.com/1bc0ae9981d968a5014ebc5bd604b07e.png",
-  "https://i.gyazo.com/67e6b6b0a9af872a47576f39d6edf11f.png",
-  "https://i.gyazo.com/5beaf5e32f46a574106679b484a0546b.png",
-  "https://i.gyazo.com/12e7ec7310fee975bc9f2eb1621d6145.png",
-  "https://i.gyazo.com/4be7cfbb10dbdbba57f1388865cf6759.png",
-  "https://i.gyazo.com/3cf5a7d371b382c09c2de707515ab250.png",
-  "https://i.gyazo.com/d82fcdcd76c81aeec8077162abf21b6b.png",
-  "https://i.gyazo.com/4a7203e6b3b54a5f38ac4c4020104c9c.png",
-  "https://i.gyazo.com/ae8e5efc68b221a4321597c3e152fc90.png",
-  "https://i.gyazo.com/f583d08f717d84d97747547c75e0da64.png",
-  "https://i.gyazo.com/db030b45cbc759418719deb3f46cca39.png"
+  "笑",
+  "わか る！",
+  "わか らん",
+  "たし かに",
+  "そう かな",
+  "すご い！",
+  "いい 話だ",
+  "ひえ ぇ〜",
+  "なる ほど",
+  "まじ かよ",
+  "気に なる",
+  "知っ てた",
+  "感動 した",
+  "わかる らんど",
+  "https://i.gyazo.com/e2c6447f25b7c62493552c961c76b1dc.png",
+  "https://i.gyazo.com/a4e8bb44169a9c0a18b44ad5da8237c9.png",
+  "https://i.gyazo.com/25031cf91e73064ea598acffc06329e5.png",
+  "https://i.gyazo.com/b3fe7da8b0d1cbcc5d0281f62793f9ec.png",
+  "https://i.gyazo.com/29ac85aa59d449c469cf4eb6e024bf56.png",
+  "https://i.gyazo.com/9ac0affa9aa678cb770a0ec86803448c.png",
+  "https://i.gyazo.com/55bd9a9ef15d6081bb4631775d87b6c4.png",
+  "https://i.gyazo.com/8eab48a46b9bab8e43eb66a47a72d06b.png",
+  "https://i.gyazo.com/427c8babba2b3e7561cf752001edaceb.png",
+  "https://i.gyazo.com/ce7439e27c5e4049c8b3d2a7227a396f.png"
 ];
 
 let listeners = {};
@@ -45,6 +56,23 @@ let listeners = {};
 const GRID_USER_INPUT_HEIGHT = 41;
 const MIN_CELL_WIDTH = 10;
 const MIN_CELL_HEIGHT = 10;
+
+// タッチパネル対応判定
+const support_touch = 'ontouchend' in document;
+
+// マウス押されているかチェック
+let mousedown_cell = "";
+let mouseDown = false;
+document.body.onmousedown = function(e) {
+  if (support_touch || e.button == 0) {
+    mouseDown = true;
+  }
+};
+document.body.onmouseup = function(e) {
+  if (support_touch || e.button == 0) {
+    mouseDown = false;
+  }
+};
 
 // connect Socket.IO & Linda
 const server_url = "//linda-server.herokuapp.com";
@@ -88,7 +116,6 @@ linda.io.on("connect", () => {
   }
 });
 
-//lindaのネストが深くて見にくいので関数にした
 const readReaction = (tuple) => {
   const reactor = tuple.data.from;
   const img_url = textToImgUrl(tuple.data.value);
@@ -286,6 +313,9 @@ const startCount = () => {
 
 // スタンプの一覧に画像を追加する
 const appendStampCell = (value, append_last) => {
+  const down = support_touch ? "touchstart" : "mousedown";
+  const up = support_touch ? "touchend" : "mouseup";
+
   let img_url;
   let id;
   let cell;
@@ -296,10 +326,14 @@ const appendStampCell = (value, append_last) => {
     cell.setAttribute("id", img_url + "_cell");
     const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
     cell.setAttribute("style", cell_style);
-    cell.addEventListener("mousedown", () => {
-      startCount(img_url);
-      const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
-      document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+    cell.addEventListener(down, (e) => {
+      if (support_touch || e.button == 0) {
+        console.log("mousedown " + value);
+        mousedown_cell = value;
+        startCount(img_url);
+        const reaction_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
+        document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+      }
     });
   } else {
     img_url = createImage(createSvg(value));
@@ -308,10 +342,14 @@ const appendStampCell = (value, append_last) => {
     cell.setAttribute("id", value + "_cell");
     const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
     cell.setAttribute("style", cell_style);
-    cell.addEventListener("mousedown", () => {
-      startCount(img_url);
-      const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
-      document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+    cell.addEventListener(down, (e) => {
+      if (support_touch || e.button == 0) {
+        console.log("mousedown " + value);
+        mousedown_cell = value;
+        startCount(img_url);
+        const reaction_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
+        document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+      }
     });
   }
 
@@ -319,37 +357,63 @@ const appendStampCell = (value, append_last) => {
   delete_button.setAttribute("class", "cell_delete_button");
   delete_button.setAttribute("width", "20px");
   delete_button.setAttribute("src", "images/delete.png");
-  delete_button.addEventListener("mousedown", (event) => {
+  delete_button.addEventListener(down, (e) => {
     displayDeleteDialog(value);
-    event.stopPropagation();
+    e.stopPropagation();
   });
+  if (support_touch) {
+    delete_button.style.display = "inline";
+  } else {
+    cell.addEventListener("mouseover", function() {
+      delete_button.style.display = "inline";
+    });
+    cell.addEventListener("mouseout", function() {
+      delete_button.style.display = "none";
+      if (mouseDown) {
+        mousedown_cell = "";
+        clearInterval(mousedown_id);
+        mousedown_count = 0;
+        const progress = document.getElementById("console_reaction_progress");
+        const progress_bar = document.getElementById("console_reaction_progress_bar");
+        progress.style.visibility = "hidden";
+        progress_bar.style.visibility = "hidden";
+        progress_bar.style.width = 0;
+        const reaction_style = "background:url('') center center no-repeat; background-size:contain";
+        document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+      }
+    });
+  }
   cell.appendChild(delete_button);
 
-  cell.addEventListener("mouseup", () => {
-    clearInterval(mousedown_id);
-    let display_time;
-    if (mousedown_count <= 5) {
-      display_time = 20;
-    } else if (mousedown_count <= 14) {
-      display_time = 60;
-    } else if (mousedown_count <= 23) {
-      display_time = 600;
-    } else if (mousedown_count < 30) {
-      display_time = 3600;
-    } else {
-      display_time = 86400;
+  cell.addEventListener(up, () => {
+    if (mousedown_cell == value) {
+      mousedown_cell = "";
+      console.log("mouseup " + value);
+      clearInterval(mousedown_id);
+      let display_time;
+      if (mousedown_count <= 5) {
+        display_time = 20;
+      } else if (mousedown_count <= 14) {
+        display_time = 60;
+      } else if (mousedown_count <= 23) {
+        display_time = 600;
+      } else if (mousedown_count < 30) {
+        display_time = 3600;
+      } else {
+        display_time = 86400;
+      }
+      if (value.match('^(https?|ftp)')) {
+        sendReaction(img_url, display_time);
+      } else {
+        sendReaction(value, display_time);
+      }
+      mousedown_count = 0;
+      const progress = document.getElementById("console_reaction_progress");
+      const progress_bar = document.getElementById("console_reaction_progress_bar");
+      progress.style.visibility = "hidden";
+      progress_bar.style.visibility = "hidden";
+      progress_bar.style.width = 0;
     }
-    if (value.match('^(https?|ftp)')) {
-      sendReaction(img_url, display_time);
-    } else {
-      sendReaction(value, display_time);
-    }
-    mousedown_count = 0;
-    const progress = document.getElementById("console_reaction_progress");
-    const progress_bar = document.getElementById("console_reaction_progress_bar");
-    progress.style.visibility = "hidden";
-    progress_bar.style.visibility = "hidden";
-    progress_bar.style.width = 0;
   });
 
   if (append_last) {
