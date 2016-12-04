@@ -62,12 +62,16 @@ const support_touch = 'ontouchend' in document;
 
 // マウス押されているかチェック
 let mousedown_cell = "";
-let mouseDown = 0;
-document.body.onmousedown = function() {
-  ++mouseDown;
+let mouseDown = false;
+document.body.onmousedown = function(e) {
+  if (support_touch || e.button == 0) {
+    mouseDown = true;
+  }
 };
-document.body.onmouseup = function() {
-  --mouseDown;
+document.body.onmouseup = function(e) {
+  if (support_touch || e.button == 0) {
+    mouseDown = false;
+  }
 };
 
 // connect Socket.IO & Linda
@@ -322,12 +326,14 @@ const appendStampCell = (value, append_last) => {
     cell.setAttribute("id", img_url + "_cell");
     const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
     cell.setAttribute("style", cell_style);
-    cell.addEventListener(down, () => {
-      console.log("mousedown " + value);
-      mousedown_cell = value;
-      startCount(img_url);
-      const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
-      document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+    cell.addEventListener(down, (e) => {
+      if (support_touch || e.button == 0) {
+        console.log("mousedown " + value);
+        mousedown_cell = value;
+        startCount(img_url);
+        const reaction_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
+        document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+      }
     });
   } else {
     img_url = createImage(createSvg(value));
@@ -336,12 +342,14 @@ const appendStampCell = (value, append_last) => {
     cell.setAttribute("id", value + "_cell");
     const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
     cell.setAttribute("style", cell_style);
-    cell.addEventListener(down, () => {
-      console.log("mousedown " + value);
-      mousedown_cell = value;
-      startCount(img_url);
-      const reaction_style = "background:url('" + img_url +"') center center no-repeat; background-size:contain";
-      document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+    cell.addEventListener(down, (e) => {
+      if (support_touch || e.button == 0) {
+        console.log("mousedown " + value);
+        mousedown_cell = value;
+        startCount(img_url);
+        const reaction_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
+        document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+      }
     });
   }
 
@@ -349,19 +357,17 @@ const appendStampCell = (value, append_last) => {
   delete_button.setAttribute("class", "cell_delete_button");
   delete_button.setAttribute("width", "20px");
   delete_button.setAttribute("src", "images/delete.png");
-  delete_button.addEventListener(down, (event) => {
+  delete_button.addEventListener(down, (e) => {
     displayDeleteDialog(value);
-    event.stopPropagation();
+    e.stopPropagation();
   });
   if (support_touch) {
     delete_button.style.display = "inline";
   } else {
     cell.addEventListener("mouseover", function() {
-      console.log("mouseover " + value);
       delete_button.style.display = "inline";
     });
     cell.addEventListener("mouseout", function() {
-      console.log("mouseout " + value);
       delete_button.style.display = "none";
       if (mouseDown) {
         mousedown_cell = "";
@@ -377,7 +383,6 @@ const appendStampCell = (value, append_last) => {
       }
     });
   }
-
   cell.appendChild(delete_button);
 
   cell.addEventListener(up, () => {
