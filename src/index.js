@@ -24,20 +24,9 @@ const default_icons = [
   "",
   "https://i.gyazo.com/f461f7b9924dbc41ea5a9c745a45e34d.png",
   "https://i.gyazo.com/1fdfa88d9051c938a8dd9b0d28d714f4.png",
-  "笑",
-  "わか る！",
-  "わか らん",
-  "たし かに",
-  "そう かな",
-  "すご い！",
-  "いい 話だ",
-  "ひえ ぇ〜",
-  "なる ほど",
-  "まじ かよ",
-  "気に なる",
-  "知っ てた",
-  "感動 した",
-  "わかる らんど",
+  "笑", "わか る！", "わか らん", "たし かに", "そう かな",
+  "すご い！", "いい 話だ", "ひえ ぇ〜", "なる ほど", "まじ かよ",
+  "気に なる", "知っ てた", "感動 した", "わかる らんど",
   "https://i.gyazo.com/e2c6447f25b7c62493552c961c76b1dc.png",
   "https://i.gyazo.com/a4e8bb44169a9c0a18b44ad5da8237c9.png",
   "https://i.gyazo.com/25031cf91e73064ea598acffc06329e5.png",
@@ -47,7 +36,8 @@ const default_icons = [
   "https://i.gyazo.com/55bd9a9ef15d6081bb4631775d87b6c4.png",
   "https://i.gyazo.com/8eab48a46b9bab8e43eb66a47a72d06b.png",
   "https://i.gyazo.com/427c8babba2b3e7561cf752001edaceb.png",
-  "https://i.gyazo.com/ce7439e27c5e4049c8b3d2a7227a396f.png"
+  "https://i.gyazo.com/ce7439e27c5e4049c8b3d2a7227a396f.png",
+  "１", "２", "３", "４"
 ];
 
 let listeners = {};
@@ -125,11 +115,11 @@ const readReaction = (tuple) => {
   if (img_url == "" || img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" || display < 2 || display == "") {
     const style = "background:url('') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
-    document.getElementById(reactor + "_image").style.opacity = 1.0;
+    document.getElementById(reactor + "_image").style.opacity = 0.5;
   } else {
     const style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
-    document.getElementById(reactor + "_image").style.opacity = 0.25;
+    document.getElementById(reactor + "_image").style.opacity = 0.2;
     if (reactor == my_name) {
       document.getElementById("console_reaction_img").setAttribute("style", style);
     }
@@ -168,14 +158,14 @@ const watchReaction = (tuple) => {
   if (img_url == "" || img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" || display == "") {
     const style = "background:url('') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
-    document.getElementById(reactor + "_image").style.opacity = 1.0;
+    document.getElementById(reactor + "_image").style.opacity = 0.5;
     if (reactor == my_name) {
       document.getElementById("console_reaction_img").setAttribute("style", style);
     }
   } else {
     const style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
-    document.getElementById(reactor + "_image").style.opacity = 0.25;
+    document.getElementById(reactor + "_image").style.opacity = 0.2;
     if (reactor == my_name) {
       document.getElementById("console_reaction_img").setAttribute("style", style);
     }
@@ -296,16 +286,20 @@ const startCount = () => {
         progress_bar.style.visibility = "visible";
         progress_bar.style.width = mousedown_count * 3.33 + "%";
       }
-      if (mousedown_count <= 5) {
+      if (mousedown_count <= 3) {
         progress_bar.innerHTML = "20秒";
-      } else if (mousedown_count <= 14) {
+      } else if (mousedown_count < 10) {
         progress_bar.innerHTML = "1分";
-      } else if (mousedown_count <= 23) {
+      } else if (mousedown_count < 15) {
         progress_bar.innerHTML = "10分";
-      } else if (mousedown_count < 30) {
+      } else if (mousedown_count < 20) {
         progress_bar.innerHTML = "1時間";
+      } else if (mousedown_count < 25) {
+        progress_bar.innerHTML = "6時間";
+      } else if (mousedown_count < 30) {
+        progress_bar.innerHTML = "12時間";
       } else {
-        progress_bar.innerHTML = "1日";
+        progress_bar.innerHTML = "24時間";
       }
     }
   }, 100);
@@ -391,14 +385,18 @@ const appendStampCell = (value, append_last) => {
       console.log("mouseup " + value);
       clearInterval(mousedown_id);
       let display_time;
-      if (mousedown_count <= 5) {
+      if (mousedown_count <= 3) {
         display_time = 20;
-      } else if (mousedown_count <= 14) {
+      } else if (mousedown_count < 10) {
         display_time = 60;
-      } else if (mousedown_count <= 23) {
+      } else if (mousedown_count < 15) {
         display_time = 600;
-      } else if (mousedown_count < 30) {
+      } else if (mousedown_count < 20) {
         display_time = 3600;
+      } else if (mousedown_count < 25) {
+        display_time = 21600;
+      } else if (mousedown_count < 30) {
+        display_time = 43200;
       } else {
         display_time = 86400;
       }
@@ -466,7 +464,7 @@ const appendUserCell = (from) => {
   const user_icon_layer = document.createElement("div");
   user_icon_layer.setAttribute("class", "cell_image");
   user_icon_layer.setAttribute("id", from + "_image");
-  const icon_style = "background:url('http://www.paper-glasses.com/api/twipi/" + from.substring(1) +"/original') center center no-repeat; background-size:contain";
+  const icon_style = "background:url('http://www.paper-glasses.com/api/twipi/" + from.substring(1) +"/original') center center no-repeat; background-size:contain; opacity:0.5";
   user_icon_layer.setAttribute("style", icon_style);
 
   const reaction_img_layer = document.createElement("div");
@@ -560,7 +558,7 @@ const withdrawReaction = (reactor, time) => {
     console.log("withdraw -> " + reactor);
     const reaction_style = "background:url('') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", reaction_style);
-    document.getElementById(reactor + "_image").style.opacity = 1.0;
+    document.getElementById(reactor + "_image").style.opacity = 0.5;
     if (reactor == my_name) {
       const reaction_style = "background:url('') center center no-repeat; background-size:contain";
       document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
@@ -581,19 +579,21 @@ const withdrawData = (from, time) => {
 const switch_display = () => {
   if (!isConsoleOnly()) {
     const console = document.getElementById("console");
-    const grid = document.getElementById("grid");
+    const button = document.getElementById("show_console");
     if (console.style.display == "block") {
       console.style.display = "none";
-      grid.style.display = "block";
+      button.src = "images/show_console.png";
     } else {
       console.style.display = "block";
-      grid.style.display = "none";
+      button.src = "images/dismiss_console.png";
     }
+    relayout_grid();
   }
 };
 
 const relayout_grid = () => {
-  const grid_width = window.innerWidth;
+  const grid = document.getElementById("grid");
+  const grid_width = grid.offsetWidth;
   const grid_height = window.innerHeight - GRID_USER_INPUT_HEIGHT;
   const gridSize = getGridSize(grid_width, grid_height, MIN_CELL_WIDTH, display_users.length);
   const columnCount = gridSize.columnCount;
@@ -619,11 +619,11 @@ const relayout_grid = () => {
     cell.style.height = Math.floor(cellHeightProportion * 1000) / 10 + "%";
     const background_layer = document.getElementById(from + "_background");
     if (cellWidth >= cellHeight) {
-      background_layer.style.width = cellHeight - 8;
-      background_layer.style.height = cellHeight - 8;
+      background_layer.style.width = cellHeight - 4;
+      background_layer.style.height = cellHeight - 4;
     } else {
-      background_layer.style.width = cellWidth - 8;
-      background_layer.style.height = cellWidth - 8;
+      background_layer.style.width = cellWidth - 4;
+      background_layer.style.height = cellWidth - 4;
     }
   }
 };
@@ -712,8 +712,11 @@ if (isConsoleOnly()) {
   const grid = document.getElementById("grid");
   const switch_button = document.getElementById("grid_switch_button");
   console.style.display = "block";
+  console.style.width = "100%";
   grid.style.display = "none";
   switch_button.style.display = "none";
+  document.getElementById("name_input").style.display = "inline";
+  document.getElementById("add_img_input").style.display = "inline";
 } else {
   // Gridの生成
   for (let i in display_users) {
@@ -747,6 +750,11 @@ for (let i in display_users) {
     listeners[from] = dummy_listener();
   }
 }
+
+// 投稿画面表示ボタン
+document.getElementById("show_console").addEventListener("click", () => {
+  switch_display();
+});
 
 $(window).resize(() => {
   if (document.getElementById("grid").style.display == "block") {
