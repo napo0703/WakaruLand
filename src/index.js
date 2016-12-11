@@ -27,6 +27,7 @@ const default_icons = [
   "笑", "わか る！", "わか らん", "たし かに", "そう かな",
   "すご い！", "いい 話だ", "ひえ ぇ〜", "なる ほど", "まじ かよ",
   "気に なる", "知っ てた", "感動 した", "わかる らんど",
+  "長押しで 表示時間 が変わる", "半角 スペース で改行",
   "https://i.gyazo.com/e2c6447f25b7c62493552c961c76b1dc.png",
   "https://i.gyazo.com/a4e8bb44169a9c0a18b44ad5da8237c9.png",
   "https://i.gyazo.com/25031cf91e73064ea598acffc06329e5.png",
@@ -111,7 +112,7 @@ const readReaction = (tuple) => {
   const img_url = textToImgUrl(tuple.data.value);
   const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
   const now_unix_time = Math.floor(new Date().getTime() / 1000);
-  const display = (reaction_unix_time + tuple.data.display) - now_unix_time;
+  const display = (reaction_unix_time + tuple.data.displaytime) - now_unix_time;
   if (img_url == "" || img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" || display < 2 || display == "") {
     const style = "background:url('') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
@@ -132,7 +133,7 @@ const readData = (tuple) => {
   const value = tuple.data.value;
   const written_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
   const now_unix_time = Math.floor(new Date().getTime() / 1000);
-  const display = (written_unix_time + tuple.data.display) - now_unix_time;
+  const display = (written_unix_time + tuple.data.displaytime) - now_unix_time;
   const background = textToImgUrl(tuple.data.background);
   const style = "background:url('" + background + "') center center no-repeat; background-size:contain";
   document.getElementById(from + "_image").setAttribute("style", style);
@@ -151,7 +152,7 @@ const readData = (tuple) => {
 
 const watchReaction = (tuple) => {
   const reactor = tuple.data.from;
-  const display = tuple.data.display;
+  const display = tuple.data.displaytime;
   const ip_address = tuple.from;
   const img_url = textToImgUrl(tuple.data.value);
   console.log(reactor + " < " + img_url + " " + display + "sec (from " + ip_address + ")");
@@ -176,7 +177,7 @@ const watchReaction = (tuple) => {
 const watchData = (tuple) => {
   const from = tuple.data.from;
   const value = tuple.data.value;
-  const display = tuple.data.display;
+  const display = tuple.data.displaytime;
   const background = textToImgUrl(tuple.data.background);
   const ip_address = tuple.from;
   console.log(from + " < " + value + " " + display + "sec (from " + ip_address + ")");
@@ -254,7 +255,7 @@ var sendReaction = (img_url, display_time) => {
   ts.write({
     wakaruland: "reaction",
     from: my_name,
-    display: display_time,
+    displaytime: display_time,
     time: date,
     value: img_url,
   }, {expire: display_time});
