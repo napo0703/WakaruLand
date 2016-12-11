@@ -22,7 +22,7 @@ body {
 
 /* Twitterユーザ名と画像追加と一覧画面表示ボタンのdiv */
 #console_header {
-  height: 70px;
+  overflow: auto;
   background-color: #ffffff;
   border-bottom: 1px solid rgba(0,0,0,0.2);
   padding-left: 8px;
@@ -31,24 +31,33 @@ body {
 }
 
 #name_input {
-  float: left;
   display: block;
 }
 
 #name_text_box {
-  width: 131px;
+  width: 140px;
+}
+
+#linda_status {
+  float: right;
+  margin-right: 8px;
+  font-size: 10px;
 }
 
 #add_img_input {
   float: left;
   display: block;
-  padding-top: 4px;
+  margin-top: 4px;
 }
 
 #image_url_text_box {
   float: left;
   width: 345px;
-  display: inline;
+}
+
+#image_url_add_button {
+  float: left;
+  margin-left: 8px;
 }
 
 /* リアクション画像一覧 */

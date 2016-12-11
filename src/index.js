@@ -73,6 +73,9 @@ const ts = linda.tuplespace("masuilab");
 
 linda.io.on("connect", () => {
   console.log("connect Linda!!");
+  const status = document.getElementById("linda_status");
+  status.innerHTML = "connection OK";
+  status.style.color = "#22aa22";
   // FIXME: ループではなくて動的にJSを書き換えてwatchするタプルを列挙できないか？
   // Read ページを開いた時に1回だけ実行される
   for (let i in display_users) {
@@ -105,6 +108,14 @@ linda.io.on("connect", () => {
       })
     }
   }
+});
+
+linda.io.on("disconnect", () => {
+  console.log("disconnect Linda...");
+  const status = document.getElementById("linda_status");
+  status.innerHTML = "disconnect...";
+  status.style.color = "#aa2222";
+
 });
 
 const readReaction = (tuple) => {
@@ -716,8 +727,6 @@ if (isConsoleOnly()) {
   console.style.width = "100%";
   grid.style.display = "none";
   switch_button.style.display = "none";
-  document.getElementById("name_input").style.display = "inline";
-  document.getElementById("add_img_input").style.display = "inline";
 } else {
   // Gridの生成
   for (let i in display_users) {
