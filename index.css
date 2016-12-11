@@ -1,21 +1,28 @@
 body {
   font-family: "-apple-system", "Yu Gothic", YuGothic, Verdana, Meiryo, "M+ 1p", sans-serif;
   background-color: #e4f0ea;
+  display: flex;
+  height: 100%;
 }
 
 /* 投稿画面 */
 #console {
-  width: 100%; /*固定したい幅の長さ*/
+  width: 380px; /*固定したい幅の長さ*/
+  height: 100%;
+  display: none;
+  border-right: solid 1px #888888;
+  overflow-y: scroll;
 }
 
 /* 一覧画面 */
 #grid {
-  width: 100%;
+  flex: auto;
+  display: block;
 }
 
 /* Twitterユーザ名と画像追加と一覧画面表示ボタンのdiv */
 #console_header {
-  height: 41px;
+  overflow: auto;
   background-color: #ffffff;
   border-bottom: 1px solid rgba(0,0,0,0.2);
   padding-left: 8px;
@@ -24,69 +31,34 @@ body {
 }
 
 #name_input {
-  float: left;
+  display: block;
 }
 
 #name_text_box {
-  width: 131px;
+  width: 140px;
 }
 
-@media screen and (min-width: 500px) {
-  /* リアクション画像追加TextBox */
-  #image_url_text_box {
-    float: left;
-    margin-left: 8px;
-    width: 300px;
-    display: inline;
-  }
-
-  /* リアクション画像追加ボタン */
-  #image_url_add_button {
-    float: left;
-    margin-left: 8px;
-    display: inline;
-  }
-
-  /* リアクション画像削除ボタン */
-  #image_url_delete_button {
-    float: left;
-    margin-left: 8px;
-    display: inline;
-  }
-}
-
-@media screen and (max-width: 600px) {
-  /* リアクション画像追加TextBox */
-  #image_url_text_box {
-    float: left;
-    margin-left: 8px;
-    width: 340px;
-    display: none;
-  }
-
-  /* リアクション画像追加ボタン */
-  #image_url_add_button {
-    float: left;
-    margin-left: 8px;
-    display: none;
-  }
-
-  /* リアクション画像削除ボタン */
-  #image_url_delete_button {
-    float: left;
-    margin-left: 8px;
-    display: none;
-  }
-}
-
-/* 投稿画面と一覧画面の切り替えボタン */
-#grid_switch_button {
+#linda_status {
   float: right;
-  margin-left: 8px;
   margin-right: 8px;
+  font-size: 10px;
 }
 
-/* 投稿画面のヘッダーを除いた部分 */
+#add_img_input {
+  float: left;
+  display: block;
+  margin-top: 4px;
+}
+
+#image_url_text_box {
+  float: left;
+  width: 345px;
+}
+
+#image_url_add_button {
+  float: left;
+  margin-left: 8px;
+}
 
 /* リアクション画像一覧 */
 #stamp_grid_view {
@@ -181,7 +153,7 @@ body {
 .cell_background {
   position: absolute;
   background-color: #ffffff;
-  border: 4px solid #fff;
+  border: 2px solid #fff;
   box-shadow: 0 1px 1px 1px rgba(0,0,0,0.4);
   right: 0;
   left: 0;
@@ -217,7 +189,12 @@ body {
   width: 100%;
 }
 
-#console_switch_button {
-  float: right;
-  margin: 8px;
+#show_console {
+  float: left;
+  margin-top: 4px;
+  width: 28px;
+  border-top: solid 1px;
+  border-right: solid 1px;
+  border-bottom: solid 1px;
+  border-color: #888888;
 }
