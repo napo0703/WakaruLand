@@ -77,7 +77,7 @@ linda.io.on("connect", () => {
   status.innerHTML = "connection OK";
   status.style.color = "#22aa22";
   // FIXME: ループではなくて動的にJSを書き換えてwatchするタプルを列挙できないか？
-  // Read ページを開いた時に1回だけ実行される
+  // Read
   for (let i in display_users) {
     if (display_users[i].charAt(0) == "@") {
       const cancel_id = ts.read({wakaruland: "reaction", from: display_users[i]}, (err, tuple) => {
@@ -115,7 +115,6 @@ linda.io.on("disconnect", () => {
   const status = document.getElementById("linda_status");
   status.innerHTML = "disconnect...";
   status.style.color = "#aa2222";
-
 });
 
 const readReaction = (tuple) => {
@@ -128,6 +127,8 @@ const readReaction = (tuple) => {
     const style = "background:url('') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
     document.getElementById(reactor + "_image").style.opacity = 0.5;
+    user_reactions[reactor] = tuple.data.value;
+    console.log(user_reactions);
   } else {
     const style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
@@ -167,6 +168,8 @@ const watchReaction = (tuple) => {
   const ip_address = tuple.from;
   const img_url = textToImgUrl(tuple.data.value);
   console.log(reactor + " < " + img_url + " " + display + "sec (from " + ip_address + ")");
+  user_reactions[reactor] = tuple.data.value;
+  console.log(user_reactions);
   if (img_url == "" || img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" || display == "") {
     const style = "background:url('') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
@@ -212,6 +215,8 @@ const watchData = (tuple) => {
 
 // URL末尾のカンマ区切り文字列から表示するユーザを抽出
 const display_users = Array.from(new Set(location.search.substring(1).split(',')));
+// 現在表示されているユーザのリアクション
+const user_reactions = {};
 
 // テキストからSVG画像を作成
 const createSvg = (text) => {
@@ -484,8 +489,70 @@ const appendUserCell = (from) => {
   reaction_img_layer.setAttribute("id", from + "_reaction");
   reaction_img_layer.setAttribute("style", "background:url('') center center no-repeat; background-size:contain");
 
+  const cell_popup = document.createElement("div");
+  cell_popup.setAttribute("class", "cell_popup");
+  cell_popup.setAttribute("id", from + "_cell_popup");
+
+  const copy_stamp = document.createElement("a");
+  copy_stamp.setAttribute("class", "cell_popup_copy_stamp");
+  copy_stamp.setAttribute("id", from + "_cell_popup_copy_stamp");
+  copy_stamp.innerHTML = "スタンプをコピー";
+  copy_stamp.addEventListener("click", function () {
+    const style = "background:url('') center center no-repeat; background-size:contain";
+    if (document.getElementById(from + "_reaction").style == style) {
+    } else {
+      const console = document.getElementById("console");
+      if (console.style.display == "none") {
+        console.style.display = "block";
+        document.getElementById("show_console").src = "images/dismiss_console.png";
+        relayout_grid();
+      }
+      const value = user_reactions[from];
+      let image_url;
+      if (value.match('^https://gyazo.com')) {
+        image_url = value + ".png";
+      } else if (value.match('^(https?|ftp).+?\.(jpg|jpeg|png|gif|bmp|svg)')) {
+        image_url = value;
+      } else {
+        image_url = toZenkaku(value);
+      }
+      if (image_url) {
+        addStampImage(image_url);
+        document.getElementById("image_url_text_box").value = "";
+      }
+    }
+  });
+  const user_name = document.createElement("a");
+  user_name.setAttribute("class", "cell_popup_user_name");
+  user_name.setAttribute("id", from + "_cell_popup_user_name");
+  if (from.charAt(0) == "@") {
+    user_name.setAttribute("href", "https://twitter.com/" + from.substring(1));
+    user_name.setAttribute("target", "_blank");
+  }
+  user_name.innerHTML = from;
+  if (from.charAt(0) == "@") {
+    cell_popup.appendChild(copy_stamp);
+  }
+  cell_popup.appendChild(user_name);
+
+  background_layer.addEventListener("mouseover", function() {
+    cell_popup.style.display = "block";
+    user_name.style.display = "block";
+    if (from.charAt(0) == "@" && !(!user_reactions[from])) {
+      copy_stamp.style.display = "block";
+    }
+  });
+  background_layer.addEventListener("mouseout", function() {
+    cell_popup.style.display = "none";
+    user_name.style.display = "none";
+    if (from.charAt(0) == "@") {
+      copy_stamp.style.display = "none";
+    }
+  });
+
   background_layer.appendChild(user_icon_layer);
   background_layer.appendChild(reaction_img_layer);
+  background_layer.appendChild(cell_popup);
   cell.appendChild(background_layer);
   return cell;
 };
@@ -575,6 +642,7 @@ const withdrawReaction = (reactor, time) => {
       const reaction_style = "background:url('') center center no-repeat; background-size:contain";
       document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
     }
+    user_reactions[reactor] = "";
   }, time * 1000); //ミリ秒
 };
 

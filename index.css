@@ -168,6 +168,28 @@ body {
   content: "";
 }
 
+.cell_popup {
+  width: 100%;
+  height: auto;
+  position:absolute;
+  right: 0%;
+  bottom: 0%;
+  background-color: #ffffffaa;
+  display: none;
+}
+
+.cell_popup_copy_stamp {
+  width: auto;
+  height: auto;
+  display: none;
+}
+
+.cell_popup_user_name {
+  width: auto;
+  height: auto;
+  display: none;
+}
+
 /* センサの値表示するView */
 .sensor_caption {
   position: absolute;
