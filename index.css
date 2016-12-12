@@ -174,7 +174,7 @@ body {
   position:absolute;
   right: 0%;
   bottom: 0%;
-  background-color: #ffffffaa;
+  background: rgba(255, 255, 255, 0.5);
   display: none;
 }
 

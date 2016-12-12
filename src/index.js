@@ -20,6 +20,8 @@ $('#grid_switch_button').on("click", () => {
   switch_display();
 });
 
+const default_users = ["napo0703", "masui"];
+
 const default_icons = [
   "",
   "https://i.gyazo.com/f461f7b9924dbc41ea5a9c745a45e34d.png",
@@ -40,8 +42,6 @@ const default_icons = [
   "https://i.gyazo.com/ce7439e27c5e4049c8b3d2a7227a396f.png",
   "１", "２", "３", "４"
 ];
-
-let listeners = {};
 
 // レイアウトの定数
 const GRID_USER_INPUT_HEIGHT = 41;
@@ -76,38 +76,17 @@ linda.io.on("connect", () => {
   const status = document.getElementById("linda_status");
   status.innerHTML = "connection OK";
   status.style.color = "#22aa22";
-  // FIXME: ループではなくて動的にJSを書き換えてwatchするタプルを列挙できないか？
   // Read
-  for (let i in display_users) {
-    if (display_users[i].charAt(0) == "@") {
-      const cancel_id = ts.read({wakaruland: "reaction", from: display_users[i]}, (err, tuple) => {
-        readReaction(tuple);
-        setTimeout(() => {
-          ts.cancel(cancel_id);
-        }, 2000);
-      })
-    } else if (!display_users[i].match('^(https?)')) {
-      const cancel_id = ts.read({wakaruland: "data", from: display_users[i]}, (err, tuple) => {
-        readData(tuple);
-        setTimeout(() => {
-          ts.cancel(cancel_id);
-        }, 2000);
-      })
-    }
-  }
-
+  // const cancel_id = ts.read({wakaruland: "users"}, (err, tuple) => {
+  //   display_users = tuple.data.users;
+  //   setTimeout(() => {
+  //     ts.cancel(cancel_id);
+  //   }, 2000);
+  // });
   // Watch
-  for (let i in display_users) {
-    if (display_users[i].charAt(0) == "@") {
-      ts.watch({wakaruland: "reaction", from: display_users[i]}, (err, tuple) => {
-        watchReaction(tuple);
-      });
-    } else if (!display_users[i].match('^(https?)')) {
-      ts.watch({wakaruland: "data", from: display_users[i]}, (err, tuple) => {
-        watchData(tuple);
-      })
-    }
-  }
+  ts.watch({wakaruland: "reaction"}, (err, tuple) => {
+    watchReaction(tuple);
+  });
 });
 
 linda.io.on("disconnect", () => {
@@ -119,11 +98,12 @@ linda.io.on("disconnect", () => {
 
 const readReaction = (tuple) => {
   const reactor = tuple.data.from;
-  const img_url = textToImgUrl(tuple.data.value);
+  const value = tuple.data.value;
+  const img_url = textToImgUrl(value);
   const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
   const now_unix_time = Math.floor(new Date().getTime() / 1000);
   const display = (reaction_unix_time + tuple.data.displaytime) - now_unix_time;
-  if (img_url == "" || img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" || display < 2 || display == "") {
+  if (img_url == "" || value == "" || img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" || display < 2 || display == "") {
     const style = "background:url('') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
     document.getElementById(reactor + "_image").style.opacity = 0.5;
@@ -140,28 +120,6 @@ const readReaction = (tuple) => {
   }
 };
 
-const readData = (tuple) => {
-  const from = tuple.data.from;
-  const value = tuple.data.value;
-  const written_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
-  const now_unix_time = Math.floor(new Date().getTime() / 1000);
-  const display = (written_unix_time + tuple.data.displaytime) - now_unix_time;
-  const background = textToImgUrl(tuple.data.background);
-  const style = "background:url('" + background + "') center center no-repeat; background-size:contain";
-  document.getElementById(from + "_image").setAttribute("style", style);
-  document.getElementById(from + "_value_text").innerHTML = value;
-  // 設定されているlistenerを削除してから新しいlistenerをセットする
-  const from_cell = document.getElementById(from);
-  from_cell.removeEventListener("click", listeners[from], false);
-  const listener = () => {ts.write(tuple.data.onclick);};
-  from_cell.addEventListener("click", listener, false);
-  listeners[from] = listener;
-  if (display > 0) {
-    document.getElementById(from + "_value_text").innerHTML = value;
-    withdrawData(from, display);
-  }
-};
-
 const watchReaction = (tuple) => {
   const reactor = tuple.data.from;
   const display = tuple.data.displaytime;
@@ -169,7 +127,13 @@ const watchReaction = (tuple) => {
   const img_url = textToImgUrl(tuple.data.value);
   console.log(reactor + " < " + img_url + " " + display + "sec (from " + ip_address + ")");
   user_reactions[reactor] = tuple.data.value;
-  console.log(user_reactions);
+  const display_users = Array.from(new Set(localStorage.users.split(',')));
+  if (!(display_users.includes(reactor))) {
+    display_users.push(reactor);
+    localStorage.users = display_users;
+    document.getElementById("grid").appendChild(appendUserCell(reactor));
+    relayout_grid();
+  }
   if (img_url == "" || img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" || display == "") {
     const style = "background:url('') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
@@ -188,33 +152,6 @@ const watchReaction = (tuple) => {
   }
 };
 
-const watchData = (tuple) => {
-  const from = tuple.data.from;
-  const value = tuple.data.value;
-  const display = tuple.data.displaytime;
-  const background = textToImgUrl(tuple.data.background);
-  const ip_address = tuple.from;
-  console.log(from + " < " + value + " " + display + "sec (from " + ip_address + ")");
-  const style = "background:url('" + background + "') center center no-repeat; background-size:contain";
-  document.getElementById(from + "_image").setAttribute("style", style);
-  document.getElementById(from + "_value_text").innerHTML = value;
-  // 設定されているlistenerを削除してから新しいlistenerをセットする
-  const from_cell = document.getElementById(from);
-  from_cell.removeEventListener("click", listeners[from], false);
-  const listener = () => {ts.write(tuple.data.onclick);};
-  from_cell.addEventListener("click", listener, false);
-  listeners[from] = listener;
-  let display_time;
-  if (display == "") {
-    display_time = 20;
-  } else {
-    display_time = display
-  }
-  withdrawData(from, display_time);
-};
-
-// URL末尾のカンマ区切り文字列から表示するユーザを抽出
-const display_users = Array.from(new Set(location.search.substring(1).split(',')));
 // 現在表示されているユーザのリアクション
 const user_reactions = {};
 
@@ -224,7 +161,7 @@ const createSvg = (text) => {
   console.log(text_array);
   const column_counts = [];
   for (let i in text_array) {
-    column_counts.push(Array.from(text_array[i]).length);
+    column_counts.push((text_array[i]).length);
   }
   const column_count = Math.max.apply(null, column_counts);
   const row_count = text_array.length;
@@ -259,8 +196,8 @@ const createImage = (svg) => {
 };
 
 var sendReaction = (img_url, display_time) => {
-  my_name = "@" + document.getElementById("name_text_box").value;
-  if (window.localStorage) localStorage.name = my_name;
+  my_name = document.getElementById("name_text_box").value;
+  if (window.localStorage) localStorage.my_name = my_name;
   const date = new Date();
 
   //自分の最新の発言を削除してからwriteする
@@ -467,7 +404,6 @@ var addStampImage = (img_url) => {
   appendStampCell(img_url, false);
 };
 
-console.log(display_users);
 // 表示する人/物/現象のViewを動的に生成する
 const appendUserCell = (from) => {
   const cell = document.createElement("div");
@@ -481,7 +417,7 @@ const appendUserCell = (from) => {
   const user_icon_layer = document.createElement("div");
   user_icon_layer.setAttribute("class", "cell_image");
   user_icon_layer.setAttribute("id", from + "_image");
-  const icon_style = "background:url('http://www.paper-glasses.com/api/twipi/" + from.substring(1) +"/original') center center no-repeat; background-size:contain; opacity:0.5";
+  const icon_style = "background:url('http://www.paper-glasses.com/api/twipi/" + from +"/original') center center no-repeat; background-size:contain; opacity:0.5";
   user_icon_layer.setAttribute("style", icon_style);
 
   const reaction_img_layer = document.createElement("div");
@@ -525,63 +461,30 @@ const appendUserCell = (from) => {
   const user_name = document.createElement("a");
   user_name.setAttribute("class", "cell_popup_user_name");
   user_name.setAttribute("id", from + "_cell_popup_user_name");
-  if (from.charAt(0) == "@") {
-    user_name.setAttribute("href", "https://twitter.com/" + from.substring(1));
-    user_name.setAttribute("target", "_blank");
-  }
+  user_name.setAttribute("href", "https://twitter.com/" + from);
+  user_name.setAttribute("target", "_blank");
   user_name.innerHTML = from;
-  if (from.charAt(0) == "@") {
-    cell_popup.appendChild(copy_stamp);
-  }
+  cell_popup.appendChild(copy_stamp);
   cell_popup.appendChild(user_name);
 
   background_layer.addEventListener("mouseover", function() {
     cell_popup.style.display = "block";
     user_name.style.display = "block";
-    if (from.charAt(0) == "@" && !(!user_reactions[from])) {
+    if (!user_reactions[from]) {
+      copy_stamp.style.display = "none";
+    } else {
       copy_stamp.style.display = "block";
     }
   });
   background_layer.addEventListener("mouseout", function() {
     cell_popup.style.display = "none";
     user_name.style.display = "none";
-    if (from.charAt(0) == "@") {
-      copy_stamp.style.display = "none";
-    }
+    copy_stamp.style.display = "none";
   });
 
   background_layer.appendChild(user_icon_layer);
   background_layer.appendChild(reaction_img_layer);
   background_layer.appendChild(cell_popup);
-  cell.appendChild(background_layer);
-  return cell;
-};
-
-const appendSensorCell = (from) => {
-  const cell = document.createElement("div");
-  cell.setAttribute("class", "cell");
-  cell.setAttribute("id", from);
-
-  const background_layer = document.createElement("div");
-  background_layer.setAttribute("class", "cell_background");
-  background_layer.setAttribute("id", from + "_background");
-
-  const sensor_icon_layer = document.createElement("div");
-  sensor_icon_layer.setAttribute("class", "cell_image");
-  sensor_icon_layer.setAttribute("id", from + "_image");
-  const icon_style = "background:url('') center center no-repeat; background-size:contain";
-  sensor_icon_layer.setAttribute("style", icon_style);
-
-  const sensor_value_text_layer = document.createElement("figcaption");
-  sensor_value_text_layer.setAttribute("class", "sensor_caption");
-
-  const sensor_value_text = document.createElement("p");
-  sensor_value_text.setAttribute("id", from + "_value_text");
-  sensor_value_text.innerHTML = "　";
-
-  sensor_value_text_layer.appendChild(sensor_value_text);
-  background_layer.appendChild(sensor_icon_layer);
-  background_layer.appendChild(sensor_value_text_layer);
   cell.appendChild(background_layer);
   return cell;
 };
@@ -643,35 +546,28 @@ const withdrawReaction = (reactor, time) => {
       document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
     }
     user_reactions[reactor] = "";
-  }, time * 1000); //ミリ秒
-};
-
-const withdrawData = (from, time) => {
-  if (from in timer_ids) {
-    window.clearTimeout(timer_ids[from]);
-  }
-  timer_ids[from] = window.setTimeout(() => {
-    console.log("withdraw -> " + from);
-    document.getElementById(from + "_value_text").innerHTML = "　";
+    document.getElementById(reactor + "_cell_popup_copy_stamp").style.display = "none";
   }, time * 1000); //ミリ秒
 };
 
 const switch_display = () => {
-  if (!isConsoleOnly()) {
-    const console = document.getElementById("console");
-    const button = document.getElementById("show_console");
-    if (console.style.display == "block") {
-      console.style.display = "none";
-      button.src = "images/show_console.png";
-    } else {
-      console.style.display = "block";
-      button.src = "images/dismiss_console.png";
-    }
-    relayout_grid();
+  const console = document.getElementById("console");
+  const button = document.getElementById("show_console");
+  if (console.style.display == "block") {
+    console.style.display = "none";
+    button.src = "images/show_console.png";
+  } else {
+    console.style.display = "block";
+    button.src = "images/dismiss_console.png";
   }
+  relayout_grid();
 };
 
 const relayout_grid = () => {
+  const display_users = Array.from(new Set(localStorage.users.split(',')));
+  if (display_users.length == 0) {
+    return;
+  }
   const grid = document.getElementById("grid");
   const grid_width = grid.offsetWidth;
   const grid_height = window.innerHeight - GRID_USER_INPUT_HEIGHT;
@@ -706,11 +602,6 @@ const relayout_grid = () => {
       background_layer.style.height = cellWidth - 4;
     }
   }
-};
-
-const isConsoleOnly = () => {
-  return (display_users.length == 0 ||
-  (display_users.length == 1 && (display_users[0] == "" || display_users[0].charAt(0) == "@")));
 };
 
 var displayDeleteDialog = (img_url) => {
@@ -766,13 +657,9 @@ var textToImgUrl = (text) => {
  *  ここから下はページを開いた時に実行されるもの
  */
 // ローカルストレージまたはURL末尾のクエリから発言者名の設定
-let my_name = "@test";
-if (display_users.length == 1 && display_users[0].charAt(0) == "@") {
-  my_name = display_users[0]
-} else {
-  my_name = localStorage.name || my_name;
-}
-document.getElementById("name_text_box").value = my_name.substring(1);
+let my_name = "";
+my_name = localStorage.my_name || my_name;
+document.getElementById("name_text_box").value = my_name;
 
 // localStorageから自分で追加した画像を表示
 if (localStorage.images == null || localStorage.images == "") {
@@ -787,47 +674,23 @@ const appendStampFromLocalStorage = (() => {
   localStorage.images = Array.from(new Set(my_images));
 })();
 
-if (isConsoleOnly()) {
-  const console = document.getElementById("console");
-  const grid = document.getElementById("grid");
-  const switch_button = document.getElementById("grid_switch_button");
-  console.style.display = "block";
-  console.style.width = "100%";
-  grid.style.display = "none";
-  switch_button.style.display = "none";
-} else {
-  // Gridの生成
+// Gridの生成
+if (localStorage.users == null || localStorage.users == "") {
+  localStorage.users = default_users;
+}
+
+const createGrid = (() => {
+  const display_users = Array.from(new Set(localStorage.users.split(',')));
   for (let i in display_users) {
     const name = display_users[i];
-    let cell;
-    if (name.charAt(0) == "@") {
-      cell = appendUserCell(name);
-    } else {
-      cell = appendSensorCell(name);
-    }
+    const cell = appendUserCell(name);
     document.getElementById("grid_view").appendChild(cell);
   }
   document.getElementById("console").style.display = "none";
   document.getElementById("grid").style.display = "block";
   relayout_grid();
-}
-
-// Motion JPEG画像の表示とdataのclickリスナの一覧の生成
-for (let i in display_users) {
-  const from = display_users[i];
-  if (from.charAt(0) == "@") {
-    //
-  } else if (from.match('^(https?)')) {
-    const style = "background:url('" + from + "') center center no-repeat; background-size:contain";
-    document.getElementById(from + "_image").setAttribute("style", style);
-    document.getElementById(from + "_value_text").innerHTML = "";
-  } else {
-    // FIXME: ヤバイ？
-    const dummy_listener = () => {};
-    document.getElementById(from).addEventListener("click", dummy_listener, false);
-    listeners[from] = dummy_listener();
-  }
-}
+  localStorage.users = Array.from(new Set(display_users));
+})();
 
 // 投稿画面表示ボタン
 document.getElementById("show_console").addEventListener("click", () => {
