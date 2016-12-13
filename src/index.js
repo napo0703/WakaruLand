@@ -45,13 +45,13 @@ document.body.onmouseup = function(e) {
 };
 
 // connect Socket.IO & Linda
-const server_url = "//linda-server.herokuapp.com";
+const server_url = "https://linda.wakaruland.com";
 const socket = SocketIO(server_url);
 const linda = new Linda().connect(socket);
-const ts = linda.tuplespace("masuilab");
+const ts = linda.tuplespace("wiss2016");
 
 linda.io.on("connect", () => {
-  console.log("connect Linda!!");
+  console.log("connect Linda!! https://linda.wakaruland.com");
   const status = document.getElementById("linda_status");
   status.innerHTML = "connection OK";
   status.style.color = "#22aa22";
