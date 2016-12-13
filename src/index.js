@@ -178,7 +178,12 @@ const createImage = (svg) => {
   return svg_data_uri;
 };
 
-var sendReaction = (img_url, display_time) => {
+const sendReaction = (img_url, display_time) => {
+  if (!(document.getElementById("name_text_box").value)) {
+    const reaction_style = "background:url('') center center no-repeat; background-size:contain";
+    document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+    return;
+  }
   //自分の最新の発言を削除してからwriteする
   const cid = ts.take({from: localStorage.my_name});
   setTimeout( () => {
@@ -258,7 +263,6 @@ const appendStampCell = (value, append_last) => {
     cell.setAttribute("style", cell_style);
     cell.addEventListener(down, (e) => {
       if (support_touch || e.button == 0) {
-        console.log("mousedown " + value);
         mousedown_cell = value;
         startCount(img_url);
         const reaction_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
@@ -274,7 +278,6 @@ const appendStampCell = (value, append_last) => {
     cell.setAttribute("style", cell_style);
     cell.addEventListener(down, (e) => {
       if (support_touch || e.button == 0) {
-        console.log("mousedown " + value);
         mousedown_cell = value;
         startCount(img_url);
         const reaction_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
@@ -359,7 +362,7 @@ const appendStampCell = (value, append_last) => {
 };
 
 // 自分で追加した画像を削除
-var removeStampImage = (img_url) => {
+const removeStampImage = (img_url) => {
   const stamp_grid = document.getElementById("stamp_grid_view");
   // TODO: elementの存在チェック
   stamp_grid.removeChild(document.getElementById(img_url + "_cell"));
@@ -371,7 +374,7 @@ var removeStampImage = (img_url) => {
 };
 
 // URLから画像を追加
-var addStampImage = (img_url) => {
+const addStampImage = (img_url) => {
   let my_images = Array.from(new Set(localStorage.images.split(',')));
   if (my_images.includes(img_url)) {
     const stamp_grid = document.getElementById("stamp_grid_view");
@@ -586,14 +589,14 @@ const relayout_grid = () => {
   }
 };
 
-var displayDeleteDialog = (img_url) => {
+const displayDeleteDialog = (img_url) => {
   if (window.confirm(img_url + "\nを削除します。よろしいですか？")) {
     removeStampImage(img_url);
   }
 };
 
-var toZenkaku = (strVal) => {
-  var value = strVal.replace(/[!-~]/g,
+const toZenkaku = (strVal) => {
+  const value = strVal.replace(/[!-~]/g,
       function( tmpStr ) {
         return String.fromCharCode(tmpStr.charCodeAt(0) + 0xFEE0);
       }
@@ -606,7 +609,7 @@ var toZenkaku = (strVal) => {
       .replace(/~/g, "〜");
 };
 
-var addStampFromTextBox = () => {
+const addStampFromTextBox = () => {
   const value = document.getElementById("image_url_text_box").value;
   let image_url;
   if (value.match('^https://gyazo.com')) {
@@ -623,7 +626,7 @@ var addStampFromTextBox = () => {
 };
 
 // テキストを渡すと画像のURLが返ってくる
-var textToImgUrl = (text) => {
+const textToImgUrl = (text) => {
   let url;
   if (text.match('^https://gyazo.com')) {
     url = text + ".png";
