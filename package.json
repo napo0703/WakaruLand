@@ -13,7 +13,6 @@
   "dependencies": {
     "babelify": "^7.3.0",
     "browserify": "^13.0.1",
-    "jquery": "^2.2.4",
     "socket.io-client": "^1.4.6",
     "uglifyify": "^3.0.1",
     "bootstrap": "^3.3.6"

@@ -9,7 +9,7 @@ body {
 #console {
   width: 380px; /*固定したい幅の長さ*/
   height: 100%;
-  display: none;
+  display: block;
   border-right: solid 1px #888888;
   overflow-y: scroll;
 }

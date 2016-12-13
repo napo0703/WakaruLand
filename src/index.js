@@ -1,27 +1,6 @@
-import $ from 'jquery'
 import SocketIO from 'socket.io-client'
 
-// 各ボタンのlistener
-$('#image_url_text_box').keypress(function(e){
-  if(e.which && e.which === 13 || e.keyCode && e.keyCode === 13) {
-    addStampFromTextBox();
-  }
-});
-
-$('#image_url_add_button').on("click", () => {
-  addStampFromTextBox();
-});
-
-$('#console_switch_button').on("click", () => {
-  switch_display();
-});
-
-$('#grid_switch_button').on("click", () => {
-  switch_display();
-});
-
 const default_users = ["napo0703", "masui"];
-
 const default_icons = [
   "",
   "https://i.gyazo.com/f461f7b9924dbc41ea5a9c745a45e34d.png",
@@ -689,15 +668,21 @@ const createGrid = (() => {
     const cell = appendUserCell(name);
     document.getElementById("grid_view").appendChild(cell);
   }
-  document.getElementById("console").style.display = "none";
+  document.getElementById("console").style.display = "block";
   document.getElementById("grid").style.display = "block";
   relayout_grid();
   localStorage.users = Array.from(new Set(display_users));
 })();
 
-// 投稿画面表示ボタン
+// 各ボタンのlistener
 document.getElementById("show_console").addEventListener("click", () => {
   switch_display();
+});
+
+document.getElementById("image_url_text_box").addEventListener("keydown", function(e){
+  if(e.which && e.which === 13 || e.keyCode && e.keyCode === 13) {
+    addStampFromTextBox();
+  }
 });
 
 window.onresize = function () {
