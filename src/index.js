@@ -399,8 +399,12 @@ const appendUserCell = (from) => {
   const user_icon_layer = document.createElement("div");
   user_icon_layer.setAttribute("class", "cell_image");
   user_icon_layer.setAttribute("id", from + "_image");
-  const icon_style = "background:url('http://www.paper-glasses.com/api/twipi/" + from +"/original') center center no-repeat; background-size:contain; opacity:0.5";
-  user_icon_layer.setAttribute("style", icon_style);
+  if ((" " + from).indexOf(" " + "user") !== -1) {
+    user_icon_layer.innerHTML = from;
+  } else {
+    const icon_style = "background:url('http://www.paper-glasses.com/api/twipi/" + from + "/original') center center no-repeat; background-size:contain; opacity:0.5";
+    user_icon_layer.setAttribute("style", icon_style);
+  }
 
   const reaction_img_layer = document.createElement("div");
   reaction_img_layer.setAttribute("class", "cell_image");
@@ -414,7 +418,7 @@ const appendUserCell = (from) => {
   const copy_stamp = document.createElement("a");
   copy_stamp.setAttribute("class", "cell_popup_copy_stamp");
   copy_stamp.setAttribute("id", from + "_cell_popup_copy_stamp");
-  copy_stamp.innerHTML = "スタンプをコピー";
+  copy_stamp.innerHTML = "スタンプ \nをコピー";
   copy_stamp.addEventListener("click", function () {
     const style = "background:url('') center center no-repeat; background-size:contain";
     if (document.getElementById(from + "_reaction").style == style) {
@@ -443,8 +447,11 @@ const appendUserCell = (from) => {
   const user_name = document.createElement("a");
   user_name.setAttribute("class", "cell_popup_user_name");
   user_name.setAttribute("id", from + "_cell_popup_user_name");
-  user_name.setAttribute("href", "https://twitter.com/" + from);
-  user_name.setAttribute("target", "_blank");
+  if ((" " + from).indexOf(" " + "user") !== -1) {
+  } else {
+    user_name.setAttribute("href", "https://twitter.com/" + from);
+    user_name.setAttribute("target", "_blank");
+  }
   user_name.innerHTML = from;
   cell_popup.appendChild(copy_stamp);
   cell_popup.appendChild(user_name);
