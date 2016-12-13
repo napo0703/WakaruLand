@@ -90,7 +90,6 @@ const readReaction = (tuple) => {
     const style = "background:url('') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
     document.getElementById(reactor + "_image").style.opacity = 0.5;
-    console.log(user_reactions);
   } else {
     const style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
@@ -108,7 +107,7 @@ const watchReaction = (tuple) => {
   const ip_address = tuple.from;
   const value = tuple.data.value;
   const img_url = textToImgUrl(value);
-  console.log(reactor + " < " + img_url + " " + display + "sec (from " + ip_address + ")");
+  console.log(reactor + " < " + value + " " + display + "sec (from " + ip_address + ")");
   user_reactions[reactor] = value;
   const display_users = Array.from(new Set(localStorage.users.split(',')));
   if (!(display_users.includes(reactor))) {
@@ -141,7 +140,6 @@ const user_reactions = {};
 // テキストからSVG画像を作成
 const createSvg = (text) => {
   const text_array = text.split(" ");
-  console.log(text_array);
   const column_counts = [];
   for (let i in text_array) {
     column_counts.push((text_array[i]).length);
@@ -321,7 +319,6 @@ const appendStampCell = (value, append_last) => {
   cell.addEventListener(up, () => {
     if (mousedown_cell == value) {
       mousedown_cell = "";
-      console.log("mouseup " + value);
       clearInterval(mousedown_id);
       let display_time;
       if (mousedown_count <= 3) {
