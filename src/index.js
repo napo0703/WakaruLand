@@ -26,10 +26,10 @@ const default_icons = [
   "",
   "https://i.gyazo.com/f461f7b9924dbc41ea5a9c745a45e34d.png",
   "https://i.gyazo.com/1fdfa88d9051c938a8dd9b0d28d714f4.png",
+  "長押しで 表示時間 が変わる", "半角 スペース で改行",
   "笑", "わか る！", "わか らん", "たし かに", "そう かな",
   "すご い！", "いい 話だ", "ひえ ぇ〜", "なる ほど", "まじ かよ",
   "気に なる", "知っ てた", "感動 した", "わかる らんど",
-  "長押しで 表示時間 が変わる", "半角 スペース で改行",
   "https://i.gyazo.com/e2c6447f25b7c62493552c961c76b1dc.png",
   "https://i.gyazo.com/a4e8bb44169a9c0a18b44ad5da8237c9.png",
   "https://i.gyazo.com/25031cf91e73064ea598acffc06329e5.png",
@@ -77,12 +77,15 @@ linda.io.on("connect", () => {
   status.innerHTML = "connection OK";
   status.style.color = "#22aa22";
   // Read
-  // const cancel_id = ts.read({wakaruland: "users"}, (err, tuple) => {
-  //   display_users = tuple.data.users;
-  //   setTimeout(() => {
-  //     ts.cancel(cancel_id);
-  //   }, 2000);
-  // });
+  const display_users = Array.from(new Set(localStorage.users.split(',')));
+  for (let i in display_users) {
+    const cancel_id = ts.read({from: display_users[i]}, (err, tuple) => {
+      readReaction(tuple);
+      setTimeout(() => {
+        ts.cancel(cancel_id);
+      }, 2000);
+    });
+  }
   // Watch
   ts.watch({wakaruland: "reaction"}, (err, tuple) => {
     watchReaction(tuple);
@@ -103,11 +106,11 @@ const readReaction = (tuple) => {
   const reaction_unix_time = Math.floor(new Date(tuple.data.time).getTime() / 1000);
   const now_unix_time = Math.floor(new Date().getTime() / 1000);
   const display = (reaction_unix_time + tuple.data.displaytime) - now_unix_time;
+  user_reactions[reactor] = value;
   if (img_url == "" || value == "" || img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" || display < 2 || display == "") {
     const style = "background:url('') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
     document.getElementById(reactor + "_image").style.opacity = 0.5;
-    user_reactions[reactor] = tuple.data.value;
     console.log(user_reactions);
   } else {
     const style = "background:url('" + img_url + "') center center no-repeat; background-size:contain";
@@ -124,9 +127,10 @@ const watchReaction = (tuple) => {
   const reactor = tuple.data.from;
   const display = tuple.data.displaytime;
   const ip_address = tuple.from;
-  const img_url = textToImgUrl(tuple.data.value);
+  const value = tuple.data.value;
+  const img_url = textToImgUrl(value);
   console.log(reactor + " < " + img_url + " " + display + "sec (from " + ip_address + ")");
-  user_reactions[reactor] = tuple.data.value;
+  user_reactions[reactor] = value;
   const display_users = Array.from(new Set(localStorage.users.split(',')));
   if (!(display_users.includes(reactor))) {
     display_users.push(reactor);
@@ -134,7 +138,7 @@ const watchReaction = (tuple) => {
     document.getElementById("grid").appendChild(appendUserCell(reactor));
     relayout_grid();
   }
-  if (img_url == "" || img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" || display == "") {
+  if (img_url == ""|| value == "" || img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" || display == "") {
     const style = "background:url('') center center no-repeat; background-size:contain";
     document.getElementById(reactor + "_reaction").setAttribute("style", style);
     document.getElementById(reactor + "_image").style.opacity = 0.5;
@@ -196,20 +200,19 @@ const createImage = (svg) => {
 };
 
 var sendReaction = (img_url, display_time) => {
-  my_name = document.getElementById("name_text_box").value;
-  if (window.localStorage) localStorage.my_name = my_name;
-  const date = new Date();
-
   //自分の最新の発言を削除してからwriteする
-  const cid = ts.take({wakaruland: "reaction", from: my_name});
+  const cid = ts.take({from: localStorage.my_name});
   setTimeout( () => {
     ts.cancel(cid);
-  }, 3000);
+  }, 2000);
+
+  my_name = document.getElementById("name_text_box").value;
+  if (window.localStorage) localStorage.my_name = my_name;
   ts.write({
     wakaruland: "reaction",
     from: my_name,
     displaytime: display_time,
-    time: date,
+    time: new Date(),
     value: img_url,
   }, {expire: display_time});
 
@@ -697,8 +700,6 @@ document.getElementById("show_console").addEventListener("click", () => {
   switch_display();
 });
 
-$(window).resize(() => {
-  if (document.getElementById("grid").style.display == "block") {
+window.onresize = function () {
     relayout_grid();
-  }
-});
+};
