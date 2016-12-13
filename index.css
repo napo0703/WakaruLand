@@ -222,3 +222,28 @@ body {
   border-bottom: solid 1px;
   border-color: #888888;
 }
+
+#reload_button {
+  float: right;
+  width: 24px;
+  height: 24px;
+  margin-top: 4px;
+  margin-right: 4px;
+}
+
+#reload_button:hover {
+  background-color: #dddddd;
+}
+
+#reload_button:active {
+  background-color: #bbbbbb;
+}
+
+#reload_caption {
+  float: right;
+  margin-top: 4px;
+  margin-right: 4px;
+  font-size: 10px;
+  color: #888888;
+  display: none;
+}

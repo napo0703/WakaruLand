@@ -3,12 +3,14 @@ import SocketIO from 'socket.io-client'
 const default_users = ["napo0703", "masui"];
 const default_icons = [
   "",
+  "わかる らんど",
   "https://i.gyazo.com/f461f7b9924dbc41ea5a9c745a45e34d.png",
   "https://i.gyazo.com/1fdfa88d9051c938a8dd9b0d28d714f4.png",
+  "ＷＩＳＳ に来た",
   "長押しで 表示時間 が変わる", "半角 スペース で改行",
   "笑", "わか る！", "わか らん", "たし かに", "そう かな",
   "すご い！", "いい 話だ", "ひえ ぇ〜", "なる ほど", "まじ かよ",
-  "気に なる", "知っ てた", "感動 した", "わかる らんど",
+  "気に なる", "知っ てた", "感動 した",
   "https://i.gyazo.com/e2c6447f25b7c62493552c961c76b1dc.png",
   "https://i.gyazo.com/a4e8bb44169a9c0a18b44ad5da8237c9.png",
   "https://i.gyazo.com/25031cf91e73064ea598acffc06329e5.png",
@@ -44,6 +46,8 @@ document.body.onmouseup = function(e) {
   }
 };
 
+let linda_users = "";
+
 // connect Socket.IO & Linda
 const server_url = "https://linda.wakaruland.com";
 const socket = SocketIO(server_url);
@@ -65,9 +69,21 @@ linda.io.on("connect", () => {
       }, 2000);
     });
   }
+  const cancel_id = ts.read({wakaruland: "users"}, (err, tuple) => {
+    linda_users = tuple.data.users;
+    setTimeout(() => {
+      ts.cancel(cancel_id);
+    }, 2000);
+  });
+
   // Watch
   ts.watch({wakaruland: "reaction"}, (err, tuple) => {
     watchReaction(tuple);
+  });
+
+  ts.watch({wakaruland: "users"}, (err, tuple) => {
+    linda_users = tuple.data.users;
+    console.log(linda_users);
   });
 });
 
@@ -690,6 +706,19 @@ document.getElementById("image_url_text_box").addEventListener("keydown", functi
   if(e.which && e.which === 13 || e.keyCode && e.keyCode === 13) {
     addStampFromTextBox();
   }
+});
+
+document.getElementById("reload_button").addEventListener("click", () => {
+  localStorage.users = linda_users;
+  location.reload();
+});
+
+document.getElementById("reload_button").addEventListener("mouseover", () => {
+  document.getElementById("reload_caption").style.display = "inline";
+});
+
+document.getElementById("reload_button").addEventListener("mouseout", () => {
+  document.getElementById("reload_caption").style.display = "none";
 });
 
 window.onresize = function () {
