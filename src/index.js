@@ -158,7 +158,7 @@ const createSvg = (text) => {
   const text_array = text.split(" ");
   const column_counts = [];
   for (let i in text_array) {
-    column_counts.push((text_array[i]).length);
+    column_counts.push(Array.from(text_array[i]).length);
   }
   const column_count = Math.max.apply(null, column_counts);
   const row_count = text_array.length;
@@ -706,6 +706,10 @@ document.getElementById("image_url_text_box").addEventListener("keydown", functi
   if(e.which && e.which === 13 || e.keyCode && e.keyCode === 13) {
     addStampFromTextBox();
   }
+});
+
+document.getElementById("image_url_add_button").addEventListener("click", () => {
+  addStampFromTextBox();
 });
 
 document.getElementById("reload_button").addEventListener("click", () => {
