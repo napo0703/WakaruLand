@@ -415,12 +415,8 @@ const appendUserCell = (from) => {
   const user_icon_layer = document.createElement("div");
   user_icon_layer.setAttribute("class", "cell_image");
   user_icon_layer.setAttribute("id", from + "_image");
-  if ((" " + from).indexOf(" " + "user") !== -1) {
-    user_icon_layer.innerHTML = from;
-  } else {
-    const icon_style = "background:url('http://www.paper-glasses.com/api/twipi/" + from + "/original') center center no-repeat; background-size:contain; opacity:0.5";
-    user_icon_layer.setAttribute("style", icon_style);
-  }
+  const icon_style = "background:url('') center center no-repeat; background-size:contain; opacity:0.5";
+  user_icon_layer.setAttribute("style", icon_style);
 
   const reaction_img_layer = document.createElement("div");
   reaction_img_layer.setAttribute("class", "cell_image");
@@ -460,21 +456,9 @@ const appendUserCell = (from) => {
       }
     }
   });
-  const user_name = document.createElement("a");
-  user_name.setAttribute("class", "cell_popup_user_name");
-  user_name.setAttribute("id", from + "_cell_popup_user_name");
-  if ((" " + from).indexOf(" " + "user") !== -1) {
-  } else {
-    user_name.setAttribute("href", "https://twitter.com/" + from);
-    user_name.setAttribute("target", "_blank");
-  }
-  user_name.innerHTML = from;
-  cell_popup.appendChild(copy_stamp);
-  cell_popup.appendChild(user_name);
 
   background_layer.addEventListener("mouseover", function() {
     cell_popup.style.display = "block";
-    user_name.style.display = "block";
     if (!user_reactions[from]) {
       copy_stamp.style.display = "none";
     } else {
@@ -483,7 +467,6 @@ const appendUserCell = (from) => {
   });
   background_layer.addEventListener("mouseout", function() {
     cell_popup.style.display = "none";
-    user_name.style.display = "none";
     copy_stamp.style.display = "none";
   });
 
