@@ -1,6 +1,6 @@
 import SocketIO from 'socket.io-client'
 
-const default_users = ["napo0703", "masui"];
+const default_users = ["napo0703"];
 const default_icons = [
   "",
   "わかる らんど",
@@ -47,6 +47,11 @@ document.body.onmouseup = function(e) {
 };
 
 let linda_users = "";
+
+// ローカルストレージまたはURL末尾のクエリから発言者名の設定
+let my_name = "";
+my_name = localStorage.my_name || my_name;
+document.getElementById("name_text_box").value = my_name;
 
 // connect Socket.IO & Linda
 const server_url = "https://linda.wakaruland.com";
@@ -276,6 +281,10 @@ const appendStampCell = (value, append_last) => {
     const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
     cell.setAttribute("style", cell_style);
     cell.addEventListener(down, (e) => {
+      if (my_name == "" || my_name == null) {
+        window.alert("名前を入力してください");
+        return;
+      }
       if (support_touch || e.button == 0) {
         mousedown_cell = value;
         startCount(img_url);
@@ -411,6 +420,10 @@ const appendUserCell = (from) => {
   const background_layer = document.createElement("div");
   background_layer.setAttribute("class", "cell_background");
   background_layer.setAttribute("id", from + "_background");
+  if (from == my_name) {
+    console.log("from is my_name!");
+    background_layer.setAttribute("style", "border: 2px solid #74a78b");
+  }
 
   const user_icon_layer = document.createElement("div");
   user_icon_layer.setAttribute("class", "cell_image");
@@ -470,29 +483,9 @@ const appendUserCell = (from) => {
     copy_stamp.style.display = "none";
   });
 
-  const delete_button = document.createElement("img");
-  delete_button.setAttribute("class", "grid_cell_delete_button");
-  delete_button.setAttribute("width", "20px");
-  delete_button.setAttribute("src", "images/delete.png");
-  delete_button.addEventListener("click", (e) => {
-    displayUserDeleteDialog(from);
-    e.stopPropagation();
-  });
-  if (support_touch) {
-    delete_button.style.display = "inline";
-  } else {
-    cell.addEventListener("mouseover", function() {
-      delete_button.style.display = "inline";
-    });
-    cell.addEventListener("mouseout", function() {
-      delete_button.style.display = "none";
-    });
-  }
-
   background_layer.appendChild(user_icon_layer);
   background_layer.appendChild(reaction_img_layer);
   background_layer.appendChild(cell_popup);
-  background_layer.appendChild(delete_button);
   cell.appendChild(background_layer);
   return cell;
 };
@@ -618,18 +611,6 @@ const displayDeleteDialog = (img_url) => {
   }
 };
 
-const displayUserDeleteDialog = (from) => {
-  if (window.confirm(from + "\nを非表示にします。よろしいですか？")) {
-    document.getElementById("grid_view").removeChild(document.getElementById(from));
-    const users = Array.from(new Set(localStorage.users.split(',')));
-    users.some((v, i) => {
-      if (v == from) users.splice(i, 1);
-    });
-    localStorage.users = users;
-    relayout_grid();
-  }
-};
-
 const toZenkaku = (strVal) => {
   const value = strVal.replace(/[!-~]/g,
       function( tmpStr ) {
@@ -676,11 +657,6 @@ const textToImgUrl = (text) => {
 /**
  *  ここから下はページを開いた時に実行されるもの
  */
-// ローカルストレージまたはURL末尾のクエリから発言者名の設定
-let my_name = "";
-my_name = localStorage.my_name || my_name;
-document.getElementById("name_text_box").value = my_name;
-
 // localStorageから自分で追加した画像を表示
 if (localStorage.images == null || localStorage.images == "") {
   localStorage.images = default_icons;
@@ -729,7 +705,7 @@ document.getElementById("image_url_add_button").addEventListener("click", () => 
 
 document.getElementById("reload_button").addEventListener("click", () => {
   localStorage.users = linda_users;
-  location.reload();
+  location.reload(true);
 });
 
 document.getElementById("reload_button").addEventListener("mouseover", () => {
