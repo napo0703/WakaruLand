@@ -267,8 +267,8 @@ const startCount = () => {
 
 // スタンプの一覧に画像を追加する
 const appendStampCell = (value, append_last) => {
-  const down = support_touch ? "mousedown" : "mousedown";
-  const up = support_touch ? "mousedown" : "mouseup";
+  const down = support_touch ? "touchstart" : "mousedown";
+  const up = support_touch ? "touchend" : "mouseup";
 
   let img_url;
   let id;
@@ -317,24 +317,28 @@ const appendStampCell = (value, append_last) => {
     displayDeleteDialog(value);
     e.stopPropagation();
   });
-  cell.addEventListener("mouseover", function() {
+  if (support_touch) {
     delete_button.style.display = "inline";
-  });
-  cell.addEventListener("mouseout", function() {
-    delete_button.style.display = "none";
-    if (mouseDown) {
-      mousedown_cell = "";
-      clearInterval(mousedown_id);
-      mousedown_count = 0;
-      const progress = document.getElementById("console_reaction_progress");
-      const progress_bar = document.getElementById("console_reaction_progress_bar");
-      progress.style.visibility = "hidden";
-      progress_bar.style.visibility = "hidden";
-      progress_bar.style.width = 0;
-      const reaction_style = "background:url('') center center no-repeat; background-size:contain";
-      document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
-    }
-  });
+  } else {
+    cell.addEventListener("mouseover", function() {
+      delete_button.style.display = "inline";
+    });
+    cell.addEventListener("mouseout", function() {
+      delete_button.style.display = "none";
+      if (mouseDown) {
+        mousedown_cell = "";
+        clearInterval(mousedown_id);
+        mousedown_count = 0;
+        const progress = document.getElementById("console_reaction_progress");
+        const progress_bar = document.getElementById("console_reaction_progress_bar");
+        progress.style.visibility = "hidden";
+        progress_bar.style.visibility = "hidden";
+        progress_bar.style.width = 0;
+        const reaction_style = "background:url('') center center no-repeat; background-size:contain";
+        document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+      }
+    });
+  }
   cell.appendChild(delete_button);
 
   cell.addEventListener(up, () => {
