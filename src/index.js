@@ -129,7 +129,7 @@ const watchReaction = (tuple) => {
   if (!(display_users.includes(reactor))) {
     display_users.push(reactor);
     localStorage.users = display_users;
-    document.getElementById("grid").appendChild(appendUserCell(reactor));
+    document.getElementById("grid_view").appendChild(appendUserCell(reactor));
     relayout_grid();
   }
   if (img_url == ""|| value == "" || img_url == "https://i.gyazo.com/f1b6ad7000e92d7c214d49ac3beb33be.png" || display == "") {
@@ -487,9 +487,29 @@ const appendUserCell = (from) => {
     copy_stamp.style.display = "none";
   });
 
+  const delete_button = document.createElement("img");
+  delete_button.setAttribute("class", "grid_cell_delete_button");
+  delete_button.setAttribute("width", "20px");
+  delete_button.setAttribute("src", "images/delete.png");
+  delete_button.addEventListener("click", (e) => {
+    displayUserDeleteDialog(from);
+    e.stopPropagation();
+  });
+  if (support_touch) {
+    delete_button.style.display = "inline";
+  } else {
+    cell.addEventListener("mouseover", function() {
+      delete_button.style.display = "inline";
+    });
+    cell.addEventListener("mouseout", function() {
+      delete_button.style.display = "none";
+    });
+  }
+
   background_layer.appendChild(user_icon_layer);
   background_layer.appendChild(reaction_img_layer);
   background_layer.appendChild(cell_popup);
+  background_layer.appendChild(delete_button);
   cell.appendChild(background_layer);
   return cell;
 };
@@ -612,6 +632,18 @@ const relayout_grid = () => {
 const displayDeleteDialog = (img_url) => {
   if (window.confirm(img_url + "\nを削除します。よろしいですか？")) {
     removeStampImage(img_url);
+  }
+};
+
+const displayUserDeleteDialog = (from) => {
+  if (window.confirm(from + "\nを非表示にします。よろしいですか？")) {
+    document.getElementById("grid_view").removeChild(document.getElementById(from));
+    const users = Array.from(new Set(localStorage.users.split(',')));
+    users.some((v, i) => {
+      if (v == from) users.splice(i, 1);
+    });
+    localStorage.users = users;
+    relayout_grid();
   }
 };
 

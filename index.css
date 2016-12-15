@@ -192,6 +192,15 @@ body {
   display: none;
 }
 
+.grid_cell_delete_button {
+  position:absolute;
+  top:0%;
+  right:0%;
+  margin-top: -8px;
+  margin-right: -8px;
+  display: none;
+}
+
 /* センサの値表示するView */
 .sensor_caption {
   position: absolute;
