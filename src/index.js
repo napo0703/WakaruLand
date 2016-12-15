@@ -469,6 +469,7 @@ const appendUserCell = (from) => {
       }
     }
   });
+  cell_popup.appendChild(copy_stamp);
 
   background_layer.addEventListener("mouseover", function() {
     cell_popup.style.display = "block";
