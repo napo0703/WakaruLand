@@ -397,37 +397,52 @@ const appendStampCell = (value, append_last) => {
   cell.appendChild(delete_button);
 
   cell.addEventListener(up, () => {
-    if (mousedown_cell == value) {
+    if (document.getElementById("name_text_box").value) {
+      if (mousedown_cell == value) {
+        mousedown_cell = "";
+        console.log("mouseup " + value);
+        clearInterval(mousedown_id);
+        let display_time;
+        if (mousedown_count <= 3) {
+          display_time = 20;
+        } else if (mousedown_count < 10) {
+          display_time = 60;
+        } else if (mousedown_count < 15) {
+          display_time = 600;
+        } else if (mousedown_count < 20) {
+          display_time = 3600;
+        } else if (mousedown_count < 25) {
+          display_time = 21600;
+        } else if (mousedown_count < 30) {
+          display_time = 43200;
+        } else {
+          display_time = 86400;
+        }
+        if (value.match('^(https?|ftp)')) {
+          sendReaction(img_url, display_time);
+        } else {
+          sendReaction(value, display_time);
+        }
+        mousedown_count = 0;
+        const progress = document.getElementById("console_reaction_progress");
+        const progress_bar = document.getElementById("console_reaction_progress_bar");
+        progress.style.visibility = "hidden";
+        progress_bar.style.visibility = "hidden";
+        progress_bar.style.width = 0;
+      }
+    } else {
       mousedown_cell = "";
       console.log("mouseup " + value);
       clearInterval(mousedown_id);
-      let display_time;
-      if (mousedown_count <= 3) {
-        display_time = 20;
-      } else if (mousedown_count < 10) {
-        display_time = 60;
-      } else if (mousedown_count < 15) {
-        display_time = 600;
-      } else if (mousedown_count < 20) {
-        display_time = 3600;
-      } else if (mousedown_count < 25) {
-        display_time = 21600;
-      } else if (mousedown_count < 30) {
-        display_time = 43200;
-      } else {
-        display_time = 86400;
-      }
-      if (value.match('^(https?|ftp)')) {
-        sendReaction(img_url, display_time);
-      } else {
-        sendReaction(value, display_time);
-      }
       mousedown_count = 0;
       const progress = document.getElementById("console_reaction_progress");
       const progress_bar = document.getElementById("console_reaction_progress_bar");
       progress.style.visibility = "hidden";
       progress_bar.style.visibility = "hidden";
       progress_bar.style.width = 0;
+      const reaction_style = "background:url('') center center no-repeat; background-size:contain";
+      document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+      window.alert("ユーザ名を入力してください");
     }
   });
 
@@ -481,8 +496,12 @@ const appendUserCell = (from) => {
   const user_icon_layer = document.createElement("div");
   user_icon_layer.setAttribute("class", "cell_image");
   user_icon_layer.setAttribute("id", from + "_image");
-  const icon_style = "background:url('https://twitter.com/" + from.substring(1) +"/profile_image?size=original') center center no-repeat; background-size:contain; opacity:0.5";
-  user_icon_layer.setAttribute("style", icon_style);
+  if (from.indexOf("@user") !== -1) {
+    user_icon_layer.innerHTML = from.substring(1);
+  } else {
+    const icon_style = "background:url('https://twitter.com/" + from.substring(1) +"/profile_image?size=original') center center no-repeat; background-size:contain; opacity:0.5";
+    user_icon_layer.setAttribute("style", icon_style);
+  }
 
   const reaction_img_layer = document.createElement("div");
   reaction_img_layer.setAttribute("class", "cell_image");
@@ -496,7 +515,7 @@ const appendUserCell = (from) => {
   const copy_stamp = document.createElement("a");
   copy_stamp.setAttribute("class", "cell_popup_copy_stamp");
   copy_stamp.setAttribute("id", from + "_cell_popup_copy_stamp");
-  copy_stamp.innerHTML = "スタンプをコピー";
+  copy_stamp.innerHTML = "スタンプ\nをコピー";
   copy_stamp.addEventListener("click", function () {
     const style = "background:url('') center center no-repeat; background-size:contain";
     if (document.getElementById(from + "_reaction").style == style) {
@@ -526,10 +545,14 @@ const appendUserCell = (from) => {
   user_name.setAttribute("class", "cell_popup_user_name");
   user_name.setAttribute("id", from + "_cell_popup_user_name");
   if (from.charAt(0) == "@") {
-    user_name.setAttribute("href", "https://twitter.com/" + from.substring(1));
-    user_name.setAttribute("target", "_blank");
+    if (from.indexOf("@user") !== -1) {
+      user_name.innerHTML = from.substring(1);
+    } else {
+      user_name.setAttribute("href", "https://twitter.com/" + from.substring(1));
+      user_name.setAttribute("target", "_blank");
+      user_name.innerHTML = from;
+    }
   }
-  user_name.innerHTML = from;
   if (from.charAt(0) == "@") {
     cell_popup.appendChild(copy_stamp);
   }
