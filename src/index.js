@@ -481,7 +481,7 @@ const appendUserCell = (from) => {
   const user_icon_layer = document.createElement("div");
   user_icon_layer.setAttribute("class", "cell_image");
   user_icon_layer.setAttribute("id", from + "_image");
-  const icon_style = "background:url('http://www.paper-glasses.com/api/twipi/" + from.substring(1) +"/original') center center no-repeat; background-size:contain; opacity:0.5";
+  const icon_style = "background:url('https://twitter.com/" + from.substring(1) +"/profile_image?size=original') center center no-repeat; background-size:contain; opacity:0.5";
   user_icon_layer.setAttribute("style", icon_style);
 
   const reaction_img_layer = document.createElement("div");
