@@ -49,18 +49,18 @@ const MIN_CELL_WIDTH = 10;
 const MIN_CELL_HEIGHT = 10;
 
 // タッチパネル対応判定
-const support_touch = 'ontouchend' in document;
+//const support_touch = 'ontouchend' in document;
 
 // マウス押されているかチェック
 let mousedown_cell = "";
 let mouseDown = false;
 document.body.onmousedown = function(e) {
-  if (support_touch || e.button == 0) {
+  if (e.button == 0) {
     mouseDown = true;
   }
 };
 document.body.onmouseup = function(e) {
-  if (support_touch || e.button == 0) {
+  if (e.button == 0) {
     mouseDown = false;
   }
 };
@@ -214,7 +214,9 @@ const watchData = (tuple) => {
 };
 
 // URL末尾のカンマ区切り文字列から表示するユーザを抽出
-const display_users = Array.from(new Set(location.search.substring(1).split(',')));
+const display_users = ["@user00","@user01","@user02","@user03","@user04","@user05","@user06","@user07","@user08",
+    "@user09","@user10","@user11","@user12","@user13","@user14","@user15","@user16","@user17","@user18","@user19",
+    "@user20","delta_door","delta_light","delta_temperature","enoshima_wind","http://masuilab.org:8765/videofeed"];
 // 現在表示されているユーザのリアクション
 const user_reactions = {};
 
@@ -324,8 +326,8 @@ const startCount = () => {
 
 // スタンプの一覧に画像を追加する
 const appendStampCell = (value, append_last) => {
-  const down = support_touch ? "touchstart" : "mousedown";
-  const up = support_touch ? "touchend" : "mouseup";
+  const down = "mousedown";
+  const up = "mouseup";
 
   let img_url;
   let id;
@@ -338,7 +340,7 @@ const appendStampCell = (value, append_last) => {
     const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
     cell.setAttribute("style", cell_style);
     cell.addEventListener(down, (e) => {
-      if (support_touch || e.button == 0) {
+      if (e.button == 0) {
         console.log("mousedown " + value);
         mousedown_cell = value;
         startCount(img_url);
@@ -354,7 +356,7 @@ const appendStampCell = (value, append_last) => {
     const cell_style = "background:url('" + img_url + "') center center no-repeat; background-size:contain; background-color: #ffffff;";
     cell.setAttribute("style", cell_style);
     cell.addEventListener(down, (e) => {
-      if (support_touch || e.button == 0) {
+      if (e.button == 0) {
         console.log("mousedown " + value);
         mousedown_cell = value;
         startCount(img_url);
@@ -372,28 +374,24 @@ const appendStampCell = (value, append_last) => {
     displayDeleteDialog(value);
     e.stopPropagation();
   });
-  if (support_touch) {
+  cell.addEventListener("mouseover", function() {
     delete_button.style.display = "inline";
-  } else {
-    cell.addEventListener("mouseover", function() {
-      delete_button.style.display = "inline";
-    });
-    cell.addEventListener("mouseout", function() {
-      delete_button.style.display = "none";
-      if (mouseDown) {
-        mousedown_cell = "";
-        clearInterval(mousedown_id);
-        mousedown_count = 0;
-        const progress = document.getElementById("console_reaction_progress");
-        const progress_bar = document.getElementById("console_reaction_progress_bar");
-        progress.style.visibility = "hidden";
-        progress_bar.style.visibility = "hidden";
-        progress_bar.style.width = 0;
-        const reaction_style = "background:url('') center center no-repeat; background-size:contain";
-        document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
-      }
-    });
-  }
+  });
+  cell.addEventListener("mouseout", function() {
+    delete_button.style.display = "none";
+    if (mouseDown) {
+      mousedown_cell = "";
+      clearInterval(mousedown_id);
+      mousedown_count = 0;
+      const progress = document.getElementById("console_reaction_progress");
+      const progress_bar = document.getElementById("console_reaction_progress_bar");
+      progress.style.visibility = "hidden";
+      progress_bar.style.visibility = "hidden";
+      progress_bar.style.width = 0;
+      const reaction_style = "background:url('') center center no-repeat; background-size:contain";
+      document.getElementById("console_reaction_img").setAttribute("style", reaction_style);
+    }
+  });
   cell.appendChild(delete_button);
 
   cell.addEventListener(up, () => {
@@ -855,6 +853,10 @@ for (let i in display_users) {
 // 投稿画面表示ボタン
 document.getElementById("show_console").addEventListener("click", () => {
   switch_display();
+});
+
+document.getElementById("image_url_add_button").addEventListener("click", () => {
+  addStampFromTextBox();
 });
 
 $(window).resize(() => {
